@@ -1,0 +1,79 @@
+import styles from "./TrackImportModal.module.scss"
+import { useState } from "react";
+import TrackImportLibrary from "./menus/TrackImportLibrary/TrackImportLibrary";
+import TrackImportPlaylists from "./menus/TrackImportPlaylists/TrackImportPlaylists";
+import TrackImportPlaylist from "./menus/TrackImportPlaylist/TrackImportPlaylist";
+import { ArrowIcon } from "@/assets/icons"
+import clsx from "clsx";
+import { Playlist } from "@playlist";
+
+/** Props for the TrackImportModal component */
+interface TrackImportModalProps { 
+    
+    /** Closes modal */
+    onClose: () => void;
+
+    /** Display modal */
+    isOpen: boolean;
+
+    /** Playlist metadata to add the track to */
+    importPlaylist: Playlist; 
+}
+
+/**
+ * Displays the modal for import track to playlist
+ */
+const TrackImportModal = ({ 
+    importPlaylist,
+    isOpen,
+    onClose 
+}: TrackImportModalProps) => {
+
+    const [view, setView] = useState<"library" | "playlists" | number>("library");
+
+    const seePlaylist = (id: number) => setView(id) 
+
+    const renderView = () => {
+        switch (view) {
+            case "library": return <TrackImportLibrary importPlaylist={importPlaylist}/>
+            case "playlists": return <TrackImportPlaylists importPlaylist={importPlaylist} seePlaylist={(id) => seePlaylist(id)}/>
+            default: {
+                if (!importPlaylist) return null;
+                    
+                return <TrackImportPlaylist playlistId={view} importPlaylist={importPlaylist} />
+            }
+        }
+    }
+
+    return isOpen && (
+        <div className={styles.layout}>
+            <div className={styles.page}>
+                <div className={styles.header}>
+                    <button onClick={() => onClose()} className={styles.closeBtn}>
+                        <ArrowIcon direction="left"/>
+                    </button>
+                    <h2 className={styles.header}>Add tracks</h2>
+                </div>
+
+                <div className={styles.menusList}>
+                    <button 
+                        onClick={() => setView("library")} 
+                        className={clsx(styles.menu, view === "library" && styles.active)}
+                    >
+                        Tracks
+                    </button>
+                    <button 
+                        onClick={() => setView("playlists")} 
+                        className={clsx(styles.menu, view === "playlists" && styles.active)}
+                    >
+                        Playlists
+                    </button>
+                </div>
+                
+                {renderView()}
+            </div>
+        </div>
+    );
+}
+
+export default TrackImportModal;

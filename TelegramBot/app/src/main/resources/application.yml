@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:mysql://u372_IRwWvXdthA:xdJShVQpVzu.hntr%5EBbiydms@89.35.130.222:3306/s372_tg_bot
+    username: u372_IRwWvXdthA
+    password: xdJShVQpVzu.hntr^Bbiydms
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+telegram:
+  bot:
+    token: 8439775160:AAFxVSBheC_KQ2b9cPh1tmOqFnQW7HFgp9g
+    username: KaiMusicUploadBot
+
+api:
+  upload-url: https://music-api.workswap.org/audio/upload

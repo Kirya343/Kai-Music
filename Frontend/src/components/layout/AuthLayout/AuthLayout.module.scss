@@ -1,0 +1,93 @@
+@use "@/css/components/mixins/" as *;
+
+.body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.formWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo img {
+    width: 100px;
+    height: 100px;
+    border-radius: 1rem;
+    border: 3px solid #666666
+}
+
+.messageConteiner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+}
+
+.message {
+    border: 1px solid #858585;
+    background-color: #6666667a;
+    padding: 5px 10px;
+    border-radius: 8px;
+
+    &.success {
+        border-color: rgb(76, 165, 76);
+        background-color: #4f854a7a;
+    }
+
+    &.error {
+        border-color: rgb(177, 44, 44);
+        background-color: #a351517a;
+    }
+}
+
+.inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+
+    input {
+        width: 100%;
+        padding: 10px 8px;
+        background-color: transparent;
+        border-radius: var(--radius);
+        border: 1px solid;
+        color: var(--text-color);
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
+
+        @include glass;
+
+        &:focus {
+            outline-color: var(--orange) !important;
+            outline-offset: 0;
+            outline-style: solid;
+
+            &::placeholder {
+                color: var(--neon-green-l1);
+                font-weight: 400;
+            }
+        }
+    }
+}
+
+.links {
+    * {
+        padding: 10px 15px;
+        border-radius: 3px;
+        transition: 
+            background-color 0.2s ease,
+            border-radius 0.3s ease-out,
+            transform 0.1s ease;
+
+        &:hover {
+            background-color: #5e5e5e78;
+            border-radius: 10px;
+        }
+    }
+}

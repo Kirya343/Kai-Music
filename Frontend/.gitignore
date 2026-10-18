@@ -1,0 +1,7 @@
+/node_modules
+/package-lock.json
+/dist
+dist.zip
+/android
+.yarn/install-state.gz
+stats.html

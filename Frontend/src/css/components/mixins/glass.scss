@@ -1,0 +1,65 @@
+@use "./breakpoints" as *;
+
+@mixin glass($hover: false) {
+    position: relative;
+
+    background-color: var(--glass-background);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(3px);
+
+    box-shadow: 0 0px 0 #757575;
+
+    transition:
+        outline-color 0.1s ease,
+        background-color 0.2s ease;
+
+    outline: 2px solid transparent;
+
+    &:is(input, textarea, select):focus {
+        outline-color: var(--glass-border);
+    }
+
+    &:is(button):active {
+        transition: transform 0.2s ease, filter 0.2s ease;
+
+        &:active {
+            transform: scale(0.96);
+            filter: brightness(0.8);
+        }
+    }
+
+    @include mobile {
+        backdrop-filter: blur(3px);
+        //-webkit-backdrop-filter: blur(3px);           
+    }
+
+    @if $hover {
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--glass-background-hover);
+        }
+    }
+}
+
+@mixin dirty-glass($hover: false) {
+    background-color: rgb(221, 221, 221);
+    color: #000;
+    backdrop-filter: blur(3px);
+    //-webkit-backdrop-filter: blur(3px);
+
+    @include mobile {
+        backdrop-filter: blur(3px);
+        //-webkit-backdrop-filter: blur(3px);                
+    }
+
+    @if $hover {
+        cursor: pointer;
+        transition: 
+            background-color 0.15s ease-out;
+        
+        &:hover {
+            background-color: rgb(150, 150, 150);
+        }
+    }
+}

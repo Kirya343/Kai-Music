@@ -1,0 +1,40 @@
+@use "@/css/components/mixins/" as *;
+@use './variables';
+@use './components';
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    scroll-behavior: smooth;
+    scrollbar-gutter: auto;
+    height: 100dvh;
+    scrollbar-color: var(--scrollbar-color) var(--scrollbar-background);
+    scrollbar-width: thin;
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text-color);
+
+    #root {
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        background: linear-gradient(120deg, #1d1d1d, #000000);
+    }
+}
+
+button {
+    background-color: transparent;
+    border: 0px solid transparent;
+    color: var(--text-color);
+}
+
+a {
+    text-decoration: none;
+    transition: all 0.3s ease;
+    color: inherit;
+}

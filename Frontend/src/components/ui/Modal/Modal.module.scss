@@ -1,0 +1,47 @@
+@use "@/css/components/mixins/" as *;
+
+dialog.modal {
+    transition: all 0.2s ease;
+    border: 1px solid;
+    background: var(--background-l1);
+    padding: 2rem;
+    height: fit-content;
+    margin: auto;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: var(--text-color);
+
+    @include glass;
+
+    @include mobile {
+        margin: auto auto 10px auto;
+        width: calc(100vw - 20px);
+    }
+
+    &::backdrop {
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        background-color: rgba(44, 44, 44, 0.678);
+    }
+
+    &:not([open]) {
+        display: none;
+    }
+
+    .close {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        cursor: pointer;
+        width: 1.7rem;
+        height: 1.7rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}

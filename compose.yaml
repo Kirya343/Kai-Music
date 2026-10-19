@@ -26,7 +26,6 @@ services:
             - ./Database/backend_init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
         networks:
             - backend-network
-            - proxy-network
         healthcheck:
             test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
             interval: 10s
@@ -80,6 +79,7 @@ services:
                 condition: service_healthy
         networks:
             - backend-network
+            - proxy-network
 
     telegram-bot:
         container_name: kai-telegram-bot

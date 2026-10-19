@@ -1,2 +1,3 @@
 cors:
   domains: 
+    - ${FRONTEND_URL}

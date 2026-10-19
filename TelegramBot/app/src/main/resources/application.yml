@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://u372_IRwWvXdthA:xdJShVQpVzu.hntr%5EBbiydms@89.35.130.222:3306/s372_tg_bot
-    username: u372_IRwWvXdthA
-    password: xdJShVQpVzu.hntr^Bbiydms
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
 
   jpa:
     hibernate:
@@ -10,8 +10,8 @@ spring:
 
 telegram:
   bot:
-    token: 8439775160:AAFxVSBheC_KQ2b9cPh1tmOqFnQW7HFgp9g
-    username: KaiMusicUploadBot
+    token: ${BOT_TOKEN}
+    username: ${}BOT_USERNAME
 
 api:
   upload-url: https://music-api.workswap.org/audio/upload

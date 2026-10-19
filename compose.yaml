@@ -1,18 +1,37 @@
 services:
-    database:
+    backend-db:
         image: mariadb:11.4
-        container_name: kai-database
+        container_name: kai-backend-db
         restart: unless-stopped
         environment:
-            MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-            MARIADB_DATABASE: ${DB_NAME}
-            MARIADB_USER: ${DB_USER}
-            MARIADB_PASSWORD: ${DB_PASSWORD}
+            MARIADB_ROOT_PASSWORD: ${BACKEND_DB_ROOT_PASSWORD}
+            MARIADB_DATABASE: ${BACKEND_DB_NAME}
+            MARIADB_USER: ${BACKEND_DB_USER}
+            MARIADB_PASSWORD: ${BACKEND_DB_PASSWORD}
         volumes:
-            - mariadb_data:/var/lib/mysql
-            - ./Database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+            - backend_db_data:/var/lib/mysql
+            - ./Database/backend_init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
         networks:
-            - kai-network
+            - backend-network
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+    bot-db:
+        image: mariadb:11.4
+        container_name: kai-bot-db
+        restart: unless-stopped
+        environment:
+            MARIADB_ROOT_PASSWORD: ${BOT_DB_ROOT_PASSWORD}
+            MARIADB_DATABASE: ${BOT_DB_NAME}
+            MARIADB_USER: ${BOT_DB_USER}
+            MARIADB_PASSWORD: ${BOT_DB_PASSWORD}
+        volumes:
+            - bot_db_data:/var/lib/mysql
+        networks:
+            - bot-network
         healthcheck:
             test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
             interval: 10s
@@ -26,14 +45,27 @@ services:
             dockerfile: Dockerfile
         restart: unless-stopped
         environment:
-            SPRING_DATASOURCE_URL: jdbc:mariadb://database:3306/${DB_NAME}
-            SPRING_DATASOURCE_USERNAME: ${DB_USER}
-            SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+            DATABASE_URL: jdbc:mariadb://backend-db:3306/${BACKEND_DB_NAME}
+            DATABASE_USER: ${BACKEND_DB_USER}
+            DATABASE_PASSWORD: ${BACKEND_DB_PASSWORD}
+
+            S3_ENDPOINT: ${S3_ENDPOINT}
+            S3_BUCKET: ${S3_BUCKET}
+            S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+            S3_SECRET_KEY: ${S3_SECRET_KEY}
+
+            FRONTEND_URL: ${FRONTEND_URL}
+
+            ACRCLOUD_HOST: ${ACRCLOUD_HOST}
+            ACRCLOUD_ACCESS_KEY: ${ACRCLOUD_ACCESS_KEY}
+            ACRCLOUD_ACCESS_SECRET: ${ACRCLOUD_ACCESS_SECRET}
+            
+            APP_DOMAIN: ${APP_DOMAIN}
         depends_on:
-            database:
+            backend-db:
                 condition: service_healthy
         networks:
-            - kai-network
+            - backend-network
 
     telegram-bot:
         container_name: kai-telegram-bot
@@ -41,15 +73,24 @@ services:
             context: ./TelegramBot
             dockerfile: Dockerfile
         restart: unless-stopped
+        environment:
+            DATABASE_URL: jdbc:mariadb://bot-db:3306/${BOT_DB_NAME}
+            DATABASE_USER: ${BOT_DB_USER}
+            DATABASE_PASSWORD: ${BOT_DB_PASSWORD}
         depends_on:
-            database:
+            bot-db:
                 condition: service_healthy
         networks:
-            - kai-network
+            - bot-network
+            - backend-network
 
 networks:
-    kai-network:
+    backend-network:
+        driver: bridge
+
+    bot-network:
         driver: bridge
 
 volumes:
-    mariadb_data:
+    backend_db_data:
+    bot_db_data:

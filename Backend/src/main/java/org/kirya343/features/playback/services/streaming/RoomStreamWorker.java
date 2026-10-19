@@ -61,10 +61,14 @@ public class RoomStreamWorker implements DiagnosticComponent {
         this.presenceService = presenceService;
         this.userAudioStreamWorkerManager = userAudioStreamWorkerManager;
 
-        addLog("Created RoomStreamWorker for %s, with state: %s, %s, %s",
-            roomId, currentState.entryId(), currentState.position(), currentState.pause());
+        if (currentState != null) {
+            addLog("Created RoomStreamWorker for %s, with state: %s, %s, %s",
+                roomId, currentState.entryId(), currentState.position(), currentState.pause());
 
-        this.applyState(currentState);
+            this.applyState(currentState);
+        } else {
+            addLog("Created RoomStreamWorker for %s", roomId);
+        }
     }
 
     public void applyState(PlaybackStateDTO state) {

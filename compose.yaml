@@ -84,6 +84,15 @@ services:
             - bot-network
             - backend-network
 
+    frontend:
+        container_name: kai-frontend
+        build:
+            context: ./Frontend
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        networks:
+            - backend-network
+
 networks:
     backend-network:
         driver: bridge

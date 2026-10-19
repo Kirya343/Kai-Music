@@ -57,7 +57,8 @@ public class RoomStreamWorkerManager {
                     presenceService
                 );
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Ошибка создания воркера для комнаты {}", roomId, e);
+                throw e;
             }
 
             log.debug("Кладём к остальным воркер для комнаты {}", roomId);

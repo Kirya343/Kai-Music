@@ -10,7 +10,7 @@ echo "=== Validate Docker Compose ==="
 docker compose config -q
 
 echo "=== Rebuild and start services ==="
-docker compose up -d --build
+docker compose up -d --build --force-recreate
 
 echo "=== Restart internal Nginx ==="
 docker compose restart nginx

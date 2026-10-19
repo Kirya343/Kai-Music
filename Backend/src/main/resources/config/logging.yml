@@ -5,5 +5,7 @@ logging:
     org.springframework.web.servlet.resource: INFO
     org.springframework.security: INFO
 
+    org.kirya343: DEBUG
+
     com.zaxxer.hikari: INFO
     org.hibernate.SQL: INFO

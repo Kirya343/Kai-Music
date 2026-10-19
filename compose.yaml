@@ -1,4 +1,17 @@
 services:
+
+    nginx:
+        image: nginx:alpine
+        container_name: kai-nginx
+        restart: unless-stopped
+        ports:
+            - "127.0.0.1:18081:80"
+        volumes:
+            - ./Nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./Nginx/conf.d:/etc/nginx/conf.d:ro
+        networks:
+            - proxy-network
+
     backend-db:
         image: mariadb:11.4
         container_name: kai-backend-db
@@ -13,6 +26,7 @@ services:
             - ./Database/backend_init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
         networks:
             - backend-network
+            - proxy-network
         healthcheck:
             test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
             interval: 10s
@@ -92,6 +106,7 @@ services:
         restart: unless-stopped
         networks:
             - backend-network
+            - proxy-network
 
 networks:
     backend-network:

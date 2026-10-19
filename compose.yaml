@@ -1,0 +1,55 @@
+services:
+    database:
+        image: mariadb:11.4
+        container_name: kai-database
+        restart: unless-stopped
+        environment:
+            MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            MARIADB_DATABASE: ${DB_NAME}
+            MARIADB_USER: ${DB_USER}
+            MARIADB_PASSWORD: ${DB_PASSWORD}
+        volumes:
+            - mariadb_data:/var/lib/mysql
+            - ./Database/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+        networks:
+            - kai-network
+        healthcheck:
+            test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+    backend:
+        container_name: kai-backend
+        build:
+            context: ./Backend
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        environment:
+            SPRING_DATASOURCE_URL: jdbc:mariadb://database:3306/${DB_NAME}
+            SPRING_DATASOURCE_USERNAME: ${DB_USER}
+            SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+        depends_on:
+            database:
+                condition: service_healthy
+        networks:
+            - kai-network
+
+    telegram-bot:
+        container_name: kai-telegram-bot
+        build:
+            context: ./TelegramBot
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        depends_on:
+            database:
+                condition: service_healthy
+        networks:
+            - kai-network
+
+networks:
+    kai-network:
+        driver: bridge
+
+volumes:
+    mariadb_data:

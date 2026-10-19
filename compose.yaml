@@ -115,6 +115,9 @@ networks:
     bot-network:
         driver: bridge
 
+    proxy-network:
+        driver: bridge
+
 volumes:
     backend_db_data:
     bot_db_data:

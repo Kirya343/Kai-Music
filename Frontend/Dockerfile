@@ -13,4 +13,4 @@ RUN node .yarn/releases/yarn-4.16.0.cjs build
 
 EXPOSE 5173
 
-CMD ["node", ".yarn/releases/yarn-4.16.0.cjs", "dev", "--host", "0.0.0.0", "--port", "5173"]
+CMD ["node", ".yarn/releases/yarn-4.16.0.cjs", "preview", "--host", "0.0.0.0", "--port", "5173"]

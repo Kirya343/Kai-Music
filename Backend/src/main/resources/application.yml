@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8080
   tomcat:
     max-http-form-post-data-size: 100MB
     max-swallow-size: -1 

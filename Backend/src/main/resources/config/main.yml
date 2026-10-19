@@ -1,5 +1,5 @@
 api:
-  url: http://localhost:8083
+  url: http://localhost:8080
 
 frontend:
   url: http://localhost:30000

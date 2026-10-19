@@ -1,13 +1,16 @@
-FROM node:22-alpine AS build
+FROM node:22-alpine
 
 WORKDIR /app
 
-RUN corepack enable
+COPY package.json yarn.lock .yarnrc.yml ./
+COPY .yarn/ .yarn/
 
-COPY package.json yarn.lock ./
-
-RUN yarn install --immutable
+RUN node .yarn/releases/yarn-4.16.0.cjs install --immutable
 
 COPY . .
 
-RUN yarn build
+RUN node .yarn/releases/yarn-4.16.0.cjs build
+
+EXPOSE 5173
+
+CMD ["node", ".yarn/releases/yarn-4.16.0.cjs", "dev", "--host", "0.0.0.0", "--port", "5173"]

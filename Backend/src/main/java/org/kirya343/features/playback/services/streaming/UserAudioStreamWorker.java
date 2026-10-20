@@ -10,11 +10,11 @@ import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
+import org.kirya343.infrastructure.diagnostics.DiagnosticLoggable;
+import org.kirya343.infrastructure.diagnostics.core.DiagnosticTextBuilder;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j 
-public class UserAudioStreamWorker {
+public class UserAudioStreamWorker
+    extends DiagnosticLoggable {
 
     private final String user;
     private Double bufferedUntil = 0.0;
@@ -43,7 +43,7 @@ public class UserAudioStreamWorker {
         this.audioStorageService = audioStorageService;
         this.playbackWebsocketService = playbackWebsocketService;
 
-        log.debug("Created UserAudioStreamWorker for {}, with state: {}, {}, {}", 
+        addLog("Created UserAudioStreamWorker for %s, with state: %s, %s, %s", 
             user, currentState.entryId(), currentState.position(), currentState.pause());
 
         playbackWebsocketService.broadcastPlaybackState(user, currentState);
@@ -52,18 +52,17 @@ public class UserAudioStreamWorker {
 
     public void applyState(PlaybackStateDTO state) {
 
-        log.debug("applyState state={}", state == null);
+        addLog("applyState state=%s", state == null);
 
         if (state == null) return;
 
         updateState(state);
 
-        log.debug("START STATE: entryId={}, position={}", state.entryId(), state.position());
+        addLog("START STATE: entryId=%s, position=%s", state.entryId(), state.position());
 
         try {
             tick();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -71,7 +70,7 @@ public class UserAudioStreamWorker {
 
     public void tick() throws IOException {
 
-        log.debug("Tick to user {}", user);
+        addLog("Tick to user %s", user);
 
         if (chunker.hasNext()) {
             fillBuffer();
@@ -80,7 +79,7 @@ public class UserAudioStreamWorker {
 
     private void fillBuffer() throws IOException {
 
-        log.debug("fillBuffer to user {}", user);
+        addLog("fillBuffer to user %s", user);
 
         double buffered = bufferedUntil;
         double target = getCurrentPosition() + BUFFER_SECONDS;
@@ -89,7 +88,7 @@ public class UserAudioStreamWorker {
             buffered < target &&
             chunker.hasNext()
         ) {
-            log.debug("buffered {}, target {}", buffered, target);
+            addLog("buffered %s, target %s", buffered, target);
 
             AudioChunk chunk = chunker.nextAudioChunk();
 
@@ -133,8 +132,8 @@ public class UserAudioStreamWorker {
          * and recreate all user chunkers with new parser
          */
         if (trackChanged) {
-            log.debug(
-                "SWITCH TRACK: {} => {}",
+            addLog(
+                "SWITCH TRACK: %s => %s",
                 previousState != null ? previousState.entryId() : "null",
                 currentState.entryId()
             );
@@ -150,8 +149,8 @@ public class UserAudioStreamWorker {
         }
 
         if (positionChanged && !trackChanged) {
-            log.debug(
-                "SEEK POSITION: {} => {}",
+            addLog(
+                "SEEK POSITION: %s => %s",
                 previousState != null ? previousState.position() : "null",
                 currentState.position()
             );
@@ -180,7 +179,7 @@ public class UserAudioStreamWorker {
             audioFile.getPath(),
             audioFile.getChunks()
         );
-        log.debug("Перематываем чанкер для пользователя {} на позицию: {}", user, stateDTO.position());
+        addLog("Перематываем чанкер для пользователя %s на позицию: %s", user, stateDTO.position());
 
         chunker.seek(stateDTO.position());
     }
@@ -201,5 +200,22 @@ public class UserAudioStreamWorker {
             task.cancel(false);
             task = null;
         }
+    }
+
+    // Diadnostic voids
+
+    public DiagnosticTextBuilder getInfo() {
+        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Stream worker of " + user);
+
+        DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
+            .addRow("position: " + currentState.position())
+            .addRow("entryId: " + currentState.entryId())
+            .addRow("pause: " + currentState.pause())
+            .addRow("user: " + currentState.user())
+            .addRow("buffered until: " + bufferedUntil);
+
+        builder.addSection(stateSection);
+
+        return builder;
     }
 }

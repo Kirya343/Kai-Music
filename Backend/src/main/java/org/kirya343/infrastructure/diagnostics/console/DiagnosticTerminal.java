@@ -31,6 +31,8 @@ public class DiagnosticTerminal {
 
         try {
             terminal.puts(InfoCmp.Capability.enter_ca_mode);
+            terminal.writer().print("\033[?25h");
+
             terminal.flush();
 
             screen.render();
@@ -83,14 +85,20 @@ public class DiagnosticTerminal {
                     continue;
                 }
 
+                int cursorPosition = screen.getCursorPosition();
+
                 // Backspace.
+                
                 if (key == 127 || key == 8) {
-                    if (!input.isEmpty()) {
-                        input.deleteCharAt(input.length() - 1);
+                    // Backspace: удалить символ слева от курсора.
+                    if (cursorPosition > 0) {
+                        input.deleteCharAt(cursorPosition - 1);
+                        screen.moveCursor(-1);
                     }
                 } else if (key >= 32 && key <= 126) {
-                    // Печатные ASCII-символы.
-                    input.append((char) key);
+                    // Вставить символ в позицию курсора.
+                    input.insert(cursorPosition, (char) key);
+                    screen.moveCursor(1);
                 }
 
                 screen.setInput(input.toString());
@@ -181,6 +189,15 @@ public class DiagnosticTerminal {
 
                     replaceInput(input, savedInput);
                 }
+            }
+
+            case "\033[D" -> {
+                screen.moveCursor(-1);
+            }
+
+            // Стрелка вправо.
+            case "\033[C" -> {
+                screen.moveCursor(1);
             }
 
             // Page Up: прокрутка вверх на несколько строчек.

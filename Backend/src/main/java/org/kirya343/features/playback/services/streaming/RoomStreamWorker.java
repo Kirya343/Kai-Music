@@ -1,9 +1,5 @@
 package org.kirya343.features.playback.services.streaming;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -16,26 +12,21 @@ import org.kirya343.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.presence.UserPresence;
 import org.kirya343.features.presence.services.PresenceService;
-import org.kirya343.infrastructure.diagnostics.core.DiagnosticComponent;
+import org.kirya343.infrastructure.diagnostics.DiagnosticLoggable;
 import org.kirya343.infrastructure.diagnostics.core.DiagnosticTextBuilder;
-import org.kirya343.infrastructure.diagnostics.models.StreamMode;
-import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
 import org.springframework.context.ApplicationEventPublisher;
 
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RoomStreamWorker implements DiagnosticComponent {
+public class RoomStreamWorker
+    extends DiagnosticLoggable {
 
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
     private final ApplicationEventPublisher eventPublisher;
     private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
     private final PresenceService presenceService;
-
-    @Getter 
-    private List<String> logs = new ArrayList<>();
 
     private final RoomPlaybackContext roomContext;
 
@@ -155,31 +146,9 @@ public class RoomStreamWorker implements DiagnosticComponent {
         }
     }
 
-    // Diadnostic voids
+    // Diadnostic commands
 
-    public String getDiagnosticId() {
-        return "room-stream-worker-" + roomId;
-    }
-
-    public void addLog(String format, Object... args) {
-
-        String newLog = String.format(format, args);
-
-        log.debug(newLog);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-
-        String timestamp = LocalDateTime.now().format(formatter);
-
-        logs.addLast(String.format("%s > %s", timestamp, newLog));
-
-        if (logs.size() > 15) {
-            logs.removeFirst();
-        }
-    }
-
-    public DiagnosticTextBuilder getData() {
-
+    public DiagnosticTextBuilder getInfo() {
         DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Stream worker of " + roomId);
 
         DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
@@ -188,22 +157,8 @@ public class RoomStreamWorker implements DiagnosticComponent {
             .addRow("pause: " + currentState.pause())
             .addRow("user: " + currentState.user());
 
-        DiagnosticTextBuilder logsSection = new DiagnosticTextBuilder("Logs: ");
-
-        for (String log : logs) {
-            logsSection.addRow(log);
-        }
-
         builder.addSection(stateSection);
-        builder.addSection(logsSection);
 
         return builder;
-    }
-
-    public StreamingResult getDiagnosticState() {
-        return new StreamingResult(
-            () -> getData().getContent(),
-            StreamMode.REPLACE
-        );
     }
 }

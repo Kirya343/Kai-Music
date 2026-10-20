@@ -1,6 +1,5 @@
 package org.kirya343.infrastructure.diagnostics.core;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
@@ -34,18 +33,20 @@ public class TerminalCommandExecutor {
             return;
         }
 
-        String[] parts = trimmedInput.split("\\s+");
-        String commandName = parts[0];
-
-        String[] commandArgs = Arrays.copyOfRange(
-            parts,
-            1,
-            parts.length
-        );
-
         try {
-            DiagnosticCommand command =
-                diagnosticManager.findCommand(commandName);
+
+            var entry = diagnosticManager.findCommand(trimmedInput);
+
+            String commandName = entry.getKey();
+            DiagnosticCommand command = entry.getValue();
+
+            String argumentsString = trimmedInput
+                .substring(commandName.length())
+                .trim();
+
+            String[] commandArgs = argumentsString.isEmpty()
+                ? new String[0]
+              : argumentsString.split("\\s+");
 
             CommandResult result = command.execute(commandArgs);
 

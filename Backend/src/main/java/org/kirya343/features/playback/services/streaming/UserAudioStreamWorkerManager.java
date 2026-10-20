@@ -1,5 +1,6 @@
 package org.kirya343.features.playback.services.streaming;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -7,6 +8,12 @@ import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
+import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
+import org.kirya343.infrastructure.diagnostics.core.DiagnosticComponent;
+import org.kirya343.infrastructure.diagnostics.models.CommandResult;
+import org.kirya343.infrastructure.diagnostics.models.StreamMode;
+import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
+import org.kirya343.infrastructure.diagnostics.models.TextResult;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -15,7 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j 
 @Component 
 @RequiredArgsConstructor 
-public class UserAudioStreamWorkerManager {
+public class UserAudioStreamWorkerManager 
+    implements DiagnosticComponent {
 
     private final AudioQueryService audioQueryService;
     private final PlaybackWebsocketService playbackWebsocketService;
@@ -61,5 +69,80 @@ public class UserAudioStreamWorkerManager {
         if (worker != null) {
             worker.cancelTask();
         }
+    }
+
+    public String getComponentId() {
+        return "user-workers";
+    }
+
+    public List<DiagnosticCommand> getCommands() {
+
+        DiagnosticCommand logsCommand = new DiagnosticCommand() {
+
+            public String getName() {
+                return "logs";
+            }
+
+            public String getDescription() {
+                return "Shows stream worker logs";
+            }
+            
+            public CommandResult execute(String[] args) {
+
+                if (args.length != 1) {
+                    throw new IllegalArgumentException(
+                        "Usage: room <roomId>"
+                    );
+                }
+
+                String userSub = args[0];
+
+                UserAudioStreamWorker worker = workers.get(userSub);
+
+                if (worker == null) {
+                    return new TextResult(String.format("Worker of user %s is offline", userSub));
+                }
+
+                return new StreamingResult(
+                    () -> worker.getLogs().getContent(),
+                    StreamMode.REPLACE
+                );
+            }
+        };
+
+        DiagnosticCommand infoCommand = new DiagnosticCommand() {
+
+            public String getName() {
+                return "info";
+            }
+
+            public String getDescription() {
+                return "Shows stream worker info";
+            }
+            
+            public CommandResult execute(String[] args) {
+
+                if (args.length != 1) {
+                    throw new IllegalArgumentException(
+                        "Usage: room <roomId>"
+                    );
+                }
+
+                String userSub = args[0];
+
+                UserAudioStreamWorker worker = workers.get(userSub);
+
+                if (worker == null) {
+                    return new TextResult(String.format("Worker of user %s is offline", userSub));
+                }
+
+                return new StreamingResult(
+                    () -> worker.getInfo().getContent(),
+                    StreamMode.REPLACE
+                );
+            }
+        };
+
+        return List.of(logsCommand, infoCommand);
     }
 }

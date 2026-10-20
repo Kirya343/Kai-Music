@@ -49,7 +49,7 @@ public class PlaybackDiagnosticService {
     public DiagnosticTextBuilder renderStreamWorker(Long roomId) {
 
         DiagnosticTextBuilder builder = roomStreamWorkerManager.getWorker(roomId)
-            .getData();
+            .getInfo();
 
         builder.setTitle("Stream worker:");
 

@@ -2,8 +2,9 @@ package org.kirya343.infrastructure.diagnostics.commands;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
+import org.kirya343.infrastructure.diagnostics.core.DiagnosticComponent;
+import org.kirya343.infrastructure.diagnostics.core.DiagnosticTextBuilder;
 import org.kirya343.infrastructure.diagnostics.models.CommandResult;
 import org.kirya343.infrastructure.diagnostics.models.TextResult;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class HelpCommand implements DiagnosticCommand {
 
     private final List<DiagnosticCommand> commands;
+    private final List<DiagnosticComponent> components;
     
     @Override
     public String getName() {
@@ -28,15 +30,39 @@ public class HelpCommand implements DiagnosticCommand {
 
     @Override
     public CommandResult execute(String[] args) {
-        String content = commands.stream()
-            .sorted(Comparator.comparing(DiagnosticCommand::getName))
-            .map(command -> String.format(
-                "%-15s %s",
-                command.getName(),
-                command.getDescription()
-            ))
-            .collect(Collectors.joining("\n"));
+        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("All application commands:");
 
-        return new TextResult(content);
+        builder.addRow("");
+        addCommands(builder, commands);
+
+        components.stream()
+            .sorted(Comparator.comparing(DiagnosticComponent::getComponentId))
+            .forEach(component -> {
+
+                DiagnosticTextBuilder componentSection = new DiagnosticTextBuilder(component.getClass().getSimpleName() + " commands: ");
+
+                componentSection.addRow("usage: " + component.getComponentId() + " <command> [-args]");
+                componentSection.addRow("");
+
+                addCommands(componentSection, component.getCommands());
+
+                builder.addSection(componentSection);
+            });
+
+        return new TextResult(builder.getContent());
+    }
+
+    private void addCommands(DiagnosticTextBuilder builder, List<DiagnosticCommand> cmds) {
+        cmds.stream()
+            .sorted(Comparator.comparing(DiagnosticCommand::getName))
+            .forEach(command -> {
+                String cmdInfo = String.format(
+                    "%-15s %s",
+                    command.getName(),
+                    command.getDescription()
+                );
+
+                builder.addRow(cmdInfo);
+            });
     }
 }

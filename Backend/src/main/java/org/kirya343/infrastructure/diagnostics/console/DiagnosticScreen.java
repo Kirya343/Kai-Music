@@ -8,6 +8,7 @@ import java.util.List;
 import org.jline.terminal.Terminal;
 import org.springframework.stereotype.Component;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -26,6 +27,9 @@ public class DiagnosticScreen {
     private int scrollOffset = 0;
 
     private String input = "";
+
+    @Getter 
+    private int cursorPosition = 0;
     private String status = "ONLINE";
 
     private int contentHeight() {
@@ -58,6 +62,12 @@ public class DiagnosticScreen {
         );
 
         renderer.render(frame);
+        
+        terminal.writer().print(
+            "\033[" + (terminal.getHeight() - 2) + ";" + (cursorPosition + 5) + "H"
+        );
+
+        terminal.flush();
     }
 
     public synchronized void addLines(List<String> newLines) {
@@ -90,6 +100,17 @@ public class DiagnosticScreen {
         render();
     }
 
+    public synchronized void moveCursor(int move) {
+        int newPos = cursorPosition + move;
+
+        if (newPos < 0) newPos = 0;
+        if (newPos > input.length()) newPos = input.length();
+
+        cursorPosition = newPos;
+
+        render();
+    }
+
     public synchronized void setContent(List<String> newContent) {
         content.clear();
 
@@ -117,6 +138,18 @@ public class DiagnosticScreen {
     }
 
     public synchronized void setInput(String input) {
+
+        // reset input and positions
+        if (input == null) {
+            this.input = "";
+            this.cursorPosition = 0;
+        } else {
+            if (cursorPosition == this.input.length()) {
+                cursorPosition = input.length();
+            }
+
+            this.input = input;
+        }
         this.input = input == null ? "" : input;
 
         render();

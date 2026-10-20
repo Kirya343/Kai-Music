@@ -1,5 +1,6 @@
 package org.kirya343.infrastructure.diagnostics.core;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -7,21 +8,41 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j 
 public class DiagnosticManager {
 
     private final Map<String, DiagnosticCommand> commands =
         new ConcurrentHashMap<>();
 
-    public DiagnosticManager(List<DiagnosticCommand> commands) {
+    public DiagnosticManager(
+        List<DiagnosticCommand> commands, 
+        List<DiagnosticComponent> components
+    ) {
         commands.forEach(this::registerCommand);
+        
+        components.forEach(c -> 
+            c.getCommands().forEach(cm -> 
+                registerCommand(cm, c.getComponentId())));
     }
 
     public void registerCommand(DiagnosticCommand command) {
-        DiagnosticCommand existing = commands.putIfAbsent(
-            command.getName(),
-            command
-        );
+        registerCommand(command, null);
+    }
+
+    public void registerCommand(DiagnosticCommand command, String componentId) {
+
+        String commandName = command.getName();
+
+        if (componentId != null) {
+            commandName = componentId + " " + commandName;
+        }
+
+        log.debug("Register command: {}", commandName);
+        
+        DiagnosticCommand existing = commands.putIfAbsent(commandName, command);
 
         if (existing != null) {
             throw new IllegalArgumentException(
@@ -30,15 +51,19 @@ public class DiagnosticManager {
         }
     }
 
-    public DiagnosticCommand findCommand(String name) {
-        DiagnosticCommand command = commands.get(name);
-
-        if (command == null) {
-            throw new IllegalArgumentException(
-                "Unknown command: " + name
+    public Map.Entry<String, DiagnosticCommand> findCommand(
+        String input
+    ) {
+        return commands.entrySet().stream()
+            .filter(entry ->
+                input.equals(entry.getKey())
+                    || input.startsWith(entry.getKey() + " ")
+            )
+            .max(Map.Entry.comparingByKey(
+                Comparator.comparingInt(String::length)
+            ))
+            .orElseThrow(() ->
+                new IllegalArgumentException("Unknown command: " + input)
             );
-        }
-
-        return command;
     }
 }

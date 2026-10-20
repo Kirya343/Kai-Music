@@ -30,7 +30,11 @@ public class DiagnosticScreenRenderer {
             frame.contentHeight(),
             innerWidth
         );
-        renderFooter(lines, frame.input(), innerWidth);
+        renderFooter(
+            lines, 
+            frame.input(), 
+            innerWidth
+        );
 
         var writer = terminal.writer();
 

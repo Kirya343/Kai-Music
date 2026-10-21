@@ -4,10 +4,10 @@ import org.kirya343.features.audio.datasource.AudioFile;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.playback.services.streaming.RoomStreamWorkerManager;
-import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
-import org.kirya343.infrastructure.diagnostics.core.DiagnosticTextBuilder;
-import org.kirya343.infrastructure.diagnostics.models.StreamMode;
-import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
+import org.kirya343.terminal.commands.DiagnosticCommand;
+import org.kirya343.terminal.core.DiagnosticTextBuilder;
+import org.kirya343.terminal.models.StreamMode;
+import org.kirya343.terminal.models.StreamingResult;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;

@@ -8,12 +8,12 @@ import org.kirya343.features.audio.services.AudioQueryService;
 import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
-import org.kirya343.infrastructure.diagnostics.core.DiagnosticComponent;
-import org.kirya343.infrastructure.diagnostics.models.CommandResult;
-import org.kirya343.infrastructure.diagnostics.models.StreamMode;
-import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
-import org.kirya343.infrastructure.diagnostics.models.TextResult;
+import org.kirya343.terminal.commands.DiagnosticCommand;
+import org.kirya343.terminal.core.DiagnosticComponent;
+import org.kirya343.terminal.models.CommandResult;
+import org.kirya343.terminal.models.StreamMode;
+import org.kirya343.terminal.models.StreamingResult;
+import org.kirya343.terminal.models.TextResult;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,10 @@ public class UserAudioStreamWorkerManager
 
     private final Map<String, UserAudioStreamWorker> workers =
             new ConcurrentHashMap<>();
+
+    public long countAll() {
+        return workers.size();
+    }
 
     public UserAudioStreamWorker getWorker(String userSub, PlaybackStateDTO currentState) {
 

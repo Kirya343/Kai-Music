@@ -10,8 +10,8 @@ import org.kirya343.features.audio.services.storage.AudioStorageService;
 import org.kirya343.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.features.playback.PlaybackWebsocketService;
 import org.kirya343.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.infrastructure.diagnostics.DiagnosticLoggable;
-import org.kirya343.infrastructure.diagnostics.core.DiagnosticTextBuilder;
+import org.kirya343.terminal.core.DiagnosticLoggable;
+import org.kirya343.terminal.core.DiagnosticTextBuilder;
 
 public class UserAudioStreamWorker
     extends DiagnosticLoggable {

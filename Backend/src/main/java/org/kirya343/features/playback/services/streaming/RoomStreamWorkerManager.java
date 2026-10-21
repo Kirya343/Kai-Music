@@ -10,10 +10,10 @@ import org.kirya343.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.features.presence.services.PresenceService;
-import org.kirya343.infrastructure.diagnostics.commands.DiagnosticCommand;
-import org.kirya343.infrastructure.diagnostics.core.DiagnosticComponent;
-import org.kirya343.infrastructure.diagnostics.models.StreamMode;
-import org.kirya343.infrastructure.diagnostics.models.StreamingResult;
+import org.kirya343.terminal.commands.DiagnosticCommand;
+import org.kirya343.terminal.core.DiagnosticComponent;
+import org.kirya343.terminal.models.StreamMode;
+import org.kirya343.terminal.models.StreamingResult;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +36,10 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
 
     public boolean checkWorker(Long roomId) {
         return workers.get(roomId) != null;
+    }
+
+    public long countAll() {
+        return workers.size();
     }
 
     public RoomStreamWorker getWorker(Long roomId) {

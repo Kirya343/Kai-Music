@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Kai Terminal",
+            "request": "launch",
+            "mainClass": "org.kirya343.Main",
+            "cwd": "${workspaceFolder}/Backend"
+        }
+    ]
+}

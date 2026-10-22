@@ -1,0 +1,45 @@
+package org.kirya343.kai.features.playlist.dto;
+
+import java.util.List;
+
+import org.kirya343.kai.features.playback.enums.PlaybackMode;
+import org.kirya343.kai.features.playlist.datasource.model.Playlist;
+import org.kirya343.kai.features.playlist.dto.queue.QueueItemDTO;
+
+public record PlaylistDTO(
+    Long id,
+    Long ownerId,
+    String title,
+    PlaybackMode mode,
+    List<QueueItemDTO> queue
+) {
+    public static PlaylistDTO ofPlaylist(Playlist playlist) {
+
+        return new PlaylistDTO(
+            playlist.getId(),
+            playlist.getOwner().getId(),
+            playlist.getTitle(),
+            playlist.getPlaybackMode(),
+            QueueItemDTO.ofList(playlist.getQueue())
+        );
+    }
+
+    public static PlaylistDTO ofPlaylistShort(Playlist playlist) {
+
+        return new PlaylistDTO(
+            playlist.getId(),
+            playlist.getOwner().getId(),
+            playlist.getTitle(),
+            playlist.getPlaybackMode(),
+            null
+        );
+    }
+
+    public static List<PlaylistDTO> ofListShort(List<Playlist> playlists) {
+        return playlists.stream().map(p -> PlaylistDTO.ofPlaylistShort(p)).toList();
+    }
+
+    public static List<PlaylistDTO> ofList(List<Playlist> playlists) {
+        return playlists.stream().map(p -> PlaylistDTO.ofPlaylist(p)).toList();
+    }
+}

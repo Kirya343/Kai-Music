@@ -1,7 +1,0 @@
-{
-    "type": "java",
-    "name": "Spring Boot",
-    "request": "launch",
-    "mainClass": "org.kirya343.Application",
-    "cwd": "${workspaceFolder}"
-}

@@ -6,7 +6,8 @@ import java.lang.management.ManagementFactory;
 import org.kirya343.kai.features.playback.services.streaming.RoomStreamWorkerManager;
 import org.kirya343.kai.features.playback.services.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.kai.features.presence.services.PresenceService;
-import org.kirya343.terminal.commands.DiagnosticCommand;
+import org.kirya343.terminal.components.commands.DiagnosticCommand;
+import org.kirya343.terminal.components.commands.TerminalCommand;
 import org.kirya343.terminal.core.DiagnosticTextBuilder;
 import org.kirya343.terminal.models.StreamMode;
 import org.kirya343.terminal.models.StreamingResult;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor 
+@TerminalCommand 
 public class StatsCommand implements DiagnosticCommand {
 
     private final PresenceService presenceService;

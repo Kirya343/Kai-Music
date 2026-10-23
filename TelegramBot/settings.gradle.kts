@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "Kai TelegramBot"
-include("app")
+include("kai-bot")

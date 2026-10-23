@@ -1,7 +1,5 @@
 package org.kirya343.kai.features.playback.services.streaming;
 
-import static org.kirya343.terminal.components.DiagnosticLoggable.log;
-
 import java.io.IOException;
 import java.util.concurrent.ScheduledFuture;
 

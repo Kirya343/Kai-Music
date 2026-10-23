@@ -122,7 +122,7 @@ public class PlaybackCommandWorker {
                 webSocketService.broadcastPlaybackState(user, state);
             }   
         } catch (Exception e) {
-            e.printStackTrace();
+            log.debug("Ошибка обработки команды комнаты: {}", e);
         }
     }
 }

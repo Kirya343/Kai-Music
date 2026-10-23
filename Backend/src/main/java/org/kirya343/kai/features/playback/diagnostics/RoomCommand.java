@@ -5,7 +5,6 @@ import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.kai.features.playback.services.streaming.RoomStreamWorkerManager;
 import org.kirya343.terminal.components.commands.DiagnosticCommand;
-import org.kirya343.terminal.components.commands.TerminalCommand;
 import org.kirya343.terminal.core.DiagnosticTextBuilder;
 import org.kirya343.terminal.models.StreamMode;
 import org.kirya343.terminal.models.StreamingResult;

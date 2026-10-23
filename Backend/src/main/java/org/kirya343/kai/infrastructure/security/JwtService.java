@@ -6,6 +6,7 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.nimbusds.jose.jwk.RSAKey;
 
@@ -27,6 +28,7 @@ import java.util.Map;
 @Service
 @Profile("production")
 @RequiredArgsConstructor
+@Slf4j 
 public class JwtService {
 
     private final RSAKey rsaKey;
@@ -133,10 +135,10 @@ public class JwtService {
         try {
 
             email = claims.getStringClaim("email");
-            System.out.println("email: " + email);
+            log.debug("email: " + email);
 
         } catch(ParseException e) {
-            System.out.println(e);
+            log.debug("exception: {}", e);
         }
         return email;
     }
@@ -149,7 +151,7 @@ public class JwtService {
             openId = claims.getStringClaim("openId");
 
         } catch(ParseException e) {
-            System.out.println(e);
+            log.debug("exception: {}", e);
         }
         return openId;
     }

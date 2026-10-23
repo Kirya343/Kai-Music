@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "KaiApplication",
+            "request": "launch",
+            "mainClass": "org.kirya343.kai.KaiApplication",
+            "projectName": "api"
+        },
+        {
+            "type": "java",
             "name": "Kai Terminal",
             "request": "launch",
             "mainClass": "org.kirya343.Main",

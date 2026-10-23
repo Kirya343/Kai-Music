@@ -84,7 +84,7 @@ public class RoomStreamWorker
                     try {
                         streamTick();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error("Ошибка обработки тика комнаты: {}", e);
                     }
                 },
                 0,
@@ -122,11 +122,11 @@ public class RoomStreamWorker
                         userAudioStreamWorkerManager.getWorker(user, currentState).tick();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    log.error("Ошибка обработки тика юзера {}: {}", user, e);
                 }
             });
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Ошибка обработки тика юзеров: {}", e);
         }
 
         if (!currentState.pause()) {

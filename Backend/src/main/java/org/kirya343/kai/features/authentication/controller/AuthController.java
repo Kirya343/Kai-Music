@@ -101,7 +101,8 @@ public class AuthController {
 
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.debug("Ошибка генерации токена: {}", e);
+            
             return ResponseEntity.internalServerError()
                     .body("Token generation error: " + e.getMessage());
         }

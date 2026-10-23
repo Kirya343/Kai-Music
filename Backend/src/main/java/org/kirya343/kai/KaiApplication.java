@@ -1,6 +1,7 @@
 package org.kirya343.kai;
 
 import org.kirya343.terminal.runtime.TerminalManaged;
+import org.springframework.boot.Banner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
@@ -13,6 +14,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class KaiApplication {
     
     public static void main(String[] args) {
-        SpringApplication.run(KaiApplication.class, args);
+        SpringApplication app = new SpringApplication(KaiApplication.class);
+        app.setBannerMode(Banner.Mode.OFF);
+        app.run(args);
     }
 }

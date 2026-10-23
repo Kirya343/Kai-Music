@@ -1,5 +1,7 @@
 package org.kirya343.kai.features.playback.services.streaming;
 
+import static org.kirya343.terminal.components.DiagnosticLoggable.log;
+
 import java.io.IOException;
 import java.util.concurrent.ScheduledFuture;
 
@@ -13,6 +15,9 @@ import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.terminal.components.DiagnosticLoggable;
 import org.kirya343.terminal.core.DiagnosticTextBuilder;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j 
 public class UserAudioStreamWorker
     extends DiagnosticLoggable {
 
@@ -63,7 +68,7 @@ public class UserAudioStreamWorker
         try {
             tick();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Ошибка обработки тика юзера {}: {}", user, e);
         }
 
     }
@@ -144,7 +149,7 @@ public class UserAudioStreamWorker
                 initializeUser();
                 fillBuffer();
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("Ошибка заполнения буфера пользователя {}: {}", user, e);
             }
         }
 

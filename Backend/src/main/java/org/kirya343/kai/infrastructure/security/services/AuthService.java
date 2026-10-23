@@ -15,8 +15,6 @@ import org.kirya343.kai.features.user.datasource.UserRepository;
 import org.kirya343.kai.features.authentication.dto.LoginRequest;
 import org.kirya343.kai.features.authentication.dto.RegisterRequest;
 import org.kirya343.kai.features.user.enums.AuthProvider;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -27,12 +25,12 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j 
 public class AuthService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -58,7 +56,7 @@ public class AuthService {
         try {
             cookiesService.setAuthCookies(response, user);
         } catch (ServletException e) {
-            e.printStackTrace();
+            log.error("Ошибка создания куков пользователя {}: {}", user.getId(), e);
         }
 
         return ResponseEntity.ok(Map.of("success", true, "message", "You successfuly signed in"));
@@ -71,7 +69,7 @@ public class AuthService {
     ) {
 
         if (userRepository.existsByName(regRequest.name())) {
-            logger.debug("Пользователь с таким именем уже зарегистрирован");
+            log.debug("Пользователь с таким именем уже зарегистрирован");
             return ResponseEntity.ok(
                 Map.of("success", false, 
                        "message", "This name is already registered"
@@ -83,27 +81,27 @@ public class AuthService {
         try {
             cookiesService.setAuthCookies(response, user);
         } catch (ServletException e) {
-            e.printStackTrace();
+            log.error("Ошибка создания куков пользователя {}: {}", user.getId(), e);
         }
 
         return ResponseEntity.ok(Map.of("success", true, "message", "You successfully signed up"));
     }
 
     public void refreshToken( HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Обновляем токен пользователя");
+        log.debug("Обновляем токен пользователя");
         try {
 
             Long userId = jwtService.validateAndGetUserId(getTokenFromCookies(request, "refreshToken"));
 
-            logger.debug("userId: {}", userId);
+            log.debug("userId: {}", userId);
 
             User user = null;
             if (userId != null) {
                 user = userRepository.findById(userId).orElse(null);
-                logger.debug("Пользователь найден по id: {}", user != null);
+                log.debug("Пользователь найден по id: {}", user != null);
 
                 if (user == null) {
-                    logger.debug("Пользователь не найден, создаём временного");
+                    log.debug("Пользователь не найден, создаём временного");
                     throw new UserNotFoundException(userId.toString());
                 }
             } else {
@@ -115,7 +113,7 @@ public class AuthService {
             cookiesService.setAuthCookies(response, user); // 4. обновляем куки с токенами
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Ошибка сервера при обновлении токена: {}", e);
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка сервера при обновлении токена.");
         }
     }
@@ -125,7 +123,7 @@ public class AuthService {
         HttpServletRequest request,
         HttpServletResponse response
     ) throws IOException {
-        logger.debug("redirect: " + redirect);
+        log.debug("redirect: " + redirect);
 
         Long userId = jwtService.validateAndGetUserId(getTokenFromCookies(request, "refreshToken"));
         String redirectUrl = URLEncoder.encode(redirect, StandardCharsets.UTF_8);

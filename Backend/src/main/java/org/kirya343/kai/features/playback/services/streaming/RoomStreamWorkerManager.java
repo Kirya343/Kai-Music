@@ -10,10 +10,10 @@ import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.kai.features.presence.services.PresenceService;
-import org.kirya343.terminal.components.commands.DiagnosticCommand;
-import org.kirya343.terminal.components.DiagnosticComponent;
-import org.kirya343.terminal.models.StreamMode;
-import org.kirya343.terminal.models.StreamingResult;
+import io.github.kirya343.terminal.components.commands.DiagnosticCommand;
+import io.github.kirya343.terminal.components.DiagnosticComponent;
+import io.github.kirya343.terminal.models.StreamMode;
+import io.github.kirya343.terminal.models.StreamingResult;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 

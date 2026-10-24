@@ -12,8 +12,8 @@ import org.kirya343.kai.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.presence.UserPresence;
 import org.kirya343.kai.features.presence.services.PresenceService;
-import org.kirya343.terminal.components.DiagnosticLoggable;
-import org.kirya343.terminal.core.DiagnosticTextBuilder;
+import io.github.kirya343.terminal.components.DiagnosticLoggable;
+import io.github.kirya343.terminal.core.DiagnosticTextBuilder;
 import org.springframework.context.ApplicationEventPublisher;
 
 import lombok.extern.slf4j.Slf4j;

@@ -8,12 +8,12 @@ import org.kirya343.kai.features.audio.services.AudioQueryService;
 import org.kirya343.kai.features.audio.services.storage.AudioStorageService;
 import org.kirya343.kai.features.playback.PlaybackWebsocketService;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.terminal.components.commands.DiagnosticCommand;
-import org.kirya343.terminal.components.DiagnosticComponent;
-import org.kirya343.terminal.models.CommandResult;
-import org.kirya343.terminal.models.StreamMode;
-import org.kirya343.terminal.models.StreamingResult;
-import org.kirya343.terminal.models.TextResult;
+import io.github.kirya343.terminal.components.commands.DiagnosticCommand;
+import io.github.kirya343.terminal.components.DiagnosticComponent;
+import io.github.kirya343.terminal.models.CommandResult;
+import io.github.kirya343.terminal.models.StreamMode;
+import io.github.kirya343.terminal.models.StreamingResult;
+import io.github.kirya343.terminal.models.TextResult;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;

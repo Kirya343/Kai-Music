@@ -1,7 +1,7 @@
 package org.kirya343;
 
 import org.kirya343.kai.KaiApplication;
-import org.kirya343.terminal.runtime.TerminalRuntime;
+import io.github.kirya343.terminal.runtime.TerminalRuntime;
 
 public class Main {
 

@@ -10,8 +10,8 @@ import org.kirya343.kai.features.audio.services.storage.AudioStorageService;
 import org.kirya343.kai.features.audio.services.util.Fmp4Chunker;
 import org.kirya343.kai.features.playback.PlaybackWebsocketService;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
-import org.kirya343.terminal.components.DiagnosticLoggable;
-import org.kirya343.terminal.core.DiagnosticTextBuilder;
+import io.github.kirya343.terminal.components.DiagnosticLoggable;
+import io.github.kirya343.terminal.core.DiagnosticTextBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 

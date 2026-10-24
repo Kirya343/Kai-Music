@@ -10,8 +10,8 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>ru.neverboost</groupId>
-	<artifactId>api</artifactId>
+	<groupId>org.kirya343</groupId>
+	<artifactId>kai</artifactId>
 	<version>1.0</version>
 	<name>api</name>
 
@@ -30,6 +30,7 @@
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
+		
 	</dependencyManagement>
 
 	<dependencies>
@@ -118,6 +119,7 @@
             <artifactId>commonmark</artifactId>
             <version>0.21.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.commonmark</groupId>
             <artifactId>commonmark-ext-gfm-tables</artifactId>
@@ -170,9 +172,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.jline</groupId>
-			<artifactId>jline</artifactId>
-			<version>3.30.6</version>
+			<groupId>io.github.kirya343</groupId>
+			<artifactId>java-control-terminal</artifactId>
+			<version>0.0.3</version>
 		</dependency>
 
 		<dependency>

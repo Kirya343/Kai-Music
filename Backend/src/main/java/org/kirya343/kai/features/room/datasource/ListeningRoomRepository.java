@@ -1,0 +1,67 @@
+package org.kirya343.kai.features.room.datasource;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.kirya343.kai.features.room.dto.ShortRoomDTO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Long> {
+    
+    @Query("""
+        SELECT DISTINCT r
+        FROM ListeningRoom r
+        LEFT JOIN FETCH r.owner
+        LEFT JOIN FETCH r.members m
+        LEFT JOIN FETCH r.playlist p
+        LEFT JOIN FETCH p.queue q
+        LEFT JOIN FETCH q.audio
+        WHERE m.id = :userId
+        """)
+    Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
+    
+    Optional<ListeningRoom> findByPlaylistId(Long playlistId);
+
+    @Query("""
+        SELECT r FROM ListeningRoom r
+        LEFT JOIN FETCH r.owner
+        LEFT JOIN r.members
+        WHERE r.id = :roomId
+    """)
+    Optional<ListeningRoom> findFullRoomById(@Param("roomId") Long roomId);
+
+    boolean existsByOwnerId(Long ownerId);
+    void deleteByOwnerId(Long ownerId);
+
+    List<ListeningRoom> findAllByOwnerId(Long ownerId);
+    Optional<ListeningRoom> findByCode(String code);
+
+    @Query("""
+        SELECT new org.kirya343.kai.features.room.dto.ShortRoomDTO(
+            r.id,
+            COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
+            r.owner.id,
+            r.code,
+            SIZE(r.members),
+            r.playlist.id
+        )
+        FROM ListeningRoom r
+    """)
+    List<ShortRoomDTO> findAllShortDTOs();
+
+    @Query("""
+        SELECT new org.kirya343.kai.features.room.dto.ShortRoomDTO(
+            r.id,
+            COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
+            r.owner.id,
+            r.code,
+            SIZE(r.members),
+            r.playlist.id
+        )
+        FROM ListeningRoom r 
+        WHERE r.id = :roomId
+    """)
+    Optional<ShortRoomDTO> findShortRoomById(@Param("roomId") Long roomId);
+}

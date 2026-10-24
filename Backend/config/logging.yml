@@ -11,8 +11,8 @@ logging:
     org.springframework.web.socket: DEBUG
     org.springframework.messaging: INFO
 
-    org.kirya343.features: DEBUG
-    org.kirya343.features.audio.recognition: INFO
+    org.kirya343.kai.features: DEBUG
+    org.kirya343.kai.features.audio.recognition: INFO
 
     com.zaxxer.hikari: INFO
     org.hibernate.SQL: INFO

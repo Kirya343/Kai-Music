@@ -116,7 +116,7 @@ public class PlaylistCommandService {
             log.debug("selected {} tracks from user {}", audioIds, authData.name());
 
             List<QueueItemCreateDTO> list = audioIds.stream()
-                .map(audioId -> new QueueItemCreateDTO(audioId, playlistId))
+                .map(audioId -> new QueueItemCreateDTO(audioId, null))
                 .toList();
 
             for (QueueItemCreateDTO dto : list) {

@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.kai.features.playback.datasource.model.RoomPlaybackState;
 import org.kirya343.kai.features.playback.datasource.repository.RoomPlaybackStateRepository;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
+import org.kirya343.kai.features.playback.services.QueueService;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.kai.features.presence.services.PresenceService;
@@ -30,6 +31,7 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
     private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
     private final PresenceService presenceService;
+    private final QueueService queueService;
 
     private final Map<Long, RoomStreamWorker> workers =
             new ConcurrentHashMap<>();
@@ -63,7 +65,8 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
                     userAudioStreamWorkerManager,
                     PlaybackStateDTO.ofState(state),
                     context,
-                    presenceService
+                    presenceService,
+                    queueService
                 );
             } catch (Exception e) {
                 log.error("Ошибка создания воркера для комнаты {}", roomId, e);

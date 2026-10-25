@@ -9,7 +9,10 @@ import java.util.concurrent.TimeUnit;
 import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.kai.features.playback.dto.commands.ChangeTrack;
+import org.kirya343.kai.features.playback.dto.commands.UpdatePlayback;
+import org.kirya343.kai.features.playback.services.QueueService;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
+import org.kirya343.kai.features.playlist.datasource.model.QueueItem;
 import org.kirya343.kai.features.presence.UserPresence;
 import org.kirya343.kai.features.presence.services.PresenceService;
 import io.github.kirya343.terminal.components.DiagnosticLoggable;
@@ -27,6 +30,7 @@ public class RoomStreamWorker
     private final ApplicationEventPublisher eventPublisher;
     private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
     private final PresenceService presenceService;
+    private final QueueService queueService;
 
     private final RoomPlaybackContext roomContext;
 
@@ -43,7 +47,8 @@ public class RoomStreamWorker
         UserAudioStreamWorkerManager userAudioStreamWorkerManager,
         PlaybackStateDTO currentState,
         RoomPlaybackContext roomContext,
-        PresenceService presenceService
+        PresenceService presenceService,
+        QueueService queueService
     ) {
 
         this.roomId = roomId;
@@ -51,6 +56,7 @@ public class RoomStreamWorker
         this.roomContext = roomContext;
         this.presenceService = presenceService;
         this.userAudioStreamWorkerManager = userAudioStreamWorkerManager;
+        this.queueService = queueService;
 
         if (currentState != null) {
             addLog("Created RoomStreamWorker for %s, with state: %s, %s, %s",
@@ -111,7 +117,26 @@ public class RoomStreamWorker
                 roomContext.getCurrentAudio().getDuration()
             );
 
-            eventPublisher.publishEvent(new ChangeTrack(roomId, "next", UserAuthData.server()));
+            try {
+                QueueItem entry = queueService.nextTrack(roomId);
+
+                eventPublisher.publishEvent(new ChangeTrack(roomId, entry.getId().toString(), UserAuthData.server()));
+            } catch (Exception e) {
+                eventPublisher.publishEvent(
+                    new UpdatePlayback(
+                        roomId, 
+                        new PlaybackStateDTO(
+                            UserAuthData.server().name(), 
+                            currentState.entryId(), 
+                            Double.valueOf(roomContext.getCurrentAudio().getDuration()), 
+                            true
+                        ), 
+                        UserAuthData.server()
+                    ));
+            }
+
+            cancelTask();
+            
             return;
         }
 

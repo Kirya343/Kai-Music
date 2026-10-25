@@ -53,12 +53,12 @@ const MobileNav = () => {
  *  NavigationLink is conponent to display navigation links
  */
 const NavigationLink = ({ link }: { link: INavigationLink }) => {
-    return link.condition == undefined || link.condition && (
+    return (link.condition ?? true) && (
         <NavLink to={link.to} className={styles.link}>
             {link.icon}
             <span className={styles.subtitle}>{link.title}</span>
         </NavLink>
-    )
+    );
 }
 
 export default MobileNav;

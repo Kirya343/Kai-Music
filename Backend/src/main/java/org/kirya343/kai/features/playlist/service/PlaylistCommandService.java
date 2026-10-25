@@ -107,19 +107,23 @@ public class PlaylistCommandService {
     @Transactional
     public void addRundomTracks(Integer amount, Long playlistId, UserAuthData authData) {
 
-        List<QueueItemCreateDTO> list = audioFileRepository
-            .findRandomIdsByOwnerId(authData.id(), amount)
-            .stream()
-            .map(audioId -> new QueueItemCreateDTO(audioId, playlistId))
-            .toList();
+        try {
+            List<QueueItemCreateDTO> list = audioFileRepository
+                .findRandomIdsByOwnerId(authData.id(), amount)
+                .stream()
+                .map(audioId -> new QueueItemCreateDTO(audioId, playlistId))
+                .toList();
 
-        for (QueueItemCreateDTO dto : list) {
-            addToQueue(playlistId, authData.id(), dto);
+            for (QueueItemCreateDTO dto : list) {
+                addToQueue(playlistId, authData.id(), dto);
+            }
+
+            eventPublisher.publishEvent(
+                new QueueChangedEvent(playlistId)
+            );
+        } catch (Exception e) {
+            log.debug("Adding rundom tracks is failed: {}", e);
         }
-
-        eventPublisher.publishEvent(
-            new QueueChangedEvent(playlistId)
-        );
     }
     
     @Transactional

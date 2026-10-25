@@ -25,12 +25,15 @@ export function useCurrentUser() {
     }, [isAuthenticated, user])
 
     const loadUser = useCallback(async (cancelled?: boolean) => {
-        userService.getCurrent().then(response => {
+        try {
+            const res = await userService.getCurrent();
+
             if (!cancelled) {
-                setUser(response.data);
-                setLoading(false);
+                setUser(res.data);
             }
-        });
+        } finally {
+            setLoading(false);
+        }
     }, [])
 
     const clearUser = useCallback(() => {

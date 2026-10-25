@@ -7,7 +7,7 @@ import StartLayout from "./components/layout/StartLayout/StartLayout";
 import PlaylistsPage from "./pages/playlists/PlaylistsPage/PlaylistsPage";
 import LibraryPage from "./pages/LibraryPage/LibraryPage";
 import PlaylistPage from "./pages/playlists/PlaylistPage/PlaylistPage";
-import ProfilePage from "./pages/profile/ProfilePage/ProfilePage";
+import ProfilePage from "./pages/account/ProfilePage/ProfilePage";
 
 const AppRouter = () => {
     return (

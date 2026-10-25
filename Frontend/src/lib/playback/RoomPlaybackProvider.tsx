@@ -1,7 +1,7 @@
 import { createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IAudio, TimeRange } from "@audio";
 import { countPosition, useData } from "@common";
-import { IPlaybackState, useAudioStream, useListeningRoomWS } from "@playback";
+import { IPlaybackState, useAudioStream, usePlaybackWS } from "@playback";
 import { playbackService } from "./services";
 
 interface RoomPlaybackContextType {
@@ -37,7 +37,7 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     const {
         setAudioChunkHandler,
         setPlaybackStateCallback,
-    } = useListeningRoomWS();
+    } = usePlaybackWS();
 
     const { 
         handleAudioChunk, 

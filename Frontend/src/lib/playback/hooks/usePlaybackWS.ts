@@ -3,7 +3,7 @@ import { useWebSocket } from "@websocket";
 import { AudioChunk } from "@audio";
 import { IPlaybackState } from "@playback";
 
-export const useListeningRoomWS = () => {
+export const usePlaybackWS = () => {
     
     const { addOnConnectHandler } = useWebSocket();
 

@@ -1,2 +1,2 @@
 export * from "./useAudioStream";
-export * from "./useListeningRoomWS"
+export * from "./usePlaybackWS"

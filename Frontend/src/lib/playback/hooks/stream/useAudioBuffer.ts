@@ -37,7 +37,11 @@ export function useAudioBuffer() {
 
         console.log("buffer", updated)
 
-        setBufferedRanges(updated);
+        setBufferedRanges(prev => {
+            const updated = new Map(prev);
+            updated.set(entryId, ranges);
+            return updated;
+        });
 
         onBufferUpdateRef.current?.(entryId)
     }, [bufferedRanges]);

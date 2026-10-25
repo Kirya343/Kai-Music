@@ -7,6 +7,7 @@ import StartLayout from "./components/layout/StartLayout/StartLayout";
 import PlaylistsPage from "./pages/playlists/PlaylistsPage/PlaylistsPage";
 import LibraryPage from "./pages/LibraryPage/LibraryPage";
 import PlaylistPage from "./pages/playlists/PlaylistPage/PlaylistPage";
+import ProfilePage from "./pages/profile/ProfilePage/ProfilePage";
 
 const AppRouter = () => {
     return (
@@ -24,6 +25,8 @@ const AppRouter = () => {
                                 <Route index element={<PlaylistsPage />}/>
                                 <Route path=":id" element={<PlaylistPage/>} />
                             </Route>
+
+                            <Route path="profile" element={<ProfilePage />}/>
                         </Route>
 
                         <Route path="login" element={<LoginPage />} />

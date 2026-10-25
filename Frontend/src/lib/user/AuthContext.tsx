@@ -7,7 +7,8 @@ interface AuthContextType {
     shortUser: IShortUser | null;
     loading: boolean;
     isAdmin: boolean;
-    loadUser: () => void
+    loadUser: () => void;
+    clearUser: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -22,10 +23,18 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children?: React.ReactNode }) => {
 
-    const { user, isAuthenticated, loading, shortUser, isAdmin, loadUser } = userService.useCurrentUser();
+    const { 
+        user, 
+        isAuthenticated, 
+        loading, 
+        shortUser, 
+        isAdmin, 
+        loadUser,
+        clearUser
+    } = userService.useCurrentUser();
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, shortUser, loading, isAdmin, loadUser }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, shortUser, loading, isAdmin, loadUser, clearUser }}>
             {children}
         </AuthContext.Provider>
     );

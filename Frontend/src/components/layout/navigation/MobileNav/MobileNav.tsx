@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import styles from "./MobileNav.module.scss"
 import { useRoomPlayback } from "@playback";
 import { useAuth } from "@user";
-import { PlaylistIcon, DoorIcon, LibraryIcon, HomeIcon } from "@/assets/icons";
+import { PlaylistIcon, DoorIcon, LibraryIcon, HomeIcon, UserIcon } from "@/assets/icons";
 
 import { ReactNode } from "react";
 import { useData, useGlobal } from "@common";
@@ -20,13 +20,12 @@ interface INavigationLink {
     to: string,
     icon: ReactNode,
     title: string,
-    condition: boolean
+    condition?: boolean
 }
 
 const MobileNav = () => {
 
     const { isMobile } = useGlobal();
-    const { isAuthenticated } = useAuth();
     const { roomData } = useData();
 
     /**
@@ -35,10 +34,11 @@ const MobileNav = () => {
     if (!isMobile) return null;
 
     const links: INavigationLink[] = [
-        { to: "/", icon: <HomeIcon className={styles.linkIcon} />, title: "Home", condition: true },
+        { to: "/", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
         { to: "/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
-        { to: "/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library", condition: isAuthenticated },
-        { to: "/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists", condition: isAuthenticated },
+        { to: "/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library" },
+        { to: "/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists" },
+        { to: "/profile", icon: <UserIcon className={styles.linkIcon} />, title: "Profile" },
     ]
 
     return (
@@ -53,7 +53,7 @@ const MobileNav = () => {
  *  NavigationLink is conponent to display navigation links
  */
 const NavigationLink = ({ link }: { link: INavigationLink }) => {
-    return link.condition && (
+    return link.condition == undefined || link.condition && (
         <NavLink to={link.to} className={styles.link}>
             {link.icon}
             <span className={styles.subtitle}>{link.title}</span>

@@ -33,6 +33,10 @@ export function useCurrentUser() {
         });
     }, [])
 
+    const clearUser = useCallback(() => {
+        setUser(null)
+    }, [setUser])
+
     useEffect(() => {
         localStorage.setItem("user", JSON.stringify(user));
     }, [user]);
@@ -47,5 +51,13 @@ export function useCurrentUser() {
         };
     }, []);
 
-    return { user, isAuthenticated, isAdmin, shortUser, loading, loadUser };
+    return { 
+        user, 
+        isAuthenticated, 
+        isAdmin, 
+        shortUser, 
+        loading, 
+        loadUser, 
+        clearUser 
+    };
 }

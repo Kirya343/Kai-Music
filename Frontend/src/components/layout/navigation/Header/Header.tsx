@@ -50,10 +50,10 @@ const Header = () => {
                     {links.map(l => <NavigationLink key={l.title} link={l} />)}
                 </div>
                 {isAuthenticated ? (
-                    <div className={styles.auth}>
+                    <Link to="/profile" className={styles.auth}>
                         <UserIcon className={styles.icon}/>
                         <span className={styles.userName}>{user?.name}</span>
-                    </div>
+                    </Link>
                 ) : (
                     <Link to="/login">Sign In</Link>
                 )}

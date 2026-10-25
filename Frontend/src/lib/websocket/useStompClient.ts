@@ -102,14 +102,17 @@ export function useStompClient(): UseStompClientResult {
             }
 
             try {
-                await api.post("/auth/refresh", null, {})
-            } catch (e) {
-                setError(true);
-                return;
-            }
+                await api.post("/auth/refresh", null, {});
 
-            stompClient.deactivate();
-            connect();
+                await stompClient.deactivate();
+
+                clientRef.current = null;
+
+                await connect();
+            } catch (error) {
+                console.error("Failed to refresh token:", error);
+                setError(true);
+            }
         };
 
         stompClient.onWebSocketClose = () => {

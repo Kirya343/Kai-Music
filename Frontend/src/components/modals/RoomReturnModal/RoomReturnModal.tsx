@@ -22,7 +22,9 @@ const RoomReturnModal = () => {
      * void that tries to join room
      */
     const continueListening = async () => {
+        
         if (!client) return;
+
         navigate("/room");
         setOpen(false)
         

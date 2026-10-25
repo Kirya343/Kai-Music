@@ -104,6 +104,7 @@ public class PlaylistCommandService {
         );
     }
 
+    @Transactional
     public void addRundomTracks(Integer amount, Long playlistId, UserAuthData authData) {
 
         List<QueueItemCreateDTO> list = audioFileRepository

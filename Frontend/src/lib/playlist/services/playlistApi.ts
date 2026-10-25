@@ -23,3 +23,5 @@ export const addToQueue = (playlistId: number, list: IQueueItemCreate[]) =>
 
 export const removeFromQueue = (playlistId: number, list: number[]) => 
     playlistApi.delete<void>(`/${playlistId}/queue`, { data: list })
+
+export const addRandomTracks = (playlistId: number, amount: number) => playlistApi.post<void>(`/${playlistId}/queue/rundom`, {}, { params: { amount } })

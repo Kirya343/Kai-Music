@@ -21,6 +21,21 @@
     }
 }
 
+.rundomBtn {
+    @include glass;
+    
+    padding: 5px 15px;
+    width: fit-content;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    svg {
+        width: 20px;
+    }
+}
+
 .header {
     text-align: center;
 }

@@ -2,10 +2,11 @@ import { useLibrary } from "@audio";
 import styles from "./TrackImportLibrary.module.scss"
 import ImportingTrack from "@/components/ui/track/ImportingTrack";
 import { useMemo } from "react";
-import { Playlist } from "@playlist";
+import { Playlist, playlistService } from "@playlist";
+import { ShuffleIcon } from "@/assets/icons";
 
 /** Displays user library with importable tracks to playlist */
-const TrackImportLibrary = ({ importPlaylist }: { importPlaylist: Playlist }) => {
+const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playlist, onClose: () => void }) => {
 
     const { 
         visibleAudios,
@@ -19,6 +20,14 @@ const TrackImportLibrary = ({ importPlaylist }: { importPlaylist: Playlist }) =>
             importPlaylist?.queue.map(item => item.audio.id)
         );
     }, [importPlaylist?.queue]);
+
+    const addRandomTracks = async () => {
+        try {
+            await playlistService.addRandomTracks(importPlaylist.id, 30)
+        } finally {
+            onClose()
+        }
+    }
 
     return (
         <div className={styles.page} ref={parentRef}>
@@ -37,6 +46,9 @@ const TrackImportLibrary = ({ importPlaylist }: { importPlaylist: Playlist }) =>
             </div>
             
             <div className={styles.trackList}>
+                <button onClick={addRandomTracks} className={styles.rundomBtn}>
+                    Добавить случайные <ShuffleIcon/>
+                </button>
                 <div
                     style={{
                         height: `${rowVirtualizer.getTotalSize()}px`,

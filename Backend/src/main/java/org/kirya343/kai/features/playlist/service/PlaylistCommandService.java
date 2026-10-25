@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.kirya343.kai.features.audio.datasource.AudioFileRepository;
 import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.dto.event.QueueChangedEvent;
 import org.kirya343.kai.features.playback.enums.PlaybackMode;
@@ -41,6 +42,7 @@ public class PlaylistCommandService {
     private final RoomQueryService roomQueryService;
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final SimpMessagingTemplate messagingTemplate;
+    private final AudioFileRepository audioFileRepository;
 
     public PlaylistDTO createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
         User user = userAuthDataService.parse(authData);
@@ -93,6 +95,23 @@ public class PlaylistCommandService {
 
     @Transactional
     public void addQueueList(List<QueueItemCreateDTO> list, Long playlistId, UserAuthData authData) {
+        for (QueueItemCreateDTO dto : list) {
+            addToQueue(playlistId, authData.id(), dto);
+        }
+
+        eventPublisher.publishEvent(
+            new QueueChangedEvent(playlistId)
+        );
+    }
+
+    public void addRundomTracks(Integer amount, Long playlistId, UserAuthData authData) {
+
+        List<QueueItemCreateDTO> list = audioFileRepository
+            .findRandomIdsByOwnerId(authData.id(), amount)
+            .stream()
+            .map(audioId -> new QueueItemCreateDTO(audioId, playlistId))
+            .toList();
+
         for (QueueItemCreateDTO dto : list) {
             addToQueue(playlistId, authData.id(), dto);
         }

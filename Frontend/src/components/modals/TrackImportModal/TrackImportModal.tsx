@@ -35,7 +35,7 @@ const TrackImportModal = ({
 
     const renderView = () => {
         switch (view) {
-            case "library": return <TrackImportLibrary importPlaylist={importPlaylist}/>
+            case "library": return <TrackImportLibrary importPlaylist={importPlaylist} onClose={onClose} />
             case "playlists": return <TrackImportPlaylists importPlaylist={importPlaylist} seePlaylist={(id) => seePlaylist(id)}/>
             default: {
                 if (!importPlaylist) return null;

@@ -94,6 +94,15 @@ public class PlaylistController {
         playlistCommandService.addQueueList(list, playlistId, authData);
     }
 
+    @PostMapping("/{playlistId}/queue/rundom")
+    public void addRundomTracks(
+        @PathVariable Long playlistId,
+        @RequestParam Integer amount,
+        @AuthenticationPrincipal UserAuthData authData
+    ) {
+        playlistCommandService.addRundomTracks(amount, playlistId, authData);
+    }
+
     @DeleteMapping("/{playlistId}/queue")
     public void removeFromQueue(
         @PathVariable Long playlistId,

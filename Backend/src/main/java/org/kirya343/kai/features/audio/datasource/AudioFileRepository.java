@@ -48,4 +48,16 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
     );
 
     List<AudioFile> findByOwnerId(Long ownerId);
+
+    @Query(value = """
+        SELECT id
+        FROM audio_file
+        WHERE owner_id = :ownerId
+        ORDER BY RAND()
+        LIMIT :amount
+        """, nativeQuery = true)
+    List<Long> findRandomIdsByOwnerId(
+        @Param("ownerId") Long ownerId,
+        @Param("amount") int amount
+    );
 }

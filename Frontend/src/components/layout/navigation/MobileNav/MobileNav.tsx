@@ -5,7 +5,7 @@ import { useAuth } from "@user";
 import { PlaylistIcon, DoorIcon, LibraryIcon, HomeIcon } from "@/assets/icons";
 
 import { ReactNode } from "react";
-import { useGlobal } from "@common";
+import { useData, useGlobal } from "@common";
 
 
 /**
@@ -27,7 +27,7 @@ const MobileNav = () => {
 
     const { isMobile } = useGlobal();
     const { isAuthenticated } = useAuth();
-    const { room } = useRoomPlayback();
+    const { roomData } = useData();
 
     /**
      * disabling on not mobile displays
@@ -36,7 +36,7 @@ const MobileNav = () => {
 
     const links: INavigationLink[] = [
         { to: "/", icon: <HomeIcon className={styles.linkIcon} />, title: "Home", condition: true },
-        { to: "/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!room },
+        { to: "/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
         { to: "/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library", condition: isAuthenticated },
         { to: "/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists", condition: isAuthenticated },
     ]

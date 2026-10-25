@@ -1,7 +1,7 @@
 import { IAudio, IAudioUpdate, audioService } from "@audio";
 import { useEffect, useState } from "react";
 import styles from "./AudioFileModal.module.scss"
-import Modal from "@/components/ui/Modal/Modal";
+import Modal from "@/components/modals/Modal/Modal";
 
 /**
  * AudioFileModal is modal to view and edit data of audiofiles

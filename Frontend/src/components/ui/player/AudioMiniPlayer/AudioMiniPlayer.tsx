@@ -1,4 +1,4 @@
-import { useRoomPlayback } from "@room";
+import { useRoomPlayback } from "@playback";
 import { useEffect, useRef } from "react";
 
 import styles from "./AudioMiniPlayer.module.scss"

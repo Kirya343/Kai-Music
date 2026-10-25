@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import styles from "./RoomReturnModal.module.scss"
 import { useNavigate } from "react-router-dom";
 import { IShortRoom, roomService } from "@room";
-import Modal from "../../Modal/Modal";
+import Modal from "../Modal/Modal";
+import { useData } from "@common";
+import { useWebSocket } from "@websocket";
 
 /**
  * RoomReturnModal is component that helps to return to room that was before 
@@ -10,37 +12,24 @@ import Modal from "../../Modal/Modal";
  */
 const RoomReturnModal = () => {
 
-    const [room, setRoom] = useState<IShortRoom | null>(null);
+    const { client } = useWebSocket();
+ 
+    const { room, synced } = useData().roomData;
     const navigate = useNavigate();
-
-    // loads room
-    useEffect(() => {
-        navigate("/");
-
-        async function loadRoom() {
-            try {
-                const res = await roomService.loadCurrentRoom();
-                setRoom(res.data);
-            } catch (e) {
-                console.log(e)
-            }
-        }
-
-        loadRoom()
-    }, [])
+    const [isOpen, setOpen] = useState(true)
 
     /**
      * void that tries to join room
      */
-    const joinRoom = async () => {
-        if (!room?.code) return;
-        try {
-            await roomService.joinRoom(room.code);
-            navigate("/room");
-            setRoom(null)
-        } catch (e) {
-            console.error(e);
-        }
+    const continueListening = async () => {
+        if (!client) return;
+        navigate("/room");
+        setOpen(false)
+        
+        client.publish({
+            destination: "/app/room/reconnect",
+            body: JSON.stringify({ roomId: room?.id })
+        });
     }
 
     /**
@@ -50,19 +39,19 @@ const RoomReturnModal = () => {
         try {
             await roomService.leaveRoom();
         } finally {
-            setRoom(null);
+            
         }
     }
 
-    return room?.code && (
+    return isOpen && room && synced && (
         <Modal
             isOpen={true} 
-            onClose={() => setRoom(null)}
+            onClose={() => setOpen(false)}
             title={`You have left room ${room.title}`}
         >
             <div className={styles.body}>
-                <button className={styles.btn} onClick={joinRoom}>Join room</button>
                 <button className={styles.btn} onClick={leaveRoom}>Cancel</button>
+                <button className={styles.btn} onClick={continueListening}>Continue listening</button>
             </div>
         </Modal>
     )

@@ -2,6 +2,7 @@ import { playlistService } from "@playlist";
 import Track, { ITrackAction } from "./Track/Track";
 import { TrashIcon } from "@/assets/icons";
 import { playbackService, IQueueItem, useRoomPlayback } from "@playback";
+import { useData } from "@common";
 
 /** Props for the RoomTrack component */
 interface RoomTrackProps {
@@ -33,10 +34,10 @@ const RoomTrack = ({
 
     const { 
         playbackState,
-        room,
-        togglePlay,
-        roomPlaylist
+        togglePlay
     } = useRoomPlayback();
+
+    const { room, playlist } = useData().roomData;
 
     const playTrack = playbackService.usePlayTrack();
 
@@ -56,11 +57,11 @@ const RoomTrack = ({
 
     const actions: ITrackAction[] = []
 
-    if (roomPlaylist?.id) {
+    if (playlist?.id) {
         actions.push({
             icon: <TrashIcon/>,
             title: "deleteAudio",
-            func: async () => await playlistService.removeFromQueue(roomPlaylist?.id, [queueItem.id])
+            func: async () => await playlistService.removeFromQueue(playlist?.id, [queueItem.id])
         })
     }
 

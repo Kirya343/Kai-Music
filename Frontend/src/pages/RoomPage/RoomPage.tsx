@@ -1,20 +1,23 @@
 import { useState } from "react";
-import { IRoomUpdate, useRoomPlayback, roomService } from "@room";
+import { IRoomUpdate, roomService } from "@room";
 import styles from "./RoomPage.module.scss";
 import AudioMiniPlayer from "@/components/ui/player/AudioMiniPlayer/AudioMiniPlayer";
-import { useGlobal } from "@common";
+import { useData, useGlobal } from "@common";
 import { useWebSocket } from "@websocket";
 import KebabMenu from "@/components/ui/KebabMenu/KebabMenu";
 import { CheckBoxIcon } from "@/assets/icons";
 import Loader from "@/components/ui/Loader/Loader";
 import { playlistService } from "@playlist";
-import TrackImportModal from "@/components/ui/modals/TrackImportModal/TrackImportModal";
+import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
 import RoomTrack from "@/components/ui/track/RoomTrack";
+import { useRoomPlayback } from "@playback";
+import { Navigate } from "react-router-dom";
 
 const RoomPage = () => {
     const [selectedTracks, setSelectedTracks] = useState<number[]>([]);
     const [selectMode, setSelectMode] = useState<boolean>(false);
-    const { room, playbackState, roomPlaylist } = useRoomPlayback();
+    const { playbackState } = useRoomPlayback();
+    const { room, playlist } = useData().roomData;
 
     const { started } = useGlobal();
     const { error } = useWebSocket();
@@ -32,13 +35,13 @@ const RoomPage = () => {
     };
 
     const deleteFromRoom = async () => {
-        if (!roomPlaylist?.id) return;
+        if (!playlist?.id) return;
 
         for (const trackId of selectedTracks) {
             setSelectedTracks(prev => prev.filter(id => id !== trackId))
         }
 
-        await playlistService.removeFromQueue(roomPlaylist?.id, selectedTracks)
+        await playlistService.removeFromQueue(playlist?.id, selectedTracks)
     }
 
     const saveRoom = async () => {
@@ -53,6 +56,10 @@ const RoomPage = () => {
         } catch (e) {
             console.error(e)
         }
+    }
+
+    if (!room) {
+        return <Navigate to={"/"}/>
     }
     
     return (
@@ -110,7 +117,7 @@ const RoomPage = () => {
                         </div>
 
                         <div className={styles.trackList}>
-                            {roomPlaylist?.queue.map(qi => (
+                            {playlist?.queue.map(qi => (
                                 <RoomTrack
                                     key={qi.id}
                                     queueItem={qi}
@@ -157,7 +164,7 @@ const RoomPage = () => {
                 {started && <AudioMiniPlayer />}
             </div>
 
-            {roomPlaylist && <TrackImportModal importPlaylist={roomPlaylist} isOpen={importOpen} onClose={() => setImportOpen(false)} />}
+            {playlist && <TrackImportModal importPlaylist={playlist} isOpen={importOpen} onClose={() => setImportOpen(false)} />}
         </>
     )
 }

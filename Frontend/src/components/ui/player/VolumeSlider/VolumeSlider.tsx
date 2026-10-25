@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./VolumeSlider.module.scss"
-import { useRoomPlayback } from "@room";
+import { useRoomPlayback } from "@playback";
 
 /**
  * VolumeSlider controls volume

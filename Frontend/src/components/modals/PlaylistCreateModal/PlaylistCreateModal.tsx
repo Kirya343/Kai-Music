@@ -1,6 +1,6 @@
 import { useState } from "react";
 import styles from "./PlaylistCreateModal.module.scss"
-import Modal from "@/components/ui/Modal/Modal";
+import Modal from "@/components/modals/Modal/Modal";
 import { CreatePlaylist } from "@playlist";
 import { useData } from "@common";
 
@@ -18,7 +18,7 @@ const PlaylistCreateModal = ({
     onClose: () => void;
 }) => {
 
-    const { playlists } = useData();
+    const { playlistsData } = useData();
 
     // new playlist title
     const [title, setTitle] = useState<string>("");
@@ -36,7 +36,7 @@ const PlaylistCreateModal = ({
         const playlist: CreatePlaylist = { title }
 
         try {
-            playlists.createPlaylist(playlist)
+            playlistsData.createPlaylist(playlist)
         } finally {
             setTitle("")
             onClose()

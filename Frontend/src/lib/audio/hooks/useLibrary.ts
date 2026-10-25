@@ -20,7 +20,7 @@ interface IUploadingAudio {
  */
 export const useLibrary = () => {
 
-    const { audios } = useData();
+    const { audiosData } = useData();
     
     /** List of current uploads */
     const [uploading, setUploading] = useState<IUploadingAudio[]>([]);
@@ -34,7 +34,7 @@ export const useLibrary = () => {
     /** Count of visibple items on page */
     const [visibleCount, setVisibleCount] = useState(50);
 
-    const { filteredList, searchQuery, setSearchQuery } = useSearch(audios.data);
+    const { filteredList, searchQuery, setSearchQuery } = useSearch(audiosData.data);
 
     /** Audios that should be currently visible */
     const visibleAudios = useMemo(() => {

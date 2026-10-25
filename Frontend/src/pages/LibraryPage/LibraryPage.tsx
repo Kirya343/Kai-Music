@@ -1,16 +1,16 @@
-import { useRoomPlayback } from "@room";
 import { IAudio, useLibrary } from "@audio";
 import { useMemo, useState } from "react";
 import styles from "./LibraryPage.module.scss"
-import AudioFileModal from "@/components/ui/modals/AudioFileModal/AudioFileModal";
+import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
 import { CirclePlusIcon, CheckmarkIcon, CrossIcon } from "@/assets/icons";
 import LibraryTrack from "@/components/ui/track/LibraryTrack";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData } from "@common";
+import { useRoomPlayback } from "@playback";
 
 const LibraryPage = () => {
 
-    const { audios } = useData();
+    const { audiosData, roomData } = useData();
 
     const { 
         visibleAudios,
@@ -22,19 +22,19 @@ const LibraryPage = () => {
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
     
-    const { roomPlaylist, playbackState } = useRoomPlayback();
+    const { playbackState } = useRoomPlayback();
 
     const playlistAudioIds = useMemo(() => {
         return new Set(
-            roomPlaylist?.queue.map(item => item.audio.id)
+            roomData.playlist?.queue.map(item => item.audio.id)
         );
-    }, [roomPlaylist?.queue]);
+    }, [roomData.playlist?.queue]);
 
     const playingAudioId = useMemo(() => {
-        return roomPlaylist?.queue.find(
+        return roomData.playlist?.queue.find(
             item => item.id === playbackState?.entryId
         )?.audio.id;
-    }, [roomPlaylist?.queue, playbackState?.entryId]);
+    }, [roomData.playlist?.queue, playbackState?.entryId]);
 
     return (
         <SearchableLayout
@@ -95,9 +95,9 @@ const LibraryPage = () => {
                                 <LibraryTrack
                                     audio={audio}
                                     trackNumber={item.index + 1}
-                                    importPlaylistId={roomPlaylist?.id}
+                                    importPlaylistId={roomData.playlist?.id}
                                     openEditModal={setAudioFileView}
-                                    handleDelete={audios.deleteAudio}
+                                    handleDelete={audiosData.deleteAudio}
                                     playing={playingAudioId === audio.id}
                                 />
                             </div>

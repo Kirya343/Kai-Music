@@ -1,4 +1,4 @@
-import { useRoomPlayback } from "@room";
+import { useRoomPlayback } from "@playback";
 import { useEffect, useRef } from "react";
 import { PlaybackModeToggle } from "../PlaybackModeToggle";
 import VolumeSlider from "../VolumeSlider/VolumeSlider";

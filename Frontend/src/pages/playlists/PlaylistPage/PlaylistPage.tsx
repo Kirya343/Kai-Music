@@ -2,7 +2,7 @@ import styles from "./PlaylistPage.module.scss"
 import { useMemo, useState } from "react";
 import { Playlist } from "@playlist";
 import { IAudio } from "@audio";
-import AudioFileModal from "@/components/ui/modals/AudioFileModal/AudioFileModal";
+import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
 import PlaylistTrack from "@/components/ui/track/PlaylistTrack";
 import { useParams } from "react-router-dom";
 import { CirclePlusIcon } from "@/assets/icons";
@@ -19,23 +19,23 @@ const PlaylistPage = ({}: {}) => {
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
-    const { roomPlaylist, playbackState } = useRoomPlayback();
+    const { playbackState } = useRoomPlayback();
 
-    const { playlists } = useData();
+    const { playlistsData, roomData } = useData();
         
     const playlist = useMemo<Playlist | null>(() => {
         if (!playlistId) return null;
 
-        return playlists.data.find(p => p.id === playlistId) || null
-    }, [playlists.data])
+        return playlistsData.data.find(p => p.id === playlistId) || null
+    }, [playlistsData.data])
     
     const { filteredList, searchQuery, setSearchQuery } = useSearch(playlist?.queue || []);
 
     const playingAudioId = useMemo(() => {
-        return roomPlaylist?.queue.find(
+        return roomData.playlist?.queue.find(
             item => item.id === playbackState?.entryId
         )?.audio.id;
-    }, [roomPlaylist?.queue, playbackState?.entryId]);
+    }, [roomData.playlist?.queue, playbackState?.entryId]);
 
     if (!playlist) return null;
 
@@ -58,7 +58,7 @@ const PlaylistPage = ({}: {}) => {
                         isInPlaylist={false}
                         currentPlaylistId={playlist.id}
                         openEditModal={setAudioFileView}
-                        handleRemove={playlists.removeAudio}
+                        handleRemove={playlistsData.removeAudio}
                         playing={playingAudioId === qi.audio.id}
                     />
                 ))}

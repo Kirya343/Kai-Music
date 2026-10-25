@@ -1,9 +1,9 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useRoomPlayback } from "@room";
+import { useRoomPlayback } from "@playback";
 import styles from "./Header.module.scss"
 import { useAuth } from "@user";
 import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon } from "@/assets/icons";
-import { useGlobal } from "@common";
+import { useData, useGlobal } from "@common";
 import { ReactNode } from "react";
 
 /**
@@ -27,7 +27,7 @@ interface INavigationLink {
 const Header = () => {
 
     const { user, isAuthenticated } = useAuth();
-    const { room } = useRoomPlayback();
+    const { roomData } = useData();
     const { isMobile } = useGlobal();
     const navigate = useNavigate();
 
@@ -37,7 +37,7 @@ const Header = () => {
     if (isMobile) return null;
 
     const links: INavigationLink[] = [
-        { to: "/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!room },
+        { to: "/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
         { to: "/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library", condition: isAuthenticated },
         { to: "/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists", condition: isAuthenticated },
     ]

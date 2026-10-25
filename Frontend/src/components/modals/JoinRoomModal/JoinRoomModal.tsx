@@ -1,7 +1,7 @@
 import { roomService } from "@room";
 import { Dispatch, SetStateAction, useState } from "react";
 import styles from "./JoinRoomModal.module.scss"
-import Modal from "@/components/ui/Modal/Modal";
+import Modal from "@/components/modals/Modal/Modal";
 import { useNavigate } from "react-router-dom";
 
 /**

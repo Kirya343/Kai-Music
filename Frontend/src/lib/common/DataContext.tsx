@@ -2,13 +2,15 @@ import { createContext, useContext, useEffect } from "react";
 import { CreatePlaylist, Playlist, usePlaylistsData } from "@playlist";
 import { IAudio, useAudioData } from "@audio";
 import { IQueueItem } from "@playback";
+import { IListeningRoom, useRoomData } from "@room";
 
 /**
  * Defines the acpplication data context.
  */
 interface DataContextType {
-    playlists: IPlaylistsData;
-    audios: IAudiosData;
+    playlistsData: IPlaylistsData;
+    audiosData: IAudiosData;
+    roomData: IRoomData;
 }
 
 
@@ -53,6 +55,20 @@ interface IAudiosData {
 }
 
 /**
+ * Defines the current room data and room's playlist.
+ */
+interface IRoomData {
+    /** Room data. */
+    room: IListeningRoom | null;
+
+    /** Room playlist. */
+    playlist: Playlist | null;
+
+    /** Shows is data already synced or not */
+    synced: boolean;
+}
+
+/**
  * Context for accessing application-wide data.
  *
  * Provides access to audio and playlist data managed by their respective hooks.
@@ -79,18 +95,20 @@ export const useData = () => {
  */
 export const DataProvider = ({ children }: { children?: React.ReactNode }) => {
 
-    const audios = useAudioData();
-    const playlists = usePlaylistsData();
+    const audiosData = useAudioData();
+    const playlistsData = usePlaylistsData();
+    const roomData = useRoomData();
 
     useEffect(() => {
-        playlists.syncPlaylists();
-        audios.syncAudios();
-    }, [playlists.syncPlaylists, audios.syncAudios]);
+        playlistsData.syncPlaylists();
+        audiosData.syncAudios();
+    }, [playlistsData.syncPlaylists, audiosData.syncAudios]);
 
     return (
         <DataContext.Provider value={{
-            audios,
-            playlists
+            audiosData,
+            playlistsData,
+            roomData
          }}>
             {children}
         </DataContext.Provider>

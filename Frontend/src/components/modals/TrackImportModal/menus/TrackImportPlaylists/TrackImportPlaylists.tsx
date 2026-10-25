@@ -19,9 +19,9 @@ const TrackImportPlaylists = ({
     importPlaylist
 }: TrackImportPlaylistsProps) => {
     
-    const { playlists } = useData();
+    const { playlistsData } = useData();
     
-    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlists.data);
+    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.data);
 
     return (
         <>
@@ -42,7 +42,7 @@ const TrackImportPlaylists = ({
                         <SelectPlaylist
                             key={playlist.id}
                             playlist={playlist}
-                            importToRoom={() => playlists.importToRoom(importPlaylist, playlist)}
+                            importToRoom={() => playlistsData.importToRoom(importPlaylist, playlist)}
                             onClick={() => seePlaylist(playlist.id)}
                         />
                     ))}

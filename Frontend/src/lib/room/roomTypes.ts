@@ -1,15 +1,20 @@
+import { Playlist } from "@playlist";
 import { IAudio } from "../audio";
 
-export interface IListeningRoom extends IShortRoom{
+export interface IListeningRoom extends RoomTemplate {
     audio: IAudio;
+    playlist: Playlist;
 }
 
-export interface IShortRoom {
+interface RoomTemplate {
     id: number;
     title: string;
     ownerId: number;
     code: string;
     listeners: number;
+}
+
+export interface IShortRoom extends RoomTemplate {
     playlistId: number;
 }
 

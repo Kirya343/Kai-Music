@@ -1,21 +1,18 @@
 import styles from "./PlaylistsPage.module.scss"
 import { CirclePlusIcon } from "@/assets/icons";
 import { useState } from "react";
-import PlaylistCreateModal from "@/components/ui/modals/PlaylistCreateModal/PlaylistCreateModal";
+import PlaylistCreateModal from "@/components/modals/PlaylistCreateModal/PlaylistCreateModal";
 import LibraryPlaylist from "@/components/ui/playlist/LibraryPlaylist";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
-import { useRoomPlayback } from "@playback";
 
 const PlaylistsPage = () => {
 
-    const { playlists } = useData();
+    const { playlistsData, roomData } = useData();
     
-    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlists.data);
+    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.data);
 
     const [isOpen, setOpen] = useState(false);
-
-    const { roomPlaylist } = useRoomPlayback();
 
     return (
         <SearchableLayout
@@ -33,8 +30,8 @@ const PlaylistsPage = () => {
                     <LibraryPlaylist
                         key={p.id}
                         playlist={p}
-                        deletePlaylist={() => playlists.deletePlaylist(p)}
-                        importToRoom={() => roomPlaylist && playlists.importToRoom(roomPlaylist, p)}
+                        deletePlaylist={() => playlistsData.deletePlaylist(p)}
+                        importToRoom={() => roomData.playlist && playlistsData.importToRoom(roomData.playlist, p)}
                     />
                 ))}
             </div>

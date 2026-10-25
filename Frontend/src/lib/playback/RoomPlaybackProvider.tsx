@@ -1,16 +1,11 @@
 import { createContext, Dispatch, SetStateAction, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IAudio, TimeRange } from "@audio";
-import { useListeningRoomWS, useAudioStream, IShortRoom } from "@room";
-import { countPosition } from "@common";
-import { IPlaybackState } from "@playback";
-import { PlaybackMode, Playlist } from "../playlist";
+import { countPosition, useData } from "@common";
+import { IPlaybackState, useAudioStream, useListeningRoomWS } from "@playback";
 import { playbackService } from "./services";
 
 interface RoomPlaybackContextType {
-    room: IShortRoom | null;
-    roomPlaylist: Playlist | null;
     playingAudio: IAudio | null;
-    playbackMode: PlaybackMode;
 
     playbackState: IPlaybackState | null;
     roomLoaded: boolean;
@@ -37,11 +32,9 @@ export const useRoomPlayback = () => {
 
 export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 
-    const { 
-        room, 
-        roomPlaylist,
-        playbackMode,
-        
+    const { roomData } = useData();
+
+    const {
         setAudioChunkHandler,
         setPlaybackStateCallback,
     } = useListeningRoomWS();
@@ -58,14 +51,14 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     } = useAudioStream();
 
     const playingAudio = useMemo<IAudio | null>(() => {
-        const queueItem = roomPlaylist?.queue.find(qi => qi.id === playbackState?.entryId)
+        const queueItem = roomData.playlist?.queue.find(qi => qi.id === playbackState?.entryId)
 
         if (!queueItem?.audio) return null;
 
         return queueItem.audio;
-    }, [roomPlaylist, playbackState])
+    }, [roomData.playlist, playbackState])
 
-    const roomLoaded: boolean = !!room;
+    const roomLoaded: boolean = !!roomData.room;
 
     const prevRoomRef = useRef<number | null>(null);
     const debounceTimeoutRef = useRef<number | null>(null);
@@ -91,17 +84,17 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     }, [playbackState])
 
     useEffect(() => {
-        if (!room) return;
+        if (!roomData.room) return;
 
         if (
             prevRoomRef.current !== null &&
-            prevRoomRef.current !== room.id
+            prevRoomRef.current !== roomData.room.id
         ) {
             pausePlayback();
         }
 
-        prevRoomRef.current = room.id;
-    }, [room?.id]);
+        prevRoomRef.current = roomData.room.id;
+    }, [roomData.room?.id]);
 
     // Обновление позиции и паузы от сервера
     useEffect(() => {
@@ -131,7 +124,7 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     // Play / Pause кнопка
     const togglePlay = useCallback(async () => {
 
-        if (!playbackState || !room?.id) return;
+        if (!playbackState || !roomData.room?.id) return;
 
         const newPaused = !playbackState?.pause
 
@@ -139,12 +132,14 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
             pausePlayback()
         }
 
-        await playbackService.updateTrackPosition(room.id, {...playbackState, pause: newPaused});
-    }, [playbackState, room?.id]);
+        await playbackService.updateTrackPosition(roomData.room.id, {...playbackState, pause: newPaused});
+    }, [playbackState, roomData.room?.id]);
 
     const seek = useCallback((position: number) => {
 
-        if (!playbackState?.entryId || !room?.id) return;
+        const roomId = roomData.room?.id;
+
+        if (!playbackState?.entryId || !roomId) return;
 
         try {
             pausePlayback();
@@ -162,12 +157,12 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
             // ставим новый таймаут на 300 мс
             debounceTimeoutRef.current = setTimeout(async () => {
                 if (playbackState) {
-                    await playbackService.updateTrackPosition(room.id, newState);
+                    await playbackService.updateTrackPosition(roomId, newState);
                 }
                 debounceTimeoutRef.current = null;
             }, 100);
         }
-    }, [playbackState, pausePlayback, room?.id]);
+    }, [playbackState, pausePlayback, roomData.room?.id]);
 
     useEffect(() => {
         setAudioChunkHandler((chunk) => {
@@ -181,7 +176,10 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     }, [setAudioChunkHandler]);
 
     useEffect(() => {
-        if (!("mediaSession" in navigator) || !playbackState || !playingAudio || !room?.id) {
+
+        const roomId = roomData.room?.id;
+
+        if (!("mediaSession" in navigator) || !playbackState || !playingAudio || !roomId) {
             return;
         }
 
@@ -207,11 +205,11 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         });
 
         navigator.mediaSession.setActionHandler("nexttrack", async () => {
-            await playbackService.playTrack(room?.id, "next");
+            await playbackService.playTrack(roomId, "next");
         });
 
         navigator.mediaSession.setActionHandler("previoustrack", async () => {
-            await playbackService.playTrack(room?.id, "prev");
+            await playbackService.playTrack(roomId, "prev");
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
@@ -246,16 +244,13 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     }, [
         playingAudio,
         playbackState,
-        room?.id,
+        roomData.room?.id,
         seek
     ]);
     
     return (
         <RoomPlaybackContext.Provider value={{ 
-            room,
-            roomPlaylist,
             playingAudio,
-            playbackMode,
 
             playbackState, 
             roomLoaded, 

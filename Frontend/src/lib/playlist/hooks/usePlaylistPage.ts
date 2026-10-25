@@ -5,13 +5,13 @@ import { IQueueItem } from "@playback";
 
 export const usePlaylistPage = (playlistId: number) => {
 
-    const { playlists } = useData();
+    const { playlistsData } = useData();
 
     const playlist = useMemo<Playlist | null>(() => {
         if (!playlistId) return null;
 
-        return playlists.data.find(p => p.id === playlistId) || null
-    }, [playlists.data])
+        return playlistsData.data.find(p => p.id === playlistId) || null
+    }, [playlistsData.data])
 
     const queue = useMemo<IQueueItem[]>(() => {
         if (!playlist?.queue) return []

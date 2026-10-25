@@ -12,11 +12,16 @@
 html, body {
     scroll-behavior: smooth;
     scrollbar-gutter: auto;
-    height: 100dvh;
+    height: 100%;
+    max-height: 100dvh;
     scrollbar-color: var(--scrollbar-color) var(--scrollbar-background);
     scrollbar-width: thin;
     font-family: 'Montserrat', sans-serif;
     color: var(--text-color);
+    
+    @include mobile {
+        max-height: 100svh;
+    }
 
     #root {
         height: 100%;

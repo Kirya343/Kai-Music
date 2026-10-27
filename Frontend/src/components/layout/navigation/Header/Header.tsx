@@ -1,5 +1,4 @@
-import { Link, NavLink, useLocation, useNavigate, useResolvedPath } from "react-router-dom";
-import { useRoomPlayback } from "@playback";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import styles from "./Header.module.scss"
 import { useAuth } from "@user";
 import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon, HomeIcon } from "@/assets/icons";

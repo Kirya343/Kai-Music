@@ -1,11 +1,10 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import styles from "./MobileNav.module.scss"
-import { useRoomPlayback } from "@playback";
-import { useAuth } from "@user";
 import { PlaylistIcon, DoorIcon, LibraryIcon, HomeIcon, UserIcon } from "@/assets/icons";
 
 import { ReactNode } from "react";
 import { useData, useGlobal } from "@common";
+import clsx from "clsx";
 
 
 /**
@@ -34,7 +33,7 @@ const MobileNav = () => {
     if (!isMobile) return null;
 
     const links: INavigationLink[] = [
-        { to: "/", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
+        { to: "/app", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
         { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
         { to: "/app/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library" },
         { to: "/app/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists" },
@@ -53,8 +52,11 @@ const MobileNav = () => {
  *  NavigationLink is conponent to display navigation links
  */
 const NavigationLink = ({ link }: { link: INavigationLink }) => {
+    const location = useLocation();
+    const isActive = link.to == location.pathname;
+
     return (link.condition ?? true) && (
-        <NavLink to={link.to} className={styles.link}>
+        <NavLink to={link.to} className={clsx(styles.link, isActive && styles.active)}>
             {link.icon}
             <span className={styles.subtitle}>{link.title}</span>
         </NavLink>

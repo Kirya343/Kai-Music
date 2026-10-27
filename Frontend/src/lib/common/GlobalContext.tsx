@@ -1,4 +1,4 @@
-import { createContext, Dispatch, SetStateAction, useContext, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 
 /**
  * Defines the global application context.
@@ -42,15 +42,30 @@ export const useGlobal = () => {
 export const GlobalProvider = ({ children }: { children?: React.ReactNode }) => {
 
     const [started, setStarted] = useState<boolean>(false);
+    console.log("перемонтировали statred", started)
 
     const isMobile = window.innerWidth < 768;
+
+    useEffect(() => {
+        const handleClick = () => {
+            setStarted(true);
+            console.log("МЫ ПОЛУЧИЛИ КЛИК")
+            document.body.removeEventListener("click", handleClick);
+        };
+
+        document.body.addEventListener("click", handleClick);
+
+        return () => {
+            document.body.removeEventListener("click", handleClick);
+        };
+    }, []);
 
     return (
         <GlobalContext.Provider value={{
             started,
             setStarted,
             isMobile
-         }}>
+        }}>
             {children}
         </GlobalContext.Provider>
     );

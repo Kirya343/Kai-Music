@@ -1,9 +1,8 @@
 @use "@/css/components/mixins/" as *;
 
-.audioTracker {
+.miniPlayer {
     position: sticky;
-    margin-top: 5px;
-    bottom: .3rem;
+    bottom: 0;
     width: 100%;
     display: flex;
     padding: 10px;
@@ -14,6 +13,7 @@
     transition: background-color 0.2s ease-in;
     border: 1px solid;
     flex-shrink: 0;
+    gap: 1rem;
 
     &:hover {
         background-color: #251818;
@@ -47,6 +47,32 @@
 
         svg {
             width: 20px;
+            height: 20px;
+        }
+    }
+}
+
+@keyframes trackerScroll {
+    0% {
+        transform: translateX(calc(50% - 120px));
+    }
+    100% {
+        transform: translateX(calc(-50% + 120px));
+    }
+}
+
+.header {
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    
+    .headerText {
+        display: inline-block;
+
+        &.animate {
+            animation: trackerScroll 10s linear infinite alternate;
         }
     }
 }

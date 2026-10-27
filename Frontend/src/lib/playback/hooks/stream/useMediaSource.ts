@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudioBuffer } from "./useAudioBuffer";
 import { IPlaybackState } from "@playback";
+import { useGlobal } from "@common";
 
 export const useMediaSource = () => {
+
+    const { started } = useGlobal();
 
     const { 
         sourceBufferRef, 
@@ -186,10 +189,14 @@ export const useMediaSource = () => {
 
         console.log('Попытка начать проигрывание', entryId);
 
+        console.log(started)
+
+        if (!started) return;
+
+        console.log('приложение уже работает');
+
         const audio = audioRef.current;
         const state = unsyncedStateRef.current;
-
-        
 
         if (!audio || !bufferedRanges || state === null) {
             return;
@@ -223,19 +230,33 @@ export const useMediaSource = () => {
             setPlaybackState(prev => ({...prev!, pause: false}))
             resumePlayback();
         }
-    }, [bufferedRanges]);
+    }, [bufferedRanges, started]);
+
+    useEffect(() => {
+        const entryId = currentEntryIdRef.current;
+
+        if (entryId == null) return;
+
+        playIfBuffered(entryId);
+    }, [started, playIfBuffered]);
+
+    const playIfBufferedRef = useRef(playIfBuffered);
+
+    useEffect(() => {
+        playIfBufferedRef.current = playIfBuffered;
+    }, [playIfBuffered]);
 
     useEffect(() => {
         setBufferUpdateHandler((entryId: number) => {
-            playIfBuffered(entryId)
-        })
+            playIfBufferedRef.current(entryId);
+        });
 
         return () => {
             setBufferUpdateHandler(() => {});
             pausePlayback();
             cleanupAudio();
         };
-    }, [])
+    }, [setBufferUpdateHandler, pausePlayback, cleanupAudio]);
 
     return {
         audioRef,

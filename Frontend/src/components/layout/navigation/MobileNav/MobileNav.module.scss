@@ -22,7 +22,7 @@
     position: relative;
     width: 60px;
 
-    &:global(.active) {
+    &.active {
         color: var(--orange);
     }
 

@@ -3,7 +3,6 @@ import { LoginPage, LoginSuccessPage, LogoutPage, MainPage, RegisterPage } from 
 import MainLayout from "./components/layout/MainLayout/MainLayout";
 import RoomPage from "./pages/app/RoomPage/RoomPage";
 import PrivateRoute from "./PrivateRoute";
-import StartLayout from "./components/layout/StartLayout/StartLayout";
 import PlaylistsPage from "./pages/app/playlists/PlaylistsPage/PlaylistsPage";
 import LibraryPage from "./pages/app/LibraryPage/LibraryPage";
 import PlaylistPage from "./pages/app/playlists/PlaylistPage/PlaylistPage";

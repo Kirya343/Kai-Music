@@ -40,7 +40,7 @@ const AudioMiniPlayer = () => {
 
     return playingAudio && playbackState && (
         <div 
-            className={styles.audioTracker} 
+            className={styles.miniPlayer} 
             data-testid="mini-player" 
             onClick={() => setFullPlayerOpen(true)}
         >

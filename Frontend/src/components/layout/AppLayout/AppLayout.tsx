@@ -5,9 +5,8 @@ import Header from "../navigation/Header/Header";
 import MobileNav from "../navigation/MobileNav/MobileNav";
 import RoomReturnModal from "@/components/modals/RoomReturnModal/RoomReturnModal";
 import clsx from "clsx";
-import { useGlobal } from "@common";
 import { useAuth } from "@user";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useWebSocket } from "@websocket";
 
 /**
@@ -15,7 +14,7 @@ import { useWebSocket } from "@websocket";
  */
 const AppLayout = () => {
 
-    const { started, setStarted } = useGlobal();
+    const [started, setStarted] = useState<boolean>(false);
     const { user, loading } = useAuth();
     const { isReady } = useWebSocket();
     const [loadingPercent, setLoadingPercent] = useState<number>(0);
@@ -59,7 +58,7 @@ const AppLayout = () => {
 
                     <MobileNav />
 
-                    <RoomReturnModal />
+                    {/* <RoomReturnModal /> */}
                 </div>
             ) : (
                 <div className={styles.loadingWrapper}>

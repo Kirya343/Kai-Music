@@ -56,6 +56,10 @@
     width: 100%;
     min-height: 0;
     animation: contentEnter 0.7s ease 1s both;
+
+    @include mobile {
+        gap: 0.5rem;
+    }
 }
 
 .startWrapper {

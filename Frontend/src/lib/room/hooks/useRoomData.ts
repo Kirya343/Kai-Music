@@ -6,7 +6,7 @@ import { Playlist } from "@playlist";
 
 export function useRoomData() {
 
-    const { addOnConnectHandler } = useWebSocket();
+    const { addOnConnectHandler, client } = useWebSocket();
     
     const currentRoomIdRef = useRef<number | null>(null);
 
@@ -38,6 +38,17 @@ export function useRoomData() {
         }
     }, [])
 
+    const reconnectToRoom = useCallback(() => {
+        if (!client) return;
+
+        console.log("переподключаемся к комнате")
+
+        client.publish({
+            destination: "/app/room/reconnect",
+            body: JSON.stringify({ roomId: room?.id })
+        });
+    }, [client])
+
     useEffect(() => {
         syncRoom()
     }, [])
@@ -45,6 +56,12 @@ export function useRoomData() {
     useEffect(() => {
         localStorage.setItem("room", JSON.stringify(room));
     }, [room])
+
+    useEffect(() => {
+        if (room && synced) {
+            reconnectToRoom()
+        }
+    }, [room?.id, synced, reconnectToRoom])
 
     useEffect(() => {
         const unsubscribe = addOnConnectHandler((client, isReconnect) => {
@@ -65,15 +82,6 @@ export function useRoomData() {
 
                 setPlaylist(prev => prev ? ({...prev, mode}) : prev);
             });
-
-            if (isReconnect && currentRoomIdRef.current !== null) {
-                client.publish({
-                    destination: "/app/room/reconnect",
-                    body: JSON.stringify({
-                        roomId: currentRoomIdRef.current
-                    })
-                });
-            }
 
             return () => {
                 roomSub.unsubscribe();

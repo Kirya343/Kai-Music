@@ -1,0 +1,16 @@
+@use "@/css/components/mixins/" as *;
+
+.page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.link {
+    border: 1px solid;
+    padding: 10px 16px;
+    border-radius: 30px;
+
+    @include glass;
+}

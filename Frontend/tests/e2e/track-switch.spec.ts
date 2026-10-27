@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("switching tracks starts playback of the new track", async ({ page }) => {
-    await page.goto("/room");
+    await page.goto("/app/room");
 
     // TODO: авторизоваться, если это необходимо.
     // TODO: подключиться к комнате, если это не происходит автоматически.

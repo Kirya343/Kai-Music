@@ -34,16 +34,18 @@ const MainPage = () => {
     const createRoom = async () => {
         try {
             await roomService.createRoom();
-        } finally {
-            navigate("/room");
+            navigate("/app/room");
+        } catch (e) {
+            console.error(e);
         }
     }
 
     const joinRoom = async (code: string) => {
         try {
             await roomService.joinRoom(code);
-        } finally {
-            navigate("/room");
+            navigate("/app/room");
+        } catch (e) {
+            console.error(e);
         }
     }
 

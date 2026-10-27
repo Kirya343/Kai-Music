@@ -28,7 +28,7 @@ const JoinRoomModal = ({
     const joinRoom = async () => {
         try {
             await roomService.joinRoom(code);
-            navigate("/room");
+            navigate("/app/room");
         } catch (e) {
             console.error(e)
         }

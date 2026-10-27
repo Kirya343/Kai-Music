@@ -1,10 +1,11 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate, useResolvedPath } from "react-router-dom";
 import { useRoomPlayback } from "@playback";
 import styles from "./Header.module.scss"
 import { useAuth } from "@user";
-import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon } from "@/assets/icons";
+import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon, HomeIcon } from "@/assets/icons";
 import { useData, useGlobal } from "@common";
 import { ReactNode } from "react";
+import clsx from "clsx";
 
 /**
  * interface for NavigationLink conponents
@@ -18,7 +19,7 @@ interface INavigationLink {
     to: string,
     icon: ReactNode,
     title: string,
-    condition: boolean
+    condition?: boolean
 }
 
 /**
@@ -37,9 +38,10 @@ const Header = () => {
     if (isMobile) return null;
 
     const links: INavigationLink[] = [
-        { to: "/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
-        { to: "/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library", condition: isAuthenticated },
-        { to: "/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists", condition: isAuthenticated },
+        { to: "/app", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
+        { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
+        { to: "/app/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library", condition: isAuthenticated },
+        { to: "/app/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists", condition: isAuthenticated },
     ]
     
     return (
@@ -50,7 +52,7 @@ const Header = () => {
                     {links.map(l => <NavigationLink key={l.title} link={l} />)}
                 </div>
                 {isAuthenticated ? (
-                    <Link to="/profile" className={styles.auth}>
+                    <Link to="/app/profile" className={styles.auth}>
                         <UserIcon className={styles.icon}/>
                         <span className={styles.userName}>{user?.name}</span>
                     </Link>
@@ -66,8 +68,11 @@ const Header = () => {
  *  NavigationLink is conponent to display navigation links
  */
 const NavigationLink = ({ link }: { link: INavigationLink }) => {
-    return link.condition && (
-        <NavLink to={link.to} className={styles.link}>
+    const location = useLocation();
+    const isActive = link.to == location.pathname;
+
+    return (link.condition ?? true) && (
+        <NavLink to={link.to} className={clsx(styles.link, isActive && styles.active)}>
             {link.icon}
             <span className={styles.subtitle}>{link.title}</span>
         </NavLink>

@@ -25,7 +25,7 @@ const RoomReturnModal = () => {
         
         if (!client) return;
 
-        navigate("/room");
+        navigate("/app/room");
         setOpen(false)
         
         client.publish({

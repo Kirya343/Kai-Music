@@ -1,14 +1,15 @@
 package org.kirya343.kai.features.audio.controller;
 
+import org.kirya343.kai.infrastructure.security.annotations.controllers.Authenticated;
+import org.kirya343.kai.infrastructure.security.annotations.parameters.AuthUser;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.kirya343.kai.infrastructure.security.services.UserAuthDataService;
 import org.kirya343.kai.features.audio.dto.AudioDTO;
 import org.kirya343.kai.features.audio.dto.AudioUpdateDTO;
 import org.kirya343.kai.features.audio.services.AudioCommandService;
 import org.kirya343.kai.features.audio.services.AudioQueryService;
 import org.kirya343.kai.features.audio.services.storage.AudioFileManager;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -36,14 +37,16 @@ public class AudioController {
     private final AudioQueryService audioQueryService;
 
     @GetMapping("/library")
-    public List<AudioDTO> getUserLibrary(@AuthenticationPrincipal UserAuthData authData) {
+    @Authenticated
+    public List<AudioDTO> getUserLibrary(@AuthUser UserAuthData authData) {
         return audioQueryService.getUserLibrary(authData.id());
     }
 
     @PostMapping("/recognize/{audioId}")
+    @Authenticated
     public void recognize(
         @PathVariable Long audioId, 
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         try {
             audioCommandService.recognize(audioId, authData);
@@ -53,10 +56,11 @@ public class AudioController {
     }
 
     @PostMapping("/upload")
+    @Authenticated
     public void uploadAudio(
         @RequestParam MultipartFile file,
         @RequestParam(required = false) String apiKey,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         if (apiKey != null) {
             authData = userAuthDataService.load(apiKey);
@@ -66,18 +70,20 @@ public class AudioController {
     }
 
     @PatchMapping("/{audioId}")
+    @Authenticated
     public void updateAudio(
         @PathVariable Long audioId,
         @RequestBody AudioUpdateDTO dto,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         audioCommandService.updateAudio(audioId, dto, authData);
     }
 
     @DeleteMapping("/{audioId}")
+    @Authenticated
     public void deleteAudio(
         @PathVariable Long audioId,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         audioCommandService.deleteAudio(audioId);
     }

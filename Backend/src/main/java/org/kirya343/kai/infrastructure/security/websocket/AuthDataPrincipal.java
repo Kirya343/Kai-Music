@@ -1,7 +1,8 @@
 package org.kirya343.kai.infrastructure.security.websocket;
 
 import java.security.Principal;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
+
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 
 import lombok.RequiredArgsConstructor;
 

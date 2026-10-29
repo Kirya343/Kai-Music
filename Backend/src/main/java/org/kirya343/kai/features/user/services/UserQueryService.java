@@ -3,9 +3,9 @@ package org.kirya343.kai.features.user.services;
 import java.util.List;
 
 import org.kirya343.kai.features.user.services.UserQueryService;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.kirya343.kai.features.user.datasource.User;
 import org.kirya343.kai.features.user.datasource.UserRepository;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.user.dto.UserDTO;
 import org.kirya343.kai.features.user.enums.UserStatus;
 import org.springframework.data.domain.PageRequest;

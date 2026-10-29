@@ -10,13 +10,11 @@ import org.kirya343.kai.features.permission.datasource.repository.PermissionRepo
 import org.kirya343.kai.features.permission.datasource.repository.RoleRepository;
 import org.kirya343.kai.features.permission.dto.PermissionDTO;
 import org.kirya343.kai.features.permission.dto.RoleDTO;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Profile({"production", "statistic"})
 @RequiredArgsConstructor
 public class PermissionQueryService {
 

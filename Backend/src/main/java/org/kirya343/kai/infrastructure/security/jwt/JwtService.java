@@ -1,4 +1,4 @@
-package org.kirya343.kai.infrastructure.security;
+package org.kirya343.kai.infrastructure.security.jwt;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.nimbusds.jose.jwk.RSAKey;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -26,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Profile("production")
 @RequiredArgsConstructor
 @Slf4j 
 public class JwtService {

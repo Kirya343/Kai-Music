@@ -6,7 +6,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.kai.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.kai.features.playback.dto.commands.UpdatePlayback;
@@ -15,6 +14,8 @@ import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playlist.datasource.model.QueueItem;
 import org.kirya343.kai.features.presence.UserPresence;
 import org.kirya343.kai.features.presence.services.PresenceService;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
+
 import io.github.kirya343.terminal.components.DiagnosticLoggable;
 import io.github.kirya343.terminal.core.DiagnosticTextBuilder;
 import org.springframework.context.ApplicationEventPublisher;

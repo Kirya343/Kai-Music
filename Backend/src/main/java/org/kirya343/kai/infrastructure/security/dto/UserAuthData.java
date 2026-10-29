@@ -1,4 +1,4 @@
-package org.kirya343.kai.features.authentication.dto;
+package org.kirya343.kai.infrastructure.security.dto;
 
 import java.util.Objects;
 

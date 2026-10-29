@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.kirya343.kai.infrastructure.security.AuthCookiesService;
-import org.kirya343.kai.infrastructure.security.JwtService;
+import org.kirya343.kai.infrastructure.security.annotations.controllers.Authenticated;
+import org.kirya343.kai.infrastructure.security.annotations.controllers.PublicEndpoint;
+import org.kirya343.kai.infrastructure.security.jwt.JwtService;
+import org.kirya343.kai.infrastructure.security.services.AuthCookiesService;
 import org.kirya343.kai.infrastructure.security.services.AuthService;
 import org.kirya343.kai.features.user.datasource.User;
 import org.kirya343.kai.features.user.datasource.UserRepository;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import jakarta.annotation.security.PermitAll;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +44,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    @PermitAll
+    @PublicEndpoint 
     public ResponseEntity<?> login(
         @Valid @RequestBody LoginRequest request, 
         HttpServletResponse response
@@ -52,7 +53,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @PermitAll
+    @PublicEndpoint 
     public ResponseEntity<?> register(
         @Valid @RequestBody RegisterRequest regRequest,
         HttpServletRequest request,
@@ -62,7 +63,7 @@ public class AuthController {
     }
 
     @GetMapping("/discord")
-    @PermitAll
+    @PublicEndpoint 
     public void redirectToDiscord(
         HttpServletRequest request,
         HttpServletResponse response
@@ -72,7 +73,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @PermitAll
+    @PublicEndpoint 
     public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
         logger.debug("Обновляем токен пользователя");
         try {
@@ -119,7 +120,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    @PermitAll
+    @Authenticated
     public ResponseEntity<?> logout(HttpServletResponse response) {
 
         try {

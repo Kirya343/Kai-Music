@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.kirya343.kai.features.user.datasource.User;
 import org.kirya343.kai.features.user.datasource.UserRepository;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

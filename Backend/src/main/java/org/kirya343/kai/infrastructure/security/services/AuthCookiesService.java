@@ -1,15 +1,14 @@
-package org.kirya343.kai.infrastructure.security;
+package org.kirya343.kai.infrastructure.security.services;
 
 import java.time.Duration;
 import java.util.Objects;
 
-import org.kirya343.kai.infrastructure.security.services.UserAuthDataService;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.jwt.JwtIssuer;
 import org.kirya343.kai.features.user.datasource.User;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.lang.NonNull;
@@ -22,7 +21,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@Profile("production")
 @RequiredArgsConstructor
 public class AuthCookiesService {
 

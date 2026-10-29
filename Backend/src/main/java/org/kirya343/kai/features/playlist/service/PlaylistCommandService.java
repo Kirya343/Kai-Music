@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.kirya343.kai.features.audio.datasource.AudioFileRepository;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.dto.event.QueueChangedEvent;
 import org.kirya343.kai.features.playback.enums.PlaybackMode;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
@@ -19,6 +18,7 @@ import org.kirya343.kai.features.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.kai.features.room.datasource.ListeningRoom;
 import org.kirya343.kai.features.room.services.RoomQueryService;
 import org.kirya343.kai.features.user.datasource.User;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.kirya343.kai.infrastructure.security.services.UserAuthDataService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;

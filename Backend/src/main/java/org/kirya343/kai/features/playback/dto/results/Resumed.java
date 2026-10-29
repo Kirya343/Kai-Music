@@ -1,6 +1,6 @@
 package org.kirya343.kai.features.playback.dto.results;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 
 public record Resumed(
     Long roomId,

@@ -5,13 +5,10 @@ import java.util.Map;
 
 import org.kirya343.kai.features.user.dto.event.UserConnectedEvent;
 import org.kirya343.kai.features.user.dto.event.UserDisconnectedEvent;
-import org.kirya343.kai.infrastructure.security.JwtService;
-import org.kirya343.kai.infrastructure.security.services.CachedPermissionsJwtTokenConverter;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.jwt.CachedPermissionsJwtTokenConverter;
+import org.kirya343.kai.infrastructure.security.jwt.JwtService;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -32,14 +29,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Profile("production")
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
+@Slf4j 
 @RequiredArgsConstructor
 public class AuthChannelInterceptor implements ChannelInterceptor {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthChannelInterceptor.class);
 
     private final JwtService jwtService;
     private final CachedPermissionsJwtTokenConverter jwtTokenConverter;
@@ -52,9 +48,9 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
         if (accessor != null) {
             Principal user = accessor.getUser();
             if (user != null) {
-                logger.debug("STOMP current user class: {}, name: {}", user.getClass(), user.getName());
+                log.debug("STOMP current user class: {}, name: {}", user.getClass(), user.getName());
             } else {
-                logger.debug("STOMP user is null");
+                log.debug("STOMP user is null");
             }
         }
 
@@ -79,17 +75,17 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
                 eventPublisher.publishEvent(new UserConnectedEvent(authData));
 
-                logger.debug("Пользователь подключался от WS: {}", authData.name());
+                log.debug("Пользователь подключался от WS: {}", authData.name());
 
                 accessor.setUser(auth);
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 context.setAuthentication(auth);
                 SecurityContextHolder.setContext(context);
 
-                logger.debug("STOMP user authenticated: {}", context);
+                log.debug("STOMP user authenticated: {}", context);
 
             } catch (Exception e) {
-                logger.error("STOMP token validation failed", e);
+                log.error("STOMP token validation failed", e);
                 throw new MessagingException(e.getMessage(), e);
             }
         }
@@ -106,7 +102,7 @@ public class AuthChannelInterceptor implements ChannelInterceptor {
 
             eventPublisher.publishEvent(new UserDisconnectedEvent(authData));
 
-            logger.debug("Пользователь отключился от WS: {}", authData.name());
+            log.debug("Пользователь отключился от WS: {}", authData.name());
         }
     }
 }

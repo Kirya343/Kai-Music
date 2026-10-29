@@ -2,14 +2,13 @@ package org.kirya343.kai.infrastructure.security.services;
 
 import java.io.IOException;
 
-import org.kirya343.kai.infrastructure.security.CookieBearerTokenResolver;
+import org.kirya343.kai.infrastructure.security.jwt.CachedPermissionsJwtTokenConverter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtException;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtDecoder jwtDecoder;
-    private final JwtAuthenticationConverter jwtTokenConverter;
+    private final CachedPermissionsJwtTokenConverter jwtTokenConverter;
     private final CookieBearerTokenResolver bearerTokenResolver;
 
     @Override

@@ -1,9 +1,9 @@
 package org.kirya343.kai.features.room.services;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.room.datasource.ListeningRoom;
 import org.kirya343.kai.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.kai.features.room.dto.RoomDTO;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;

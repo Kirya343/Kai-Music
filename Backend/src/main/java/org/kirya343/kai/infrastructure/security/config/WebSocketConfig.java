@@ -2,8 +2,8 @@ package org.kirya343.kai.infrastructure.security.config;
 
 import org.kirya343.kai.infrastructure.security.websocket.AuthChannelInterceptor;
 import org.kirya343.kai.infrastructure.security.websocket.AuthHandshakeInterceptor;
+import org.kirya343.kai.infrastructure.security.websocket.WebSocketAuthUserArgumentResolver;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.Ordered;
 import org.springframework.lang.NonNull;
@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import org.springframework.security.messaging.context.AuthenticationPrincipalArgumentResolver;
 import org.springframework.security.messaging.context.SecurityContextChannelInterceptor;
 
 import lombok.RequiredArgsConstructor;
@@ -30,13 +29,13 @@ import java.util.List;
 
 @Configuration
 @EnableWebSocketMessageBroker
-@Profile({"production"})
 @RequiredArgsConstructor
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final AuthChannelInterceptor authChannelInterceptor;
     private final AuthHandshakeInterceptor authHandshakeInterceptor;
+    private final WebSocketAuthUserArgumentResolver authUserArgumentResolver;
 
     @Override
     public void registerStompEndpoints(@NonNull StompEndpointRegistry registry) {
@@ -73,7 +72,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void addArgumentResolvers(@NonNull List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AuthenticationPrincipalArgumentResolver());
+        resolvers.add(authUserArgumentResolver);
     }
 
     @Override

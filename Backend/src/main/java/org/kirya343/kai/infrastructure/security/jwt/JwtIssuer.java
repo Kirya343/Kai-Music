@@ -1,11 +1,11 @@
-package org.kirya343.kai.infrastructure.security;
+package org.kirya343.kai.infrastructure.security.jwt;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;

@@ -8,7 +8,10 @@ import org.kirya343.kai.features.room.services.RoomQueryService;
 import org.kirya343.kai.features.room.datasource.ListeningRoom;
 import org.kirya343.kai.features.room.datasource.ListeningRoomRepository;
 import org.kirya343.kai.features.user.datasource.UserRepository;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.annotations.controllers.Authenticated;
+import org.kirya343.kai.infrastructure.security.annotations.controllers.PublicEndpoint;
+import org.kirya343.kai.infrastructure.security.annotations.parameters.AuthUser;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.kai.features.playback.services.streaming.UserAudioStreamWorkerManager;
@@ -16,7 +19,6 @@ import org.kirya343.kai.features.room.dto.MainPageRequest;
 import org.kirya343.kai.features.room.dto.RoomDTO;
 import org.kirya343.kai.features.room.dto.RoomUpdateDTO;
 import org.kirya343.kai.features.room.dto.ShortRoomDTO;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,19 +47,22 @@ public class RoomController {
     private final RoomPlaybackContextStore roomPlaybackContextStore;
 
     @GetMapping
-    public RoomDTO getCurrentRoom(@AuthenticationPrincipal UserAuthData authData) {
+    @Authenticated
+    public RoomDTO getCurrentRoom(@AuthUser UserAuthData authData) {
         return roomQueryService.getCurrentRoom(authData);
     }
 
     @PostMapping
-    public void createRoom(@AuthenticationPrincipal UserAuthData authData) {
+    @Authenticated
+    public void createRoom(@AuthUser UserAuthData authData) {
         roomCommandService.createRoom(authData);
     }
 
     @PostMapping("/join")
+    @Authenticated
     public void setUserRoom(
         @RequestParam String code,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
 
         ListeningRoom prevRoom = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
@@ -74,8 +79,9 @@ public class RoomController {
     }
 
     @PostMapping("/leave")
+    @Authenticated
     public void leaveRoom(
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
 
         ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
@@ -92,6 +98,7 @@ public class RoomController {
     }
 
     @GetMapping("/list/page")
+    @PublicEndpoint
     public MainPageRequest getMainPage() {
 
         List<ShortRoomDTO> rooms = listeningRoomRepository.findAllShortDTOs();
@@ -105,10 +112,11 @@ public class RoomController {
     }
 
     @PatchMapping("/{roomId}")
+    @Authenticated
     public void updateRoom(
         @PathVariable Long roomId,
         @RequestBody RoomUpdateDTO roomDto,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         
         ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(

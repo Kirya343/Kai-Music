@@ -1,7 +1,7 @@
 package org.kirya343.kai.features.playback.services;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;

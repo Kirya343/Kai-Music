@@ -9,10 +9,10 @@ import org.kirya343.kai.features.audio.services.util.Fmp4Parser;
 import org.kirya343.kai.features.audio.datasource.AudioFile;
 import org.kirya343.kai.features.audio.datasource.AudioFileRepository;
 import org.kirya343.kai.features.user.datasource.User;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.kirya343.kai.features.audio.dto.AudioChunk;
 import org.kirya343.kai.features.audio.dto.AudioDTO;
 import org.kirya343.kai.features.audio.dto.AudioMetadataDTO;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

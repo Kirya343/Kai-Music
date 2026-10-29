@@ -3,7 +3,6 @@ package org.kirya343.kai.features.playback.services.command;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.kirya343.kai.features.audio.services.AudioQueryService;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.PlaybackWebsocketService;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.kai.features.playback.dto.commands.ChangeTrack;
@@ -17,6 +16,7 @@ import org.kirya343.kai.features.playback.services.streaming.RoomStreamWorker;
 import org.kirya343.kai.features.playback.services.streaming.RoomStreamWorkerManager;
 import org.kirya343.kai.features.playlist.datasource.model.QueueItem;
 import org.kirya343.kai.features.playlist.datasource.repository.QueueItemRepository;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 

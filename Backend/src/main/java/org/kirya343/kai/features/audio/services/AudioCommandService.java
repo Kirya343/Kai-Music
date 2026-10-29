@@ -10,7 +10,7 @@ import org.kirya343.kai.features.audio.services.recognition.AcrCloudRecognitionS
 import org.kirya343.kai.features.audio.services.recognition.AcrCloudResponse;
 import org.kirya343.kai.features.audio.services.storage.AudioStorageService;
 import org.kirya343.kai.features.audio.services.util.M4aBuilder;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

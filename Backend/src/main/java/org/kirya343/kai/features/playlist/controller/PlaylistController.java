@@ -2,7 +2,6 @@ package org.kirya343.kai.features.playlist.controller;
 
 import java.util.List;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.enums.PlaybackMode;
 import org.kirya343.kai.features.playlist.datasource.model.Playlist;
 import org.kirya343.kai.features.playlist.datasource.repository.PlaylistRepository;
@@ -10,7 +9,9 @@ import org.kirya343.kai.features.playlist.dto.PlaylistCreateDTO;
 import org.kirya343.kai.features.playlist.dto.PlaylistDTO;
 import org.kirya343.kai.features.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.kai.features.playlist.service.PlaylistCommandService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.kirya343.kai.infrastructure.security.annotations.controllers.Authenticated;
+import org.kirya343.kai.infrastructure.security.annotations.parameters.AuthUser;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,9 +35,10 @@ public class PlaylistController {
     private final PlaylistCommandService playlistCommandService;
 
     @GetMapping("/{playlistId}")
+    @Authenticated
     public PlaylistDTO getPlaylist(
         @PathVariable Long playlistId,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         Playlist playlist = playlistRepository.findById(playlistId).orElse(null);
 
@@ -44,8 +46,9 @@ public class PlaylistController {
     }
 
     @GetMapping("/my")
+    @Authenticated
     public List<PlaylistDTO> getMyPlaylist(
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         List<Playlist> playlists = playlistRepository.findUserPlaylists(authData.id());
 
@@ -53,31 +56,35 @@ public class PlaylistController {
     }
 
     @PostMapping
+    @Authenticated
     public PlaylistDTO createPlaylist(
         @RequestBody PlaylistCreateDTO dto,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         return playlistCommandService.createPlaylist(dto, authData);
     }
 
     @PostMapping("/{targetPlaylistId}/import")
+    @Authenticated
     public void importPlaylist(
         @PathVariable Long targetPlaylistId, 
         @RequestParam Long playlistId,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         playlistCommandService.importPlaylist(targetPlaylistId, playlistId, authData);
     }
 
     @DeleteMapping("/{playlistId}")
+    @Authenticated
     public void deletePlaylist(
         @PathVariable Long playlistId,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         playlistRepository.deleteById(playlistId);
     }
 
     @PatchMapping("/{playlistId}/mode")
+    @Authenticated
     public void updatePlaybackMode(
         @PathVariable Long playlistId, 
         @RequestParam PlaybackMode mode
@@ -86,28 +93,31 @@ public class PlaylistController {
     }
 
     @PostMapping("/{playlistId}/queue")
+    @Authenticated
     public void addToQueue(
         @PathVariable Long playlistId,
         @RequestBody List<QueueItemCreateDTO> list,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         playlistCommandService.addQueueList(list, playlistId, authData);
     }
 
     @PostMapping("/{playlistId}/queue/rundom")
+    @Authenticated
     public void addRundomTracks(
         @PathVariable Long playlistId,
         @RequestParam Integer amount,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         playlistCommandService.addRundomTracks(amount, playlistId, authData);
     }
 
     @DeleteMapping("/{playlistId}/queue")
+    @Authenticated
     public void removeFromQueue(
         @PathVariable Long playlistId,
         @RequestBody List<Long> list,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
         playlistCommandService.removeQueueList(list, playlistId, authData);
     }

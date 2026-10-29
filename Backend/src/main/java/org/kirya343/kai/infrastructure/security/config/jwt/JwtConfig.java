@@ -1,4 +1,4 @@
-package org.kirya343.kai.infrastructure.security.config;
+package org.kirya343.kai.infrastructure.security.config.jwt;
 
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;

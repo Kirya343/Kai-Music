@@ -1,11 +1,11 @@
-package org.kirya343.kai.infrastructure.security.services;
+package org.kirya343.kai.infrastructure.security.jwt;
 
 import java.util.Collection;
 import java.util.Objects;
 
-import org.kirya343.kai.infrastructure.security.UserJwtAuthenticationToken;
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.user.enums.UserStatus;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.services.PermissionsService;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AbstractAuthenticationToken;

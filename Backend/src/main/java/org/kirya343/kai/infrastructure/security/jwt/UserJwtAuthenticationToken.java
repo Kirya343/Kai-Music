@@ -1,8 +1,8 @@
-package org.kirya343.kai.infrastructure.security;
+package org.kirya343.kai.infrastructure.security.jwt;
 
 import java.util.Collection;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;

@@ -3,7 +3,6 @@ package org.kirya343.kai.features.playback.controller;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.kai.features.authentication.dto.UserAuthData;
 import org.kirya343.kai.features.playback.datasource.model.RoomPlaybackState;
 import org.kirya343.kai.features.playback.datasource.repository.RoomPlaybackStateRepository;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
@@ -11,8 +10,10 @@ import org.kirya343.kai.features.playback.dto.commands.ChangeTrack;
 import org.kirya343.kai.features.playback.dto.commands.RoomCommand;
 import org.kirya343.kai.features.playback.dto.commands.UpdatePlayback;
 import org.kirya343.kai.features.playback.services.command.PlaybackCommandWorker;
+import org.kirya343.kai.infrastructure.security.annotations.controllers.Authenticated;
+import org.kirya343.kai.infrastructure.security.annotations.parameters.AuthUser;
+import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,9 +36,10 @@ public class PlaybackController {
     private static final long UPDATE_DELAY_MS = 300;
     
     @GetMapping("/{roomId}/playback-state")
+    @Authenticated
     public PlaybackStateDTO getPlaybackState(
         @PathVariable Long roomId,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
 
         RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
@@ -47,10 +49,11 @@ public class PlaybackController {
     }
     
     @PostMapping("/{roomId}/update-state")
+    @Authenticated
     public void updatePlaybackState(
         @RequestBody PlaybackStateDTO state,
         @PathVariable Long roomId,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
 
         if (shouldIgnore(authData.id(), roomId, "updatePlayback")) {
@@ -63,10 +66,11 @@ public class PlaybackController {
     }
 
     @PostMapping("/{roomId}/change-track")
+    @Authenticated
     public void changeTrack(
         @RequestParam String changing,
         @PathVariable Long roomId,
-        @AuthenticationPrincipal UserAuthData authData
+        @AuthUser UserAuthData authData
     ) {
 
         if (shouldIgnore(authData.id(), roomId, "changeTrack")) {

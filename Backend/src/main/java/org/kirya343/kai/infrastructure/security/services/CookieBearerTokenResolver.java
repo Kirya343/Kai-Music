@@ -1,15 +1,17 @@
-package org.kirya343.kai.infrastructure.security;
+package org.kirya343.kai.infrastructure.security.services;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
+@Component 
 public class CookieBearerTokenResolver implements BearerTokenResolver {
 
-    private final String cookieName;
+    private static final String COOKIE_NAME = "accessToken";
 
     @Override
     public String resolve(HttpServletRequest request) {
@@ -21,7 +23,7 @@ public class CookieBearerTokenResolver implements BearerTokenResolver {
             return null;
         }
         for (Cookie c : cookies) {
-            if (cookieName.equals(c.getName())) {
+            if (COOKIE_NAME.equals(c.getName())) {
                 return c.getValue();
             }
         }

@@ -7,8 +7,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.kirya343.kai.infrastructure.common.exceptions.UserNotFoundException;
-import org.kirya343.kai.infrastructure.security.AuthCookiesService;
-import org.kirya343.kai.infrastructure.security.JwtService;
+import org.kirya343.kai.infrastructure.security.jwt.JwtService;
 import org.kirya343.kai.features.user.services.UserCommandService;
 import org.kirya343.kai.features.user.datasource.User;
 import org.kirya343.kai.features.user.datasource.UserRepository;

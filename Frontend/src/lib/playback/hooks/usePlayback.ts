@@ -44,7 +44,7 @@ export const usePlayback = ({
         }
 
         audio.pause();
-    }, []);
+    }, [audio]);
 
     /**
      * Resumes playing audio
@@ -70,7 +70,7 @@ export const usePlayback = ({
                 error
             );
         }
-    }, []);
+    }, [audio]);
 
     // Play / Pause кнопка
     const togglePlay = useCallback(async () => {
@@ -152,6 +152,7 @@ export const usePlayback = ({
         unsyncedStateRef.current = null;
 
         if (!state.pause) {
+            console.log("начинаем проигрываание")
             setPlaybackState(prev => ({ ...prev!, pause: false }));
             resumePlayback();
         }

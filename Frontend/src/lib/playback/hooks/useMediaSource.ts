@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudioBuffer } from "./useAudioBuffer";
 
 export const useMediaSource = () => {
@@ -84,6 +84,10 @@ export const useMediaSource = () => {
 
         return audio;
     }, [])
+    
+    useEffect(() => {
+        console.log("audio updated", audio)
+    }, [audio])
 
     const cleanupMediaSource = useCallback(() => {
         const audioElement = audioRef.current;

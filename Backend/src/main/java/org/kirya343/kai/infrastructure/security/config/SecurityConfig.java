@@ -1,23 +1,22 @@
-package org.kirya343.kai.infrastructure.common.config;
+package org.kirya343.kai.infrastructure.security.config;
 
 import jakarta.servlet.MultipartConfigElement;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
-import org.kirya343.kai.infrastructure.security.CookieBearerTokenResolver;
-import org.kirya343.kai.infrastructure.security.services.CachedPermissionsJwtTokenConverter;
+import org.kirya343.kai.infrastructure.common.logging.HttpRequestStatisticsFilter;
+import org.kirya343.kai.infrastructure.security.services.JwtAuthenticationFilter;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.util.unit.DataSize;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -30,39 +29,20 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
  
     private final CorsConfig corsConfig;
-    private final CachedPermissionsJwtTokenConverter jwtTokenConverter;
+    private final HttpRequestStatisticsFilter statisticsFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-
-                // для авторизации
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers(
-                    "/auth/register",
-                    "/auth/refresh", 
-                    "/auth/login",
-                    "/audio/upload"
-                ).permitAll()
-                
-                .anyRequest().authenticated()
-            )
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .bearerTokenResolver(new CookieBearerTokenResolver("accessToken"))
-                .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtTokenConverter))
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"error\":\"unauthorized\"}");
-                })
-            )
+            .addFilterBefore(jwtAuthenticationFilter, AuthorizationFilter.class)
+            .addFilterBefore(statisticsFilter, AuthorizationFilter.class)
             .anonymous(anonymous -> anonymous.disable())
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
+            .cors(Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable())
             .build();
     }
 

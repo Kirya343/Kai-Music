@@ -1,4 +1,4 @@
-package org.kirya343.kai.infrastructure.common.config;
+package org.kirya343.kai.infrastructure.security.config;
 
 import java.util.ArrayList;
 import java.util.List;

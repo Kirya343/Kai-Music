@@ -118,9 +118,13 @@ export const usePlayback = ({
      * audio is loaded on current position
      */
     const playIfBuffered = useCallback(() => {
+        console.log("попытка начать воспроизведение", started)
+
         if (!started) return;
 
         const state = unsyncedStateRef.current;
+
+        console.log("audio", audio, "state", state)
 
         if (!audio || !state) return;
 
@@ -236,6 +240,7 @@ export const usePlayback = ({
                 }
 
                 setPlaybackState(state);
+                playIfBufferedRef.current();
                 unsyncedStateRef.current = state;
             });
 

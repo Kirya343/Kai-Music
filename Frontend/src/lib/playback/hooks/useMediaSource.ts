@@ -21,6 +21,7 @@ export const useMediaSource = () => {
     } = useAudioBuffer({ currentEntryIdRef, mediaSourceRef });
 
     const createMediaSource = useCallback<(entryId: number) => HTMLAudioElement | null>((entryId: number) => {
+        console.log("создаём новый mediaSource")
         if (mediaSourceRef.current) {
             return audioRef.current;
         }
@@ -79,6 +80,8 @@ export const useMediaSource = () => {
             });
         });
 
+        setAudio(audio);
+
         return audio;
     }, [])
 
@@ -98,6 +101,8 @@ export const useMediaSource = () => {
         audioRef.current = null;
         mediaSourceRef.current = null;
         objectUrlRef.current = null;
+
+        resetBuffer();
 
         setAudio(null);
     }, []);

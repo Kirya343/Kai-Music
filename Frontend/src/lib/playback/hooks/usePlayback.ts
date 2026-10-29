@@ -240,8 +240,8 @@ export const usePlayback = ({
                 }
 
                 setPlaybackState(state);
-                playIfBufferedRef.current();
                 unsyncedStateRef.current = state;
+                playIfBufferedRef.current();
             });
 
             return () => {

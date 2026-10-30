@@ -95,7 +95,7 @@ public class RoomStreamWorker
 
     public void streamTick() {
 
-        addLog("Room tick %s, %s", roomId);
+        addLog("Room tick %s", roomId);
 
         /**
          * if current playback position is after than audio duration - cancel task and send Next command
@@ -132,7 +132,7 @@ public class RoomStreamWorker
         }
 
         try {
-            userStreamWorkers.forEach(w -> w.tick());
+            userStreamWorkers.forEach(UserAudioStreamWorker::tick);
         } catch (Exception e) {
             log.error("Ошибка обработки тика юзеров: {}", e);
         }

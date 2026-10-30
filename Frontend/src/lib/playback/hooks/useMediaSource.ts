@@ -70,7 +70,7 @@ export const useMediaSource = () => {
                 });
 
                 sourceBuffer.addEventListener('error', event => {
-                    console.log(
+                    logger.error(
                         'SourceBuffer error:',
                         event
                     );
@@ -78,7 +78,7 @@ export const useMediaSource = () => {
             }
 
             mediaSource.addEventListener('error', event => {
-                console.log(
+                logger.error(
                     'MediaSource error:',
                     event
                 );

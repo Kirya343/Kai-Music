@@ -2,6 +2,9 @@ import { useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@user";
 import { api } from "@common";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Pages.Logout");
 
 const LogoutPage = () => {
 
@@ -13,7 +16,7 @@ const LogoutPage = () => {
         try {
             await api.post("/auth/logout");
         } catch (e) {
-            console.error("Logout failed", e);
+            logger.error("Logout failed", e);
         } finally {
             navigate("/");
             clearUser();

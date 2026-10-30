@@ -6,16 +6,23 @@ const config: LoggerConfig = {
     defaultLevel: "INFO",
 
     categories: {
-        Audio: "DEBUG",
-        "Audio.Buffer": "DEBUG",
-        "Audio.MediaSource": "DEBUG",
-        "Audio.Playback": "DEBUG",
+        Audio: "INFO" 
+        /* Audio: {
+            Buffer: "DEBUG",
+            MediaSource: "DEBUG",
+            Playback: "DEBUG",
+        } */,
         WebSocket: "ERROR",
         GlobalContext: "DEBUG",
 
-        "HTTP.Request": "NONE",
-        "HTTP.Response": "NONE",
-        "HTTP.Error": "NONE",
+        HTTP: "NONE",
+
+        Pages: {
+            Room: "INFO",
+            Main: "INFO",
+        },
+
+        Data: "INFO",
     },
 
     isGroupCollapsed: false

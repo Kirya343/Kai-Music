@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { IRoomUpdate, roomService } from "@room";
 import styles from "./RoomPage.module.scss";
 import AudioMiniPlayer from "@/components/ui/player/AudioMiniPlayer/AudioMiniPlayer";
@@ -12,6 +12,9 @@ import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportMo
 import RoomTrack from "@/components/ui/track/RoomTrack";
 import { useRoomPlayback } from "@playback";
 import { Navigate } from "react-router-dom";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Pages.Room");
 
 const RoomPage = () => {
     const [selectedTracks, setSelectedTracks] = useState<number[]>([]);
@@ -54,7 +57,7 @@ const RoomPage = () => {
             await roomService.updateRoom(room.id, roomUpdate);
             setEditMode(false)
         } catch (e) {
-            console.error(e)
+            logger.error(e)
         }
     }
 

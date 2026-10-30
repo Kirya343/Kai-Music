@@ -3,6 +3,9 @@ import { Dispatch, SetStateAction, useState } from "react";
 import styles from "./JoinRoomModal.module.scss"
 import Modal from "@/components/modals/Modal/Modal";
 import { useNavigate } from "react-router-dom";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Component.JoinRoomModal");
 
 /**
  * JoinRoomModal is modal for join to any room
@@ -30,7 +33,7 @@ const JoinRoomModal = ({
             await roomService.joinRoom(code);
             navigate("/app/room");
         } catch (e) {
-            console.error(e)
+            logger.error(e)
         }
     }
 

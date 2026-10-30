@@ -3,6 +3,9 @@ import { CreatePlaylist, Playlist } from "../playlistTypes";
 import { playlistService } from "../services";
 import { useWebSocket } from "@websocket";
 import { IQueueItem } from "@playback";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Data.Playlist");
 
 export const usePlaylistsData = () => {
     
@@ -46,7 +49,7 @@ export const usePlaylistsData = () => {
             try {
                 await playlistService.deletePlaylist(playlist.id)
             } catch (e) {
-                console.error(e)
+                logger.error(e)
             }
         }
     }, [])
@@ -55,7 +58,7 @@ export const usePlaylistsData = () => {
         try {
             await playlistService.createPlaylist(playlist)
         } catch (e) {
-            console.error(e)
+            logger.error(e)
         }
     }, [])
 
@@ -75,7 +78,7 @@ export const usePlaylistsData = () => {
         try {
             await playlistService.removeFromQueue(playlistId, [queueItem.id])
         } catch (e) {
-            console.error(e)
+            logger.error(e)
         }
     }
 

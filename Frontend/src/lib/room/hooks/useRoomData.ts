@@ -3,6 +3,9 @@ import { IListeningRoom } from "../roomTypes";
 import { roomService } from "../services";
 import { useWebSocket } from "@websocket";
 import { Playlist } from "@playlist";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Data.Room");
 
 export function useRoomData() {
 
@@ -41,7 +44,7 @@ export function useRoomData() {
     const reconnectToRoom = useCallback(() => {
         if (!client) return;
 
-        console.log("переподключаемся к комнате")
+        logger.debug("переподключаемся к комнате")
 
         client.publish({
             destination: "/app/room/reconnect",

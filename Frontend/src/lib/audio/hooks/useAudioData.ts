@@ -1,6 +1,9 @@
 import { audioService, IAudio } from "@audio";
 import { useWebSocket } from "@websocket";
 import { useCallback, useEffect, useState } from "react";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Data.Audio");
 
 /**
  * Manages the list of user's audio tracks, initializes it from localStorage,
@@ -39,7 +42,7 @@ export const useAudioData = () => {
             try {
                 await audioService.deleteAudio(audio.id)
             } catch (e) {
-                console.error(e)
+                logger.error(e)
             }
         }
     }, [])

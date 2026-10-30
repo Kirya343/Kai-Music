@@ -10,6 +10,9 @@ import {
 import JoinRoomModal from "@/components/modals/JoinRoomModal/JoinRoomModal";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout/PageLayout";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Pages.Main");
 
 const MainPage = () => {
 
@@ -36,7 +39,7 @@ const MainPage = () => {
             await roomService.createRoom();
             navigate("/app/room");
         } catch (e) {
-            console.error(e);
+            logger.error(e);
         }
     }
 
@@ -45,7 +48,7 @@ const MainPage = () => {
             await roomService.joinRoom(code);
             navigate("/app/room");
         } catch (e) {
-            console.error(e);
+            logger.error(e);
         }
     }
 

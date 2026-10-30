@@ -5,7 +5,9 @@ import { Client, Frame } from "@stomp/stompjs";
 
 import { API_BASE } from "@/config";
 import { useAuth } from "@user";
-import { api } from "@common";
+import { api, loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("WebSocket");
 
 interface UseStompClientResult {
     client: Client | null;
@@ -36,7 +38,7 @@ export function useStompClient(): UseStompClientResult {
         try {
             clientRef.current.deactivate();
         } catch (e) {
-            console.warn("⚠️ Error during cleanup:", e);
+            logger.warn("⚠️ Error during cleanup:", e);
         }
 
         clientRef.current = null;
@@ -71,7 +73,7 @@ export function useStompClient(): UseStompClientResult {
             setConnected(true);
             setError(false);
 
-            console.log("Подключение")
+            logger.debug("Подключение")
 
             for (const handler of handlers.current) {
                 cleanups.current.get(handler)?.();
@@ -94,7 +96,7 @@ export function useStompClient(): UseStompClientResult {
             const message =
                 frame?.headers?.message || "Unknown STOMP error";
 
-            console.error("❌ Broker error:", message);
+            logger.error("❌ Broker error:", message);
 
             if (!message.includes("invalidToken")) {
                 setError(true);
@@ -110,7 +112,7 @@ export function useStompClient(): UseStompClientResult {
 
                 await connect();
             } catch (error) {
-                console.error("Failed to refresh token:", error);
+                logger.error("Failed to refresh token:", error);
                 setError(true);
             }
         };
@@ -148,7 +150,7 @@ export function useStompClient(): UseStompClientResult {
 
     useEffect(() => {
 
-        console.log(user)
+        logger.debug("Пользователь: ", user)
         if (!user) return;
 
         connect();

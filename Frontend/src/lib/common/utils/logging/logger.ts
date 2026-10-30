@@ -15,9 +15,15 @@ const LEVELS: Record<string, LogLevel> = {
     NONE: LogLevel.NONE,
 };
 
+export type LoggerCategoryConfig =
+    | keyof typeof LEVELS
+    | {
+        [key: string]: LoggerCategoryConfig;
+    };
+
 export interface LoggerConfig {
     defaultLevel: keyof typeof LEVELS;
-    categories: Record<string, keyof typeof LEVELS>;
+    categories: Record<string, LoggerCategoryConfig>;
     isGroupCollapsed?: boolean;
 }
 
@@ -28,14 +34,13 @@ class NamedLogger {
     ) {}
 
     private getLevel(): LogLevel {
-        // Exact category first, then parent category.
         const parts = this.name.split(".");
 
         while (parts.length > 0) {
             const category = parts.join(".");
             const configured = this.config.categories[category];
 
-            if (configured !== undefined) {
+            if (typeof configured === "string") {
                 return LEVELS[configured];
             }
 
@@ -86,9 +91,33 @@ class NamedLogger {
 }
 
 export class LoggerFactory {
-    constructor(private readonly config: LoggerConfig) {}
+    private readonly categories: Record<string, keyof typeof LEVELS> = {};
+
+    constructor(private readonly config: LoggerConfig) {
+        this.flattenCategories(config.categories);
+    }
+
+    private flattenCategories(
+        categories: Record<string, LoggerCategoryConfig>,
+        prefix = ""
+    ) {
+        for (const [name, value] of Object.entries(categories)) {
+            const category = prefix
+                ? `${prefix}.${name}`
+                : name;
+
+            if (typeof value === "string") {
+                this.categories[category] = value;
+            } else {
+                this.flattenCategories(value, category);
+            }
+        }
+    }
 
     getLogger(name: string): NamedLogger {
-        return new NamedLogger(name, this.config);
+        return new NamedLogger(name, {
+            ...this.config,
+            categories: this.categories,
+        });
     }
 }

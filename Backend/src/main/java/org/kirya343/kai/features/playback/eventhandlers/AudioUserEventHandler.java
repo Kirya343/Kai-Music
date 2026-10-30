@@ -3,6 +3,7 @@ package org.kirya343.kai.features.playback.eventhandlers;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
 import org.kirya343.kai.features.playback.services.streaming.RoomStreamWorkerManager;
+import org.kirya343.kai.features.playback.services.streaming.UserAudioStreamWorker;
 import org.kirya343.kai.features.playback.services.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.kai.features.room.datasource.ListeningRoom;
 import org.kirya343.kai.features.room.datasource.ListeningRoomRepository;
@@ -34,9 +35,13 @@ public class AudioUserEventHandler {
 
         RoomPlaybackContext context = roomPlaybackContextStore.get(room.getId());
 
+        UserAudioStreamWorker userWorker = userAudioStreamWorkerManager.getWorker(event.authData().openId());
+
         if (context != null) {
             context.getListeners().remove(event.authData().openId());
             roomPlaybackContextStore.listenersUpdated(room.getId());
+
+            roomStreamWorkerManager.getWorker(room.getId()).removeUserWorker(userWorker);
 
             if (context.getListeners().size() == 0) {
                 roomStreamWorkerManager.removeWorker(room.getId());

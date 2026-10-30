@@ -12,13 +12,14 @@ import org.kirya343.kai.features.playback.PlaybackWebsocketService;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import io.github.kirya343.terminal.components.DiagnosticLoggable;
 import io.github.kirya343.terminal.core.DiagnosticTextBuilder;
-
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j 
 public class UserAudioStreamWorker
     extends DiagnosticLoggable {
 
+    @Getter 
     private final String user;
     private Double bufferedUntil = 0.0;
     private PlaybackStateDTO currentState;
@@ -38,19 +39,14 @@ public class UserAudioStreamWorker
         String user,
         AudioQueryService audioQueryService,
         AudioStorageService audioStorageService,
-        PlaybackWebsocketService playbackWebsocketService,
-        PlaybackStateDTO currentState
+        PlaybackWebsocketService playbackWebsocketService
     ) {
         this.user = user;
         this.audioQueryService = audioQueryService;
         this.audioStorageService = audioStorageService;
         this.playbackWebsocketService = playbackWebsocketService;
 
-        addLog("Created UserAudioStreamWorker for %s, with state: %s, %s, %s", 
-            user, currentState.entryId(), currentState.position(), currentState.pause());
-
-        playbackWebsocketService.broadcastPlaybackState(user, currentState);
-        applyState(currentState);
+        addLog("Created UserAudioStreamWorker for %s", user);
     }
 
     public void applyState(PlaybackStateDTO state) {
@@ -63,15 +59,10 @@ public class UserAudioStreamWorker
 
         addLog("START STATE: entryId=%s, position=%s", state.entryId(), state.position());
 
-        try {
-            tick();
-        } catch (IOException e) {
-            log.error("Ошибка обработки тика юзера {}: {}", user, e);
-        }
-
+        tick();
     }
 
-    public void tick() throws IOException {
+    public void tick() {
 
         addLog("Tick to user %s", user);
 
@@ -80,7 +71,8 @@ public class UserAudioStreamWorker
         }
     }
 
-    private void fillBuffer() throws IOException {
+    private void fillBuffer() {
+        try {
 
         addLog("fillBuffer to user %s", user);
 
@@ -93,7 +85,9 @@ public class UserAudioStreamWorker
         ) {
             addLog("buffered %s, target %s", buffered, target);
 
-            AudioChunk chunk = chunker.nextAudioChunk();
+            AudioChunk chunk;
+
+            chunk = chunker.nextAudioChunk();
 
             playbackWebsocketService.sendChunk(
                 user,
@@ -105,6 +99,12 @@ public class UserAudioStreamWorker
         }
 
         bufferedUntil = buffered;
+
+        } catch (IOException e) {
+
+            addLog("Exception while downloading audio chunk: %s", e);
+            throw new RuntimeException(e);
+        }
     }
 
     public void updateState(PlaybackStateDTO state) {
@@ -163,14 +163,18 @@ public class UserAudioStreamWorker
         }
     }
 
-    private void initializeUser() throws IOException {
+    private void initializeUser() {
 
-        playbackWebsocketService.sendChunk(
-            user, 
-            chunker.initializationChunk(), 
-            currentState.entryId());
+        try {
+            playbackWebsocketService.sendChunk(
+                user, 
+                chunker.initializationChunk(), 
+                currentState.entryId());
 
-        bufferedUntil = currentState.position();
+            bufferedUntil = currentState.position();
+        } catch (IOException e) {
+            addLog("Exception while initializing user: %s", e);
+        }
     }
 
     private void reloadChunker(PlaybackStateDTO stateDTO) {

@@ -10,7 +10,6 @@ import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.kai.features.playback.services.QueueService;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContextStore;
-import org.kirya343.kai.features.presence.services.PresenceService;
 import io.github.kirya343.terminal.components.commands.DiagnosticCommand;
 import io.github.kirya343.terminal.components.DiagnosticComponent;
 import io.github.kirya343.terminal.models.StreamMode;
@@ -29,8 +28,6 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
     private final RoomPlaybackStateRepository roomPlaybackStateRepository;
-    private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
-    private final PresenceService presenceService;
     private final QueueService queueService;
 
     private final Map<Long, RoomStreamWorker> workers =
@@ -62,10 +59,8 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
                 worker = new RoomStreamWorker(
                     roomId,
                     eventPublisher, 
-                    userAudioStreamWorkerManager,
                     PlaybackStateDTO.ofState(state),
                     context,
-                    presenceService,
                     queueService
                 );
             } catch (Exception e) {
@@ -89,6 +84,8 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
             worker.cancelTask();
         }
     }
+
+    // Diagnotsic
 
     public String getComponentId() {
         return "room-workers";

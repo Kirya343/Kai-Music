@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.kai.features.audio.services.AudioQueryService;
 import org.kirya343.kai.features.audio.services.storage.AudioStorageService;
 import org.kirya343.kai.features.playback.PlaybackWebsocketService;
-import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import io.github.kirya343.terminal.components.commands.DiagnosticCommand;
 import io.github.kirya343.terminal.components.DiagnosticComponent;
 import io.github.kirya343.terminal.models.CommandResult;
@@ -36,7 +35,7 @@ public class UserAudioStreamWorkerManager
         return workers.size();
     }
 
-    public UserAudioStreamWorker getWorker(String userSub, PlaybackStateDTO currentState) {
+    public UserAudioStreamWorker getWorker(String userSub) {
 
         log.debug("Пытаемся получить воркер для пользователя {}", userSub);
 
@@ -50,8 +49,7 @@ public class UserAudioStreamWorkerManager
                 userSub,
                 audioQueryService,
                 audioStorageService,
-                playbackWebsocketService,
-                currentState
+                playbackWebsocketService
             );
 
             log.debug("Кладём к остальным воркер для пользователя {}", userSub);

@@ -1,6 +1,7 @@
 package org.kirya343.kai.features.playback.services.streaming;
 
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -12,8 +13,6 @@ import org.kirya343.kai.features.playback.dto.commands.UpdatePlayback;
 import org.kirya343.kai.features.playback.services.QueueService;
 import org.kirya343.kai.features.playback.services.cache.RoomPlaybackContext;
 import org.kirya343.kai.features.playlist.datasource.model.QueueItem;
-import org.kirya343.kai.features.presence.UserPresence;
-import org.kirya343.kai.features.presence.services.PresenceService;
 import org.kirya343.kai.infrastructure.security.dto.UserAuthData;
 
 import io.github.kirya343.terminal.components.DiagnosticLoggable;
@@ -29,8 +28,6 @@ public class RoomStreamWorker
     private final ScheduledExecutorService scheduler =
         Executors.newSingleThreadScheduledExecutor();
     private final ApplicationEventPublisher eventPublisher;
-    private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
-    private final PresenceService presenceService;
     private final QueueService queueService;
 
     private final RoomPlaybackContext roomContext;
@@ -39,24 +36,23 @@ public class RoomStreamWorker
 
     private static final int CHUNK_INTERVAL_SECONDS = 2;
 
+    private final Set<UserAudioStreamWorker> userStreamWorkers =
+        ConcurrentHashMap.newKeySet();
+
     private PlaybackStateDTO currentState;
     private ScheduledFuture<?> task;
 
     public RoomStreamWorker(
         Long roomId,
         ApplicationEventPublisher eventPublisher,
-        UserAudioStreamWorkerManager userAudioStreamWorkerManager,
         PlaybackStateDTO currentState,
         RoomPlaybackContext roomContext,
-        PresenceService presenceService,
         QueueService queueService
     ) {
 
         this.roomId = roomId;
         this.eventPublisher = eventPublisher;
         this.roomContext = roomContext;
-        this.presenceService = presenceService;
-        this.userAudioStreamWorkerManager = userAudioStreamWorkerManager;
         this.queueService = queueService;
 
         if (currentState != null) {
@@ -77,11 +73,7 @@ public class RoomStreamWorker
 
         currentState = state;
 
-        roomContext.getListeners().forEach(user -> {
-            if (presenceService.getPresence(user) == UserPresence.ONLINE) {
-                userAudioStreamWorkerManager.getWorker(user, state).applyState(state);
-            }
-        });
+        userStreamWorkers.forEach(w -> w.applyState(state));
 
         addLog("START STATE: entryId=%s, position=%s", state.entryId(), state.position());
 
@@ -103,9 +95,7 @@ public class RoomStreamWorker
 
     public void streamTick() {
 
-        Set<String> listeners = roomContext.getListeners();
-
-        addLog("Room tick %s, %s", roomId, listeners);
+        addLog("Room tick %s, %s", roomId);
 
         /**
          * if current playback position is after than audio duration - cancel task and send Next command
@@ -142,15 +132,7 @@ public class RoomStreamWorker
         }
 
         try {
-            listeners.forEach(user -> {
-                try {
-                    if (presenceService.getPresence(user) == UserPresence.ONLINE) {
-                        userAudioStreamWorkerManager.getWorker(user, currentState).tick();
-                    }
-                } catch (Exception e) {
-                    log.error("Ошибка обработки тика юзера {}: {}", user, e);
-                }
-            });
+            userStreamWorkers.forEach(w -> w.tick());
         } catch (Exception e) {
             log.error("Ошибка обработки тика юзеров: {}", e);
         }
@@ -170,6 +152,16 @@ public class RoomStreamWorker
             task.cancel(false);
             task = null;
         }
+    }
+
+    public void addUserWorker(UserAudioStreamWorker worker) {
+        worker.applyState(currentState);
+
+        userStreamWorkers.add(worker);
+    }
+
+    public void removeUserWorker(UserAudioStreamWorker worker) {
+        userStreamWorkers.remove(worker);
     }
 
     // Diadnostic commands

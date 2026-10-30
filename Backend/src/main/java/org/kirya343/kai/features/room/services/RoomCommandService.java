@@ -9,6 +9,8 @@ import org.kirya343.kai.features.playback.PlaybackWebsocketService;
 import org.kirya343.kai.features.playback.dto.PlaybackStateDTO;
 import org.kirya343.kai.features.playback.services.RoomSessionService;
 import org.kirya343.kai.features.playback.services.streaming.RoomStreamWorkerManager;
+import org.kirya343.kai.features.playback.services.streaming.UserAudioStreamWorker;
+import org.kirya343.kai.features.playback.services.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.kai.features.playlist.dto.PlaylistDTO;
 import org.kirya343.kai.features.playlist.service.PlaylistWebSocketService;
 import org.kirya343.kai.features.room.dto.ShortRoomDTO;
@@ -32,6 +34,7 @@ public class RoomCommandService {
     private final PlaylistWebSocketService playlistWebSocketService;
     private final RoomStreamWorkerManager roomStreamWorkerManager;
     private final PlaybackWebsocketService playbackWebsocketService;
+    private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
     
     @Transactional 
     public ListeningRoom createRoom(UserAuthData authData) {
@@ -64,12 +67,15 @@ public class RoomCommandService {
         userRepository.updateListeningRoom(authData.id(), room.getId());
 
         roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(room));
+
         playbackWebsocketService.broadcastPlaybackState(authData.openId(), PlaybackStateDTO.ofState(room.getPlaybackState()));
         playlistWebSocketService.broadcastRoomPlaylist(authData.openId(), PlaylistDTO.ofPlaylist(room.getPlaylist()));
 
         roomSessionService.initializeRoom(room.getId(), authData);
 
+        UserAudioStreamWorker userWorker = userAudioStreamWorkerManager.getWorker(authData.openId());
+
         // Reloads worker
-        roomStreamWorkerManager.getWorker(room.getId());
+        roomStreamWorkerManager.getWorker(room.getId()).addUserWorker(userWorker);
     }
 }

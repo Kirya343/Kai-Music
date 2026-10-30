@@ -6,7 +6,7 @@ const logger = loggerFactory.getLogger("Audio.MediaSource");
 
 export const useMediaSource = () => {
 
-    logger.info("Creating hook")
+    logger.debug("Creating hook")
 
     const currentEntryIdRef = useRef<number | null>(null)
 

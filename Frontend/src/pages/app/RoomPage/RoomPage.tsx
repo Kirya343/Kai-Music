@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IRoomUpdate, roomService } from "@room";
 import styles from "./RoomPage.module.scss";
-import AudioMiniPlayer from "@/components/ui/player/AudioMiniPlayer/AudioMiniPlayer";
+import AudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/MobileAudioMiniPlayer";
 import { useData, useGlobal } from "@common";
 import { useWebSocket } from "@websocket";
 import KebabMenu from "@/components/ui/KebabMenu/KebabMenu";

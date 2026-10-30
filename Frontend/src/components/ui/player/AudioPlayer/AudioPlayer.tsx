@@ -1,11 +1,10 @@
 import { useRoomPlayback } from "@playback";
 import { useEffect, useRef } from "react";
-import { PlaybackModeToggle } from "../PlaybackModeToggle";
-import VolumeSlider from "../VolumeSlider/VolumeSlider";
-import { countPosition } from "@common";
+import VolumeSlider from "../parts/VolumeSlider/VolumeSlider";
 import styles from "./AudioPlayer.module.scss";
-import { PlusIcon, DownIcon, RightIcon, LeftIcon, PlayIcon, PauseIcon } from "@/assets/icons";
-import { playbackService } from "@playback";
+import { DownIcon } from "@/assets/icons";
+import AudioNavigation from "../parts/AudioNavigation/AudioNavigation";
+import TrackPositionTracker from "../parts/TrackPositionTracker/TrackPositionTracker";
 
 /**
  * Audio is component that contains main player
@@ -18,17 +17,12 @@ const AudioPlayer = () => {
         updateMessage, 
         fullPlayerOpen, playingAudio,
         setFullPlayerOpen,
-        togglePlay, seek,
-        bufferedRanges,
         playbackState
     } = useRoomPlayback();
-
-    const playTrack = playbackService.usePlayTrack();
 
     // variables to control the scrolling title
     const headerRef = useRef<HTMLDivElement | null>(null);
     const textRef = useRef<HTMLDivElement | null>(null);
-    const duration = playingAudio?.duration || 0
 
     // scrolling title control
     useEffect(() => {
@@ -61,69 +55,8 @@ const AudioPlayer = () => {
                             {playingAudio?.title ?? playingAudio?.name}
                         </div>
                     </div>
-                    <div className={styles.tracker}>
-                        <div className={styles.progress}>
-                            <div className={styles.buffered}>
-                                {bufferedRanges.get(playbackState.entryId)?.map((range, index) => (
-                                    <div
-                                        key={index}
-                                        className={styles.bufferedRange}
-                                        style={{
-                                            left: `${(range.start / duration) * 100}%`,
-                                            width: `${((range.end - range.start) / duration) * 100}%`
-                                        }}
-                                    />
-                                ))}
-                            </div>
-
-                            <input
-                                type="range"
-                                min={0}
-                                max={duration}
-                                value={playbackState.position}
-                                onChange={(e) => seek(Number(e.target.value))}
-                                style={{
-                                    width: "100%",
-                                    background: `linear-gradient(
-                                        to right,
-                                        #ffffff ${(playbackState.position / duration) * 100}%,
-                                        #00000000 ${(playbackState.position / duration) * 100}%
-                                    )`
-                                }}
-                            />
-                        </div>
-
-                        <div className={styles.positionMeta}>
-                            <span className={styles.currentPosition}>
-                                {countPosition(playbackState.position)}
-                            </span>
-
-                            <span className={styles.duration}>
-                                {countPosition(duration)}
-                            </span>
-                        </div>
-                    </div>
-                    <div className={styles.navigation}>
-                        <PlaybackModeToggle />
-                        <button 
-                            aria-label="Play Prev Track"
-                            onClick={() => playTrack("prev")}
-                        >
-                            <LeftIcon />
-                        </button>
-                        <button
-                            aria-label={playbackState.pause ? "Resume Track" : "Pause Track"}
-                            onClick={togglePlay}
-                        >
-                            {playbackState.pause ? <PlayIcon /> : <PauseIcon />}
-                        </button>
-                        <button 
-                            aria-label="Play Next Track"
-                            onClick={() => playTrack("next")}>
-                            <RightIcon />
-                        </button>
-                        <button><PlusIcon/></button>
-                    </div>
+                    <TrackPositionTracker />
+                    <AudioNavigation />
                     <VolumeSlider />
                     {updateMessage && <div className={styles.update}>{updateMessage}</div>}
                 </div>

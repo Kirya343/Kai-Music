@@ -51,28 +51,3 @@
         }
     }
 }
-
-@keyframes trackerScroll {
-    0% {
-        transform: translateX(calc(50% - 120px));
-    }
-    100% {
-        transform: translateX(calc(-50% + 120px));
-    }
-}
-
-.header {
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    
-    .headerText {
-        display: inline-block;
-
-        &.animate {
-            animation: trackerScroll 10s linear infinite alternate;
-        }
-    }
-}

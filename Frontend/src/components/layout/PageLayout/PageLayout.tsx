@@ -1,4 +1,4 @@
-import AudioMiniPlayer from "@/components/ui/player/AudioMiniPlayer/AudioMiniPlayer";
+import MobileAudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/MobileAudioMiniPlayer";
 import styles from "./PageLayout.module.scss";
 import { useRoomPlayback } from "@playback";
 
@@ -25,7 +25,7 @@ const PageLayout = ({ title, children }: PageLayoutProps) => {
                 {children}
             </div>
 
-            {roomLoaded && <AudioMiniPlayer />}
+            {roomLoaded && <MobileAudioMiniPlayer />}
         </div>
     );
 };

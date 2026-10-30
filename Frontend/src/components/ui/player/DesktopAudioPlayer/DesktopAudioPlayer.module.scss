@@ -1,0 +1,38 @@
+@use "@/css/components/mixins/" as *;
+
+.player {
+    width: 100%;
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease-in;
+    border-top: 1px solid;
+    flex-shrink: 0;
+    gap: 1rem;
+
+    @include glass;
+
+    & > div {
+        display: flex;
+
+        &.info {
+            width: 30%;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+
+        &.tracker {
+            width: 40%;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        &.controls {
+            width: 30%;
+            justify-content: flex-end;
+        }
+    }
+}

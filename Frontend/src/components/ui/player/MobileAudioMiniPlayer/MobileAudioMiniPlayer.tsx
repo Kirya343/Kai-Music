@@ -1,9 +1,11 @@
 import { useRoomPlayback } from "@playback";
 import { useEffect, useRef } from "react";
 
-import styles from "./AudioMiniPlayer.module.scss"
+import styles from "./MobileAudioMiniPlayer.module.scss"
 import { RightIcon, PlayIcon, PauseIcon } from "@/assets/icons";
 import { playbackService } from "@playback";
+import { useGlobal } from "@common";
+import ScrollableTitle from "../../ScrollableTitle/ScrollableTitle";
 
 /**
  * Component that display on bottom of pages and displays
@@ -11,45 +13,27 @@ import { playbackService } from "@playback";
  * 
  * on click opens AudioPlayer
  */
-const AudioMiniPlayer = () => {
+const MobileAudioMiniPlayer = () => {
+
+    const { isMobile } = useGlobal();
 
     const { 
         playbackState, playingAudio, 
-        fullPlayerOpen, setFullPlayerOpen, 
-        togglePlay 
+        setFullPlayerOpen, togglePlay 
     } = useRoomPlayback();
 
     const playTrack = playbackService.usePlayTrack();
 
-    const headerRef = useRef<HTMLDivElement | null>(null);
-    const textRef = useRef<HTMLDivElement | null>(null);
     const duration = playingAudio?.duration || 0
 
-    useEffect(() => {
-        const header = headerRef.current;
-        const text = textRef.current;
-
-        if (!header || !text) return;
-
-        if (text.scrollWidth > header.clientWidth) {
-            text.classList.add(styles.animate);
-        } else {
-            text.classList.remove(styles.animate);
-        }
-    }, [playingAudio, fullPlayerOpen]);
-
-    return playingAudio && playbackState && (
+    return playingAudio && playbackState && isMobile && (
         <div 
             className={styles.miniPlayer} 
             data-testid="mini-player" 
             onClick={() => setFullPlayerOpen(true)}
         >
 
-            <div ref={headerRef} className={styles.header}>
-                <div ref={textRef} className={styles.headerText}>
-                    {playingAudio?.title ?? playingAudio?.name}
-                </div>
-            </div>
+            <ScrollableTitle title={playingAudio?.title ?? playingAudio?.name} />
 
             <div 
                 className={styles.trackPosition}
@@ -82,4 +66,4 @@ const AudioMiniPlayer = () => {
     );
 }
 
-export default AudioMiniPlayer;
+export default MobileAudioMiniPlayer;

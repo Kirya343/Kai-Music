@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { useAuth } from "@user";
 import { useEffect, useState } from "react";
 import { useWebSocket } from "@websocket";
+import DesktopAudioPlayer from "@/components/ui/player/DesktopAudioPlayer/DesktopAudioPlayer";
 
 /**
  * AppLayout is layout for the entire application to keep same style
@@ -57,6 +58,8 @@ const AppLayout = () => {
                     <AudioPlayer />
 
                     <MobileNav />
+
+                    <DesktopAudioPlayer />
 
                     {/* <RoomReturnModal /> */}
                 </div>

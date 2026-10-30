@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudioBuffer } from "./useAudioBuffer";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Audio.MediaSource");
 
 export const useMediaSource = () => {
+
+    logger.info("Creating hook")
 
     const currentEntryIdRef = useRef<number | null>(null)
 
@@ -21,7 +26,7 @@ export const useMediaSource = () => {
     } = useAudioBuffer({ currentEntryIdRef, mediaSourceRef });
 
     const createMediaSource = useCallback<(entryId: number) => HTMLAudioElement | null>((entryId: number) => {
-        console.log("создаём новый mediaSource")
+        logger.debug("создаём новый mediaSource")
         if (mediaSourceRef.current) {
             return audioRef.current;
         }
@@ -45,7 +50,7 @@ export const useMediaSource = () => {
         objectUrlRef.current = objectUrl;
 
         mediaSource.addEventListener('sourceopen', () => {
-            console.log('MediaSource opened');
+            logger.debug('MediaSource opened');
 
             if (!sourceBufferRef.current) {
                 const sourceBuffer = mediaSource.addSourceBuffer(
@@ -86,7 +91,7 @@ export const useMediaSource = () => {
     }, [])
     
     useEffect(() => {
-        console.log("audio updated", audio)
+        logger.debug("audio updated", audio)
     }, [audio])
 
     const cleanupMediaSource = useCallback(() => {

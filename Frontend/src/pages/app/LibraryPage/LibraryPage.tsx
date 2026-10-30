@@ -41,7 +41,7 @@ const LibraryPage = () => {
             title="Library"
             search={{searchQuery, setSearchQuery, filteredList}}
             extraActions={[
-                <label htmlFor="uploadAudio" className={styles.upload}>
+                <label htmlFor="uploadAudio" key={"upload"} className={styles.upload}>
                     <CirclePlusIcon />
                     <span>Upload new</span>
                 </label>

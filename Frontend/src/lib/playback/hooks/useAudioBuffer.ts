@@ -1,6 +1,9 @@
 import { AudioChunk, TimeRange } from "@audio";
 import { useWebSocket } from "@websocket";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Audio.Buffer");
 
 interface useAudioBufferProps {
     mediaSourceRef: RefObject<MediaSource | null>;
@@ -46,7 +49,7 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
             const updated = new Map(prev);
             updated.set(entryId, ranges);
             
-            console.log("buffer", updated)
+            logger.debug("buffer", updated)
 
             return updated;
         });
@@ -87,7 +90,7 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
      * Resets the source buffer
      */
     const resetBuffer = useCallback(() => {
-        console.log("Очищаем буфер")
+        logger.info("Очищаем буфер")
         sourceBufferRef.current = null;
     }, []);
 
@@ -142,21 +145,21 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
             return;
         }
 
-        /* console.log(
+        logger.debug(
             'Добавлен buffer:',
             chunksToAppend.map(chunk =>
                 chunk.initialization
                     ? 'init'
                     : chunk.sequence
             )
-        ); */
+        );
     }, [appendChunks]);
 
     /**
      * Вызывается на каждый chunk от backend.
      */
     const handleAudioChunk = useCallback((chunk: AudioChunk) => {
-        console.log(`Получен ${chunk.initialization ? "init" : "media"} chunk: ${chunk.sequence}`);
+        logger.debug(`Получен ${chunk.initialization ? "init" : "media"} chunk: ${chunk.sequence}`);
 
         queueRef.current.push(chunk);
 

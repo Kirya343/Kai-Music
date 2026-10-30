@@ -1,4 +1,7 @@
 import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("GlobalContext");
 
 /**
  * Defines the global application context.
@@ -42,14 +45,14 @@ export const useGlobal = () => {
 export const GlobalProvider = ({ children }: { children?: React.ReactNode }) => {
 
     const [started, setStarted] = useState<boolean>(false);
-    console.log("перемонтировали statred", started)
+    logger.debug("перемонтировали statred", started)
 
     const isMobile = window.innerWidth < 768;
 
     useEffect(() => {
         const handleClick = () => {
             setStarted(true);
-            console.log("МЫ ПОЛУЧИЛИ КЛИК")
+            logger.debug("МЫ ПОЛУЧИЛИ КЛИК")
             document.body.removeEventListener("click", handleClick);
         };
 

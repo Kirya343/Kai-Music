@@ -3,6 +3,9 @@ import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { IPlaybackState } from "../playbackTypes";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
+import { loggerFactory } from "@common";
+
+const logger = loggerFactory.getLogger("Audio.Playback");
 
 interface usePlaybackProps {
     roomId: number | null;
@@ -65,7 +68,7 @@ export const usePlayback = ({
                 return;
             }
 
-            console.log(
+            logger.error(
                 'Ошибка запуска audio:',
                 error
             );
@@ -118,13 +121,13 @@ export const usePlayback = ({
      * audio is loaded on current position
      */
     const playIfBuffered = useCallback(() => {
-        console.log("попытка начать воспроизведение", started)
+        logger.debug("попытка начать воспроизведение", started)
 
         if (!started) return;
 
         const state = unsyncedStateRef.current;
 
-        console.log("audio", audio, "state", state)
+        logger.debug("audio", audio, "state", state)
 
         if (!audio || !state) return;
 
@@ -141,7 +144,7 @@ export const usePlayback = ({
         );
 
         if (!isBuffered) {
-            console.warn(
+            logger.warn(
                 'Требуемая позиция не буферизирована',
                 state.position
             );
@@ -152,7 +155,7 @@ export const usePlayback = ({
         unsyncedStateRef.current = null;
 
         if (!state.pause) {
-            console.log("начинаем проигрываание")
+            logger.debug("начинаем проигрываание")
             setPlaybackState(prev => ({ ...prev!, pause: false }));
             resumePlayback();
         }
@@ -222,7 +225,7 @@ export const usePlayback = ({
     }, [addTimeUpdateListener, createMediaSource]);
 
     const startNewAudio = useCallback((entryId: number) => {
-        console.log("Начинаем новый media resource");
+        logger.debug("Начинаем новый media resource");
 
         cleanupMediaSource();
         initMediaSource(entryId);
@@ -234,7 +237,7 @@ export const usePlayback = ({
             const playbackSub = client.subscribe(`/user/queue/playback`, (message) => {
                 const state: IPlaybackState = JSON.parse(message.body);
 
-                console.log("Пришло обновление playback: ", state)
+                logger.debug("Пришло обновление playback: ", state)
 
                 if (currentEntryIdRef.current !== state.entryId) {
                     startNewAudio(state.entryId);
@@ -244,6 +247,8 @@ export const usePlayback = ({
                 unsyncedStateRef.current = state;
                 playIfBufferedRef.current();
             });
+
+            logger.debug("Подписались на /user/queue/playback")
 
             return () => {
                 playbackSub.unsubscribe();

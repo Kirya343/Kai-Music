@@ -1,6 +1,7 @@
 // apiClient.ts
 import { API_BASE } from "@/config";
 import axios from "axios";
+import { setupHttpLogging } from "./logging/api/setupHttpConfig";
 
 /**
  * Base Axios instance configured for API requests.
@@ -29,6 +30,8 @@ let refreshPromise: Promise<void> | null = null;
  * @returns The configured Axios instance.
  */
 const setupAuthInterceptor = (instance: typeof api) => {
+    setupHttpLogging(instance)
+
     instance.interceptors.response.use(
         response => response,
         async error => {

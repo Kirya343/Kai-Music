@@ -1,0 +1,17 @@
+api:
+  url: http://localhost:8080
+
+frontend:
+  url: http://localhost:30000
+
+app:
+  cookie:
+    secure: true
+    domain: ${APP_DOMAIN} 
+    sameSite: "Strict"
+
+acrcloud:
+  host: ${ACRCLOUD_HOST}
+  access-key: ${ACRCLOUD_ACCESS_KEY}
+  access-secret: ${ACRCLOUD_ACCESS_SECRET}
+  timeout: 10s

@@ -1,0 +1,11 @@
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/annotations/controllers/Authenticated.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/annotations/controllers/PublicEndpoint.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/annotations/controllers/RequiredPermission.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/annotations/controllers/RequiredRole.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/annotations/parameters/AuthUser.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/annotations/parameters/OptionalAuthUser.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/dto/UserAuthData.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/enums/AuthProvider.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/enums/UserStatus.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/exceptions/ForbiddenException.java
+/home/kirya343/projects/pet-projects/Kai/Backend/infrastructure/security-core/src/main/java/org/kirya343/security/core/exceptions/UnauthenticatedException.java

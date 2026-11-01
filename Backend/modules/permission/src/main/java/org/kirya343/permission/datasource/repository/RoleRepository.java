@@ -1,0 +1,85 @@
+package org.kirya343.permission.datasource.repository;
+
+import java.util.List;
+import java.util.Set;
+
+import org.kirya343.permission.datasource.model.Permission;
+import org.kirya343.permission.datasource.model.Role;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+public interface RoleRepository extends JpaRepository<Role, Long> {
+
+    Role findByName(String name);
+    
+    List<Role> findByPermissionsContaining(Permission permission);
+
+    @Query("""
+        select distinct r
+        from User u
+        join u.roles r
+        join fetch r.permissions
+        where u.id = :userId
+    """)
+    Set<Role> findRolesWithPermissionsByUserId(@Param("userId") Long userId);
+    
+    @Modifying
+    @Transactional
+    @Query(
+        value = """
+            insert into role_permissions (role_id, permissions_id)
+            values (:roleId, :permissionId)
+            """,
+        nativeQuery = true
+    )
+    void addPermissionToRole(
+            @Param("roleId") Long roleId,
+            @Param("permissionId") Long permissionId
+    );
+
+    @Modifying
+    @Transactional
+    @Query(
+        value = """
+            delete from role_permissions
+            where role_id = :roleId and permissions_id = :permissionId
+            """,
+        nativeQuery = true
+    )
+    void removePermissionFromRole(
+            @Param("roleId") Long roleId,
+            @Param("permissionId") Long permissionId
+    );
+
+    @Modifying
+    @Transactional
+    @Query(
+        value = """
+            insert into user_roles (user_id, roles_id)
+            values (:userId, :roleId)
+            """,
+        nativeQuery = true
+    )
+    void addRoleToUser(
+            @Param("userId") Long userId,
+            @Param("roleId") Long roleId
+    );
+
+    @Modifying
+    @Transactional
+    @Query(
+        value = """
+            delete from user_roles
+            where user_id = :userId and roles_id = :roleId
+            """,
+        nativeQuery = true
+    )
+    void removeRoleFromUser(
+            @Param("userId") Long userId,
+            @Param("roleId") Long roleId
+    );
+}
+

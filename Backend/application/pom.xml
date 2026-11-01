@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+        <groupId>org.kirya343</groupId>
+        <artifactId>kai</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <groupId>org.workswap</groupId>
+	<artifactId>server</artifactId>
+	<name>kai-app</name>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.48</version>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+        </dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>audio</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>authentication</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>permission</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>playback</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>playlist</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>presence</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>room</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>storage</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.kirya343</groupId>
+			<artifactId>user</artifactId>
+		</dependency>
+		
+	</dependencies>
+
+	<build>
+		<finalName>app</finalName>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

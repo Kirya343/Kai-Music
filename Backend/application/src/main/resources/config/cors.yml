@@ -1,0 +1,4 @@
+cors:
+  domains: 
+    - ${FRONTEND_URL}
+    - https://music.workswap.org

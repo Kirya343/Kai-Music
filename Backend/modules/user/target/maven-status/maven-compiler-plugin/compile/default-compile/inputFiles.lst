@@ -1,0 +1,12 @@
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/controller/UserWebSocketController.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/controller/UsersController.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/datasource/User.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/datasource/UserRepository.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/dto/FullUserDTO.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/dto/ShortUserDTO.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/dto/UserDTO.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/dto/UsersPageRequest.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/dto/event/UserConnectedEvent.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/dto/event/UserDisconnectedEvent.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/services/UserCommandService.java
+/home/kirya343/projects/pet-projects/Kai/Backend/modules/user/src/main/java/org/kirya343/user/services/UserQueryService.java

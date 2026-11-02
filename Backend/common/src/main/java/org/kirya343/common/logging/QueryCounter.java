@@ -17,7 +17,14 @@ public class QueryCounter implements StatementInspector {
         int currentCount = count.get() + 1;
         count.set(currentCount);
 
-        logger.debug("Query #{}", currentCount);
+        String formattedSql = sql.length() > 100
+            ? sql.substring(0, 100) + "..."
+            : sql;
+            
+        logger.debug(
+            "Query #{} -> {}", 
+            currentCount, 
+            formattedSql);
 
         return sql;
     }

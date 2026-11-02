@@ -1,8 +1,5 @@
 package org.kirya343.playback.services;
 
-import org.kirya343.room.datasource.ListeningRoom;
-import org.kirya343.room.datasource.ListeningRoomRepository;
-
 import java.util.Optional;
 
 import org.kirya343.playback.datasource.model.PlaybackState;
@@ -10,6 +7,7 @@ import org.kirya343.playback.enums.PlaybackTargetType;
 import org.kirya343.playback.datasource.repository.PlaybackStateRepository;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
+import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,14 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 public class QueueService {
 
     private final QueueItemRepository queueItemRepository;
-    private final ListeningRoomRepository listeningRoomRepository;
     private final PlaybackStateRepository playbackStateRepository;
+    private final PlaylistRepository playlistRepository;
 
     public QueueItem nextTrack(Long roomId) {
-        ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
-            () -> new EntityNotFoundException("Комната не найдена"));
 
-        Playlist playlist = room.getPlaylist();
+        Playlist playlist = playlistRepository.findByRoomId(roomId).orElseThrow(
+            () -> new EntityNotFoundException("Playlist by room (%s) not found".formatted(roomId)));
 
         Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
 
@@ -46,7 +43,7 @@ public class QueueService {
 
                 case NORMAL ->
                     queueItemRepository
-                        .findNextTrack(room.getPlaylist().getId(), prevEntryId)
+                        .findNextTrack(playlist.getId(), prevEntryId)
                         .orElse(null);
 
                 case REPEAT_ALL -> {
@@ -78,7 +75,7 @@ public class QueueService {
             log.debug("Режим проигрывания: {}", existingState.getPlaybackMode());
         } else {
             queueItem = queueItemRepository
-                .findFirstByPlaylistIdOrderByPositionAsc(room.getPlaylist().getId())
+                .findFirstByPlaylistIdOrderByPositionAsc(playlist.getId())
                 .orElse(null);
         }
 
@@ -92,14 +89,12 @@ public class QueueService {
     }
 
     public QueueItem prevTrack(Long roomId) {
-        
-        ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
-            () -> new EntityNotFoundException("Комната не найдена"));
 
         Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
 
         QueueItem queueItem = null;
-        Playlist playlist = room.getPlaylist();
+        Playlist playlist = playlistRepository.findByRoomId(roomId).orElseThrow(
+            () -> new EntityNotFoundException("Playlist by room (%s) not found".formatted(roomId)));
 
         if (playbackState.isPresent()) {
             PlaybackState existingState = playbackState.get();

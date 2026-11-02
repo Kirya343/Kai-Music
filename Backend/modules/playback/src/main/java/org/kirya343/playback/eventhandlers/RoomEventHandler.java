@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoomEventHandler {
 
-    private final PlaybackStateRepository roomPlaybackStateRepository;
+    private final PlaybackStateRepository playbackStateRepository;
     private final RoomSessionService roomSessionService;
 
     @Async
@@ -26,7 +26,7 @@ public class RoomEventHandler {
     @Transactional
     public void handlePlayback(RoomPlaybackEvent event) {
         
-        PlaybackState state = roomPlaybackStateRepository.findById(event.roomId())
+        PlaybackState state = playbackStateRepository.findByTargetIdAndTargetType(event.roomId(), PlaybackTargetType.ROOM)
             .orElse(new PlaybackState(event.roomId(), PlaybackTargetType.ROOM));
 
         state.setPosition(event.stateDTO().position());
@@ -34,7 +34,7 @@ public class RoomEventHandler {
         state.setPaused(event.stateDTO().pause());
         state.setInitiatorName(event.authData().name());
         
-        roomPlaybackStateRepository.save(state);
+        playbackStateRepository.save(state);
     }
 
     @Async

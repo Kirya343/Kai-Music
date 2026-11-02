@@ -111,8 +111,13 @@ public class RoomStreamWorker
             try {
                 QueueItem entry = queueService.nextTrack(roomId);
 
+                addLog("Found next track: %s", entry.getId());
+
                 eventPublisher.publishEvent(new ChangeTrack(roomId, entry.getId().toString(), UserAuthData.server()));
             } catch (Exception e) {
+
+                addLog("Exception while auto-switching track  %s", e);
+
                 eventPublisher.publishEvent(
                     new UpdatePlayback(
                         roomId, 

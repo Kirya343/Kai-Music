@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.playback.enums.PlaybackTargetType;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ public class PlaybackRepository {
     
     private final EntityManager entityManager;
 
+    @Transactional(readOnly = true)
     public Optional<AudioFile> findCurrentAudio(
         Long targetId,
         PlaybackTargetType targetType

@@ -9,6 +9,8 @@ import org.kirya343.playback.enums.PlaybackTargetType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,9 +45,11 @@ public class PlaybackState {
 
     private Long targetId;
 
+    @Enumerated(EnumType.STRING)
     private PlaybackTargetType targetType;
 
-    private PlaybackMode playbackMode;
+    @Enumerated(EnumType.STRING)
+    private PlaybackMode playbackMode = PlaybackMode.NORMAL;
 
     public PlaybackState(Long targetId, PlaybackTargetType targetType, Long entryId, Double position, boolean paused, String userName) {
         this.targetId = targetId;

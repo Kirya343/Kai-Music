@@ -6,11 +6,11 @@ const config: LoggerConfig = {
     defaultLevel: "INFO",
 
     categories: {
-        /* Audio: {
-            Buffer: "DEBUG",
-            MediaSource: "DEBUG",
+        Audio: {
+            // Buffer: "DEBUG",
+            // MediaSource: "DEBUG",
             Playback: "DEBUG",
-        }, */
+        },
         WebSocket: "ERROR",
         GlobalContext: "DEBUG",
 

@@ -1,6 +1,6 @@
 import { useGlobal } from "@common";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { IPlaybackState } from "../playbackTypes";
+import { IPlaybackState, PlaybackMode } from "../playbackTypes";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
 import { loggerFactory } from "@common";
@@ -37,6 +37,7 @@ export const usePlayback = ({
 
     // audio state
     const [playbackState, setPlaybackState] = useState<IPlaybackState | null>(null);
+    const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
 
     /**
      * Pauses playing audio
@@ -248,9 +249,16 @@ export const usePlayback = ({
                 playIfBufferedRef.current();
             });
 
+            const playbackModeSub = client.subscribe(`/user/queue/playback-mode`, (message) => {
+                const mode = JSON.parse(message.body);
+
+                setPlaybackMode(mode);
+            });
+
             logger.debug("Подписались на /user/queue/playback")
 
             return () => {
+                playbackModeSub.unsubscribe();
                 playbackSub.unsubscribe();
             }
         });
@@ -262,6 +270,7 @@ export const usePlayback = ({
         pausePlayback,
         resumePlayback,
         playbackState,
+        playbackMode,
         togglePlay,
         seek
     }

@@ -27,7 +27,7 @@ public class AuthorizationService {
         Package controllerPackage =
                 method.getDeclaringClass().getPackage();
 
-        if (!controllerPackage.getName().startsWith("org.kirya343.kai")) {
+        if (!controllerPackage.getName().startsWith("org.kirya343")) {
             return;
         }
         

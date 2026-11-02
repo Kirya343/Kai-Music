@@ -17,10 +17,10 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         LEFT JOIN FETCH r.playlist p
         LEFT JOIN FETCH p.queue q
         LEFT JOIN FETCH q.audio
-        JOIN FETCH User u ON u.id = :userId
-        JOIN FETCH UserPlayback up
-        WHERE up.userSub = u.openId
-            AND up.targetType = ROOM
+        JOIN UserPlayback up ON up.targetId = r.id
+        WHERE up.userId = :userId
+            AND up.targetType =
+                org.kirya343.playback.enums.PlaybackTargetType.ROOM
         """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
     
@@ -47,7 +47,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             r.code,
             COUNT(DISTINCT up.user_id) AS membersCount,
             r.playlist_id AS playlistId
-        FROM listening_rooms r
+        FROM listening_room r
         JOIN users u ON u.id = r.owner_id
         LEFT JOIN user_playbacks up
             ON up.target_id = r.id
@@ -68,15 +68,21 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
             r.owner_id AS ownerId,
             r.code,
-            (
-                SELECT COUNT(*)
-                FROM room_members rm
-                WHERE rm.room_id = r.id
-            ) AS membersCount,
+            COUNT(DISTINCT up.user_id) AS membersCount,
             r.playlist_id AS playlistId
-        FROM listening_rooms r
+        FROM listening_room r
         JOIN users u ON u.id = r.owner_id
+        LEFT JOIN user_playbacks up
+            ON up.target_id = r.id
+            AND up.target_type = 'ROOM'
         WHERE r.id = :roomId
+        GROUP BY
+            r.id,
+            r.title,
+            u.name,
+            r.owner_id,
+            r.code,
+            r.playlist_id
         """, nativeQuery = true)
     Optional<ShortRoomDTO> findShortRoomById(
         @Param("roomId") Long roomId

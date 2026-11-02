@@ -1,6 +1,7 @@
 package org.kirya343.playback.eventhandlers;
 
 import org.kirya343.common.event.room.RoomConnectedEvent;
+import org.kirya343.common.event.room.RoomDisconnectedEvent;
 import org.kirya343.playback.datasource.model.PlaybackState;
 import org.kirya343.playback.enums.PlaybackTargetType;
 import org.kirya343.playback.services.RoomSessionService;
@@ -36,7 +37,15 @@ public class RoomEventHandler {
         roomPlaybackStateRepository.save(state);
     }
 
+    @Async
+    @EventListener
     public void handleRoomConnected(RoomConnectedEvent event) {
         roomSessionService.connectUserToRoom(event.roomId(), event.userOpenId());
+    }
+
+    @Async
+    @EventListener
+    public void handleRoomDisconnected(RoomDisconnectedEvent event) {
+
     }
 }

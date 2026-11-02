@@ -62,7 +62,7 @@ const RoomPage = () => {
     }
 
     if (!room) {
-        return <Navigate to={"/"}/>
+        return <Navigate to={"/app"}/>
     }
     
     return (

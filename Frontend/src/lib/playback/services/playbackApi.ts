@@ -1,5 +1,5 @@
 import { createApi } from "@common";
-import { IPlaybackState } from "@playback";
+import { IPlaybackState, PlaybackMode, PlaybackTargetType } from "@playback";
 
 const playbackApi = createApi("/playback")
 
@@ -27,3 +27,6 @@ export const playTrack = (roomId: number, track: "next" | "prev" | number) =>
  */
 export const updateTrackPosition = (roomId: number, state: IPlaybackState) => 
     playbackApi.post<void>(`/${roomId}/update-state`, state);
+
+export const setPlaylistPlaybackMode = (targetId: number, targetType: PlaybackTargetType, mode: PlaybackMode) => 
+    playbackApi.post<void>(`/${targetId}/mode`, {}, { params: { mode, targetType }})

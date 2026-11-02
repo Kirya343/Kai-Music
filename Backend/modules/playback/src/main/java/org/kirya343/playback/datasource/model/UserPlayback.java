@@ -21,7 +21,7 @@ public class UserPlayback {
 
     @Id
     @Column(unique = true)
-    private Long userSub;
+    private Long userId;
 
     private Long targetId;
 

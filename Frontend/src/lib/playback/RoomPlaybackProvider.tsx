@@ -1,13 +1,14 @@
 import { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IAudio, TimeRange } from "@audio";
 import { countPosition, useData } from "@common";
-import { IPlaybackState, playbackService } from "@playback";
+import { IPlaybackState, PlaybackMode, playbackService } from "@playback";
 import { useAudioPlayer } from "./hooks";
 
 interface RoomPlaybackContextType {
     playingAudio: IAudio | null;
 
     playbackState: IPlaybackState | null;
+    playbackMode: PlaybackMode;
     roomLoaded: boolean;
     fullPlayerOpen: boolean;
     setFullPlayerOpen: Dispatch<SetStateAction<boolean>>;
@@ -38,7 +39,9 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         pausePlayback, 
         audioRef, bufferedRanges,
 
-        playbackState, seek,
+        playbackState, 
+        playbackMode,
+        seek,
         togglePlay
     } = useAudioPlayer(roomData.room?.id || null);
 
@@ -171,7 +174,9 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         <RoomPlaybackContext.Provider value={{ 
             playingAudio,
 
-            playbackState, 
+            playbackState,
+            playbackMode,
+
             roomLoaded, 
             fullPlayerOpen, 
             setFullPlayerOpen,

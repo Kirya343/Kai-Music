@@ -21,7 +21,9 @@ const config: LoggerConfig = {
             Main: "INFO",
         },
 
-        Data: "INFO",
+        Data: {
+            Room: "DEBUG"
+        }
     },
 
     isGroupCollapsed: false

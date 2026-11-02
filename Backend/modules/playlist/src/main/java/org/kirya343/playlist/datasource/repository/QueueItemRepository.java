@@ -97,6 +97,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         JOIN FETCH q.audio
         WHERE q.playlist.id = :playlistId
         ORDER BY q.position ASC
+        LIMIT 1
         """)
     Optional<QueueItem> findFirstInPlaylist(
         @Param("playlistId") Long playlistId
@@ -108,6 +109,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         JOIN FETCH q.audio
         WHERE q.playlist.id = :playlistId
         ORDER BY q.position DESC
+        LIMIT 1
         """)
     Optional<QueueItem> findLastInPlaylist(
         @Param("playlistId") Long playlistId

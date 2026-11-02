@@ -1,9 +1,0 @@
-org/kirya343/permission/datasource/repository/PermissionRepository.class
-org/kirya343/permission/dto/PermissionDTO.class
-org/kirya343/permission/datasource/model/Permission.class
-org/kirya343/permission/datasource/model/Role.class
-org/kirya343/permission/dto/RoleDTO.class
-org/kirya343/permission/services/PermissionQueryService.class
-org/kirya343/permission/datasource/repository/RoleRepository.class
-org/kirya343/permission/services/PermissionCommandSevice.class
-org/kirya343/permission/controller/PermissionController.class

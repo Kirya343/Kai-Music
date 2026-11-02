@@ -3,12 +3,15 @@ package org.kirya343.playback.controller;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.playback.datasource.model.RoomPlaybackState;
-import org.kirya343.playback.datasource.repository.RoomPlaybackStateRepository;
+import org.kirya343.playback.datasource.model.PlaybackState;
+import org.kirya343.playback.enums.PlaybackTargetType;
+import org.kirya343.playback.datasource.repository.PlaybackStateRepository;
 import org.kirya343.playback.dto.PlaybackStateDTO;
 import org.kirya343.playback.dto.commands.ChangeTrack;
 import org.kirya343.playback.dto.commands.RoomCommand;
 import org.kirya343.playback.dto.commands.UpdatePlayback;
+import org.kirya343.playback.enums.PlaybackMode;
+import org.kirya343.playback.services.PlaybackService;
 import org.kirya343.playback.services.command.PlaybackCommandWorker;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
@@ -30,8 +33,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/playback")
 public class PlaybackController {
 
-    private final RoomPlaybackStateRepository roomPlaybackStateRepository;
+    private final PlaybackStateRepository roomPlaybackStateRepository;
     private final PlaybackCommandWorker playbackCommandWorker;
+    private final PlaybackService playbackService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
     
@@ -42,7 +46,7 @@ public class PlaybackController {
         @AuthUser UserAuthData authData
     ) {
 
-        RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
+        PlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
             () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return PlaybackStateDTO.ofState(state);
@@ -80,6 +84,17 @@ public class PlaybackController {
         RoomCommand cmd = new ChangeTrack(roomId, changing, authData);
         
         playbackCommandWorker.submit(cmd);
+    }
+
+    @PostMapping("/{targetId}/mode")
+    @Authenticated
+    public void updatePlaybackMode(
+        @PathVariable Long targetId,
+        @RequestParam PlaybackTargetType targetType,
+        @RequestParam PlaybackMode mode,
+        @AuthUser UserAuthData authData
+    ) {
+        playbackService.updatePlaybackMode(targetId, targetType, mode, authData);
     }
 
     private boolean shouldIgnore(Long userId, Long roomId, String action) {

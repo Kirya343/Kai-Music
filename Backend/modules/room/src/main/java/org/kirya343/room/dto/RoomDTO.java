@@ -20,7 +20,7 @@ public record RoomDTO(
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
             room.getOwner().getId(),
             room.getCode(),
-            room.getMembers().size(),
+            0,
             PlaylistDTO.ofPlaylist(room.getPlaylist()),
             AudioDTO.ofAudioFile(audio)
         );
@@ -45,7 +45,7 @@ public record RoomDTO(
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
             room.getOwner().getId(),
             room.getCode(),
-            room.getMembers().size(),
+            0,
             PlaylistDTO.ofPlaylist(room.getPlaylist()),
             null
         );

@@ -1,14 +1,15 @@
 package org.kirya343.playback.eventhandlers;
 
-import org.kirya343.room.datasource.ListeningRoom;
-import org.kirya343.playback.datasource.model.RoomPlaybackState;
-import org.kirya343.playback.datasource.repository.RoomPlaybackStateRepository;
+import org.kirya343.common.event.room.RoomConnectedEvent;
+import org.kirya343.playback.datasource.model.PlaybackState;
+import org.kirya343.playback.enums.PlaybackTargetType;
+import org.kirya343.playback.services.RoomSessionService;
+import org.kirya343.playback.datasource.repository.PlaybackStateRepository;
 import org.kirya343.playback.dto.event.RoomPlaybackEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -16,24 +17,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RoomEventHandler {
 
-    private final RoomPlaybackStateRepository roomPlaybackStateRepository;
-    private final EntityManager entityManager;
+    private final PlaybackStateRepository roomPlaybackStateRepository;
+    private final RoomSessionService roomSessionService;
 
     @Async
     @EventListener
     @Transactional
     public void handlePlayback(RoomPlaybackEvent event) {
         
-        RoomPlaybackState state = roomPlaybackStateRepository.findById(event.roomId())
-            .orElse(new RoomPlaybackState(
-                entityManager.getReference(ListeningRoom.class, event.roomId())
-            ));
+        PlaybackState state = roomPlaybackStateRepository.findById(event.roomId())
+            .orElse(new PlaybackState(event.roomId(), PlaybackTargetType.ROOM));
 
         state.setPosition(event.stateDTO().position());
-        state.setCurrentQueueEntryId(event.stateDTO().entryId());
+        state.setEntryId(event.stateDTO().entryId());
         state.setPaused(event.stateDTO().pause());
-        state.setUser(event.authData().name());
+        state.setInitiatorName(event.authData().name());
         
         roomPlaybackStateRepository.save(state);
+    }
+
+    public void handleRoomConnected(RoomConnectedEvent event) {
+        roomSessionService.connectUserToRoom(event.roomId(), event.userOpenId());
     }
 }

@@ -2,24 +2,29 @@ package org.kirya343.playback.services;
 
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
-import org.kirya343.playback.datasource.model.RoomPlaybackState;
+
+import java.util.Optional;
+
+import org.kirya343.playback.datasource.model.PlaybackState;
+import org.kirya343.playback.enums.PlaybackTargetType;
+import org.kirya343.playback.datasource.repository.PlaybackStateRepository;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j 
 public class QueueService {
 
     private final QueueItemRepository queueItemRepository;
     private final ListeningRoomRepository listeningRoomRepository;
-    private static final Logger logger = LoggerFactory.getLogger(QueueService.class);
+    private final PlaybackStateRepository playbackStateRepository;
 
     public QueueItem nextTrack(Long roomId) {
         ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
@@ -27,50 +32,61 @@ public class QueueService {
 
         Playlist playlist = room.getPlaylist();
 
-        RoomPlaybackState playbackState = room.getPlaybackState();
+        Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
 
-        Long previousEntryId = playbackState.getCurrentQueueEntryId();
+        QueueItem queueItem = null;
 
-        logger.debug("Переключаем трек в комнате {}, номер предыдущего трека: {}", roomId, previousEntryId);
+        if (playbackState.isPresent()) {
 
-        QueueItem queueItem = switch (playlist.getPlaybackMode()) {
-            case NORMAL ->
-                queueItemRepository
-                    .findNextTrack(playlist.getId(), previousEntryId)
-                    .orElse(null);
+            PlaybackState existingState = playbackState.get();
 
-            case REPEAT_ALL -> {
-                QueueItem next = queueItemRepository
-                    .findNextTrack(playlist.getId(), previousEntryId)
-                    .orElse(null);
+            Long prevEntryId = existingState.getEntryId();
 
-                if (next == null) {
-                    next = queueItemRepository
-                        .findFirstByPlaylistIdOrderByPositionAsc(playlist.getId())
+            queueItem = switch (existingState.getPlaybackMode()) {
+
+                case NORMAL ->
+                    queueItemRepository
+                        .findNextTrack(room.getPlaylist().getId(), prevEntryId)
                         .orElse(null);
+
+                case REPEAT_ALL -> {
+                    QueueItem next = queueItemRepository
+                        .findNextTrack(playlist.getId(), prevEntryId)
+                        .orElse(null);
+
+                    if (next == null) {
+                        next = queueItemRepository
+                            .findFirstByPlaylistIdOrderByPositionAsc(playlist.getId())
+                            .orElse(null);
+                    }
+
+                    yield next;
                 }
 
-                yield next;
-            }
+                case REPEAT_ONE ->
+                    queueItemRepository
+                        .findByPlaylistIdAndId(playlist.getId(), prevEntryId)
+                        .orElse(null);
 
-            case REPEAT_ONE ->
-                queueItemRepository
-                    .findByPlaylistIdAndId(playlist.getId(), previousEntryId)
-                    .orElse(null);
+                case SHUFFLE ->
+                    queueItemRepository
+                        .findRandomTrack(playlist.getId())
+                        .orElse(null);
+                
+            };
 
-            case SHUFFLE ->
-                queueItemRepository
-                    .findRandomTrack(playlist.getId())
-                    .orElse(null);
-            
-        };
+            log.debug("Режим проигрывания: {}", existingState.getPlaybackMode());
+        } else {
+            queueItem = queueItemRepository
+                .findFirstByPlaylistIdOrderByPositionAsc(room.getPlaylist().getId())
+                .orElse(null);
+        }
 
         if (queueItem == null) {
             throw new EntityNotFoundException("Нет подходящего трека для воспроизведения");
-        } 
+        }
 
-        logger.debug("Режим проигрывания комнаты: {}", playlist.getPlaybackMode());
-        logger.debug("Id следующего трека: {}", queueItem.getId());
+        log.debug("Id следующего трека: {}", queueItem.getId());
 
         return queueItem;
     }
@@ -80,10 +96,16 @@ public class QueueService {
         ListeningRoom room = listeningRoomRepository.findById(roomId).orElseThrow(
             () -> new EntityNotFoundException("Комната не найдена"));
 
-        RoomPlaybackState playbackState = room.getPlaybackState();
+        Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
+
+        QueueItem queueItem = null;
         Playlist playlist = room.getPlaylist();
 
-        QueueItem queueItem = queueItemRepository.findPrevTrack(playlist.getId(), playbackState.getCurrentQueueEntryId()).orElse(null);
+        if (playbackState.isPresent()) {
+            PlaybackState existingState = playbackState.get();
+
+            queueItem = queueItemRepository.findPrevTrack(playlist.getId(), existingState.getEntryId()).orElse(null);
+        }
 
         if (queueItem == null) {
             queueItem = queueItemRepository.findFirstByPlaylistIdOrderByPositionDesc(playlist.getId()).orElse(null);

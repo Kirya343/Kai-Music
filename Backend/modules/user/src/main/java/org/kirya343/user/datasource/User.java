@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.common.config.datasource.Constants;
-import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.security.core.enums.AuthProvider;
 import org.kirya343.security.core.enums.UserStatus;
 import org.kirya343.permission.datasource.model.Role;
@@ -25,7 +24,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.EqualsAndHashCode;
@@ -99,11 +97,6 @@ public class User {
     @Column(name = "provider") // имя колонки для enum
     @Enumerated(EnumType.STRING)
     private Set<AuthProvider> providers = new HashSet<>(Set.of(AuthProvider.LOCAL));
-
-    // TODO Разрываем цикл user <-> room
-    // @ManyToOne
-    // @Setter
-    // private ListeningRoom listeningRoom;
 
     @Transient
     @Setter

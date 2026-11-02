@@ -8,21 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
-    
-    @Query("""
-        SELECT a
-        FROM QueueItem q
-        JOIN q.audio a
-        JOIN q.playlist p
-        JOIN ListeningRoom r ON r.playlist.id = p.id
-        LEFT JOIN r.members m
-        WHERE q.id = :queueItemId
-        AND (r.owner.id = :userId OR m.id = :userId)
-        """)
-    Optional<AudioFile> findAudioInUserRoom(
-        Long userId,
-        Long queueItemId
-    );
 
     @Query("""
         SELECT a
@@ -32,19 +17,6 @@ public interface AudioFileRepository extends JpaRepository<AudioFile, Long> {
     """)
     Optional<AudioFile> findAudioByQueueItem(
         Long queueItemId
-    );
-
-    @Query("""
-        SELECT a
-        FROM QueueItem q
-        JOIN q.audio a
-        JOIN ListeningRoom r ON r.playlist.id = q.playlist.id
-        JOIN r.playbackState ps
-        WHERE r.id = :roomId
-            AND ps.currentQueueEntryId = q.id
-        """)
-    Optional<AudioFile> findCurrentAudioByRoom(
-        @Param("roomId") Long roomId
     );
 
     List<AudioFile> findByOwnerId(Long ownerId);

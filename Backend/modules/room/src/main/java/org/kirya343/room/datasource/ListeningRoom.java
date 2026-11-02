@@ -1,8 +1,6 @@
 package org.kirya343.room.datasource;
 
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.common.config.datasource.Constants;
@@ -19,8 +17,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,14 +28,9 @@ public class ListeningRoom {
 
     public ListeningRoom(User owner) {
         this.owner = owner;
-        this.members = new HashSet<>();
-        this.members.add(owner);
         this.title = owner.getName() + "\'s room";
 
         this.playlist = new Playlist(title + " playlist", owner);
-
-        // TODO отвязываем playbackState от комнаты
-        // this.playbackState = new RoomPlaybackState(this);
     }
     
     @Id
@@ -59,9 +50,6 @@ public class ListeningRoom {
     @Setter
     private String title;
 
-    @OneToMany(mappedBy = "listeningRoom")
-    private Set<User> members = new HashSet<>();
-
     @ManyToOne(
         cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
         optional = false
@@ -71,7 +59,4 @@ public class ListeningRoom {
     
     @CreationTimestamp
     private Instant createdAt;
-
-    // @OneToOne(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
-    // private RoomPlaybackState playbackState;
 }

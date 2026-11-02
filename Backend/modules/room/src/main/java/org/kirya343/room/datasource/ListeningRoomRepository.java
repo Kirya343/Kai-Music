@@ -14,11 +14,13 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         SELECT DISTINCT r
         FROM ListeningRoom r
         LEFT JOIN FETCH r.owner
-        LEFT JOIN FETCH r.members m
         LEFT JOIN FETCH r.playlist p
         LEFT JOIN FETCH p.queue q
         LEFT JOIN FETCH q.audio
-        WHERE m.id = :userId
+        JOIN FETCH User u ON u.id = :userId
+        JOIN FETCH UserPlayback up
+        WHERE up.userSub = u.openId
+            AND up.targetType = ROOM
         """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
     
@@ -27,7 +29,6 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     @Query("""
         SELECT r FROM ListeningRoom r
         LEFT JOIN FETCH r.owner
-        LEFT JOIN r.members
         WHERE r.id = :roomId
     """)
     Optional<ListeningRoom> findFullRoomById(@Param("roomId") Long roomId);
@@ -38,30 +39,46 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
     List<ListeningRoom> findAllByOwnerId(Long ownerId);
     Optional<ListeningRoom> findByCode(String code);
 
-    @Query("""
-        SELECT new org.kirya343.room.dto.ShortRoomDTO(
+    @Query(value = """
+        SELECT
             r.id,
-            COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
-            r.owner.id,
+            COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
+            r.owner_id AS ownerId,
             r.code,
-            SIZE(r.members),
-            r.playlist.id
-        )
-        FROM ListeningRoom r
-    """)
+            COUNT(DISTINCT up.user_id) AS membersCount,
+            r.playlist_id AS playlistId
+        FROM listening_rooms r
+        JOIN users u ON u.id = r.owner_id
+        LEFT JOIN user_playbacks up
+            ON up.target_id = r.id
+            AND up.target_type = 'ROOM'
+        GROUP BY
+            r.id,
+            r.title,
+            u.name,
+            r.owner_id,
+            r.code,
+            r.playlist_id
+        """, nativeQuery = true)
     List<ShortRoomDTO> findAllShortDTOs();
 
-    @Query("""
-        SELECT new org.kirya343.room.dto.ShortRoomDTO(
+    @Query(value = """
+        SELECT
             r.id,
-            COALESCE(r.title, CONCAT(r.owner.name, '''s room')),
-            r.owner.id,
+            COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
+            r.owner_id AS ownerId,
             r.code,
-            SIZE(r.members),
-            r.playlist.id
-        )
-        FROM ListeningRoom r 
+            (
+                SELECT COUNT(*)
+                FROM room_members rm
+                WHERE rm.room_id = r.id
+            ) AS membersCount,
+            r.playlist_id AS playlistId
+        FROM listening_rooms r
+        JOIN users u ON u.id = r.owner_id
         WHERE r.id = :roomId
-    """)
-    Optional<ShortRoomDTO> findShortRoomById(@Param("roomId") Long roomId);
+        """, nativeQuery = true)
+    Optional<ShortRoomDTO> findShortRoomById(
+        @Param("roomId") Long roomId
+    );
 }

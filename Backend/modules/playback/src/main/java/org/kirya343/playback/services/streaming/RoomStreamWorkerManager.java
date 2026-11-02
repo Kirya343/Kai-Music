@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.playback.datasource.model.RoomPlaybackState;
-import org.kirya343.playback.datasource.repository.RoomPlaybackStateRepository;
+import org.kirya343.playback.datasource.model.PlaybackState;
+import org.kirya343.playback.datasource.repository.PlaybackStateRepository;
 import org.kirya343.playback.dto.PlaybackStateDTO;
 import org.kirya343.playback.services.QueueService;
 import org.kirya343.playback.services.cache.RoomPlaybackContext;
@@ -27,7 +27,7 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
 
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
-    private final RoomPlaybackStateRepository roomPlaybackStateRepository;
+    private final PlaybackStateRepository roomPlaybackStateRepository;
     private final QueueService queueService;
 
     private final Map<Long, RoomStreamWorker> workers =
@@ -51,7 +51,7 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
 
             log.debug("Создаём новый воркер для комнаты {}", roomId);
 
-            RoomPlaybackState state = roomPlaybackStateRepository.findById(roomId).orElse(null);
+            PlaybackState state = roomPlaybackStateRepository.findById(roomId).orElse(null);
 
             RoomPlaybackContext context = roomPlaybackContextStore.computeIfAbsent(roomId);
 

@@ -22,10 +22,9 @@ public class PlaylistWebSocketService {
         );
     }
 
-    public void broadcastRoomPlaylist(String userOpenId, PlaylistDTO playlist) {
-        messagingTemplate.convertAndSendToUser(
-            userOpenId, 
-            "/queue/playlist.room", 
+    public void broadcastRoomPlaylist(PlaylistDTO playlist) {
+        messagingTemplate.convertAndSend(
+            "/topic/playlist/" + playlist.id(), 
             playlist
         );
     }

@@ -1,6 +1,6 @@
 package org.kirya343.playback.dto;
 
-import org.kirya343.playback.datasource.model.RoomPlaybackState;
+import org.kirya343.playback.datasource.model.PlaybackState;
 
 public record PlaybackStateDTO(
     String user,
@@ -9,13 +9,13 @@ public record PlaybackStateDTO(
     boolean pause
 ) {
 
-    public static PlaybackStateDTO ofState(RoomPlaybackState state) {
+    public static PlaybackStateDTO ofState(PlaybackState state) {
 
-        if (state == null || state.getCurrentQueueEntryId() == null) return null;
+        if (state == null || state.getEntryId() == null) return null;
         
         return new PlaybackStateDTO(
-            state.getUser(), 
-            state.getCurrentQueueEntryId(), 
+            state.getInitiatorName(), 
+            state.getEntryId(), 
             state.getCurrentPosition(), 
             state.isPaused()
         );

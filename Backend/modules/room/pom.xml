@@ -29,6 +29,11 @@
 
         <dependency>
 			<groupId>org.kirya343</groupId>
+			<artifactId>playlist</artifactId>
+		</dependency>
+
+        <dependency>
+			<groupId>org.kirya343</groupId>
 			<artifactId>common</artifactId>
 		</dependency>
 

@@ -2,7 +2,6 @@ package org.kirya343.playback.services.command;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.playback.PlaybackWebsocketService;
 import org.kirya343.playback.dto.PlaybackStateDTO;
 import org.kirya343.playback.dto.commands.ChangeTrack;
@@ -34,7 +33,6 @@ public class PlaybackCommandWorker {
     private final PlaybackWebsocketService webSocketService;
     private final PlaybackExecutorRegistry executorRegistry;
     private final RoomStreamWorkerManager roomStreamWorkerManager;
-    private final AudioQueryService audioQueryService;
     private final QueueItemRepository queueItemRepository;
 
     public void submit(RoomCommand cmd) {
@@ -85,7 +83,7 @@ public class PlaybackCommandWorker {
 
                                 Long entryId = Long.parseLong(c.changing());
 
-                                entry = queueItemRepository.findById(entryId).orElseThrow();
+                                entry = queueItemRepository.findByIdWithAudio(entryId).orElseThrow();
 
                             } catch (NumberFormatException e) {
                                 throw e;
@@ -102,7 +100,7 @@ public class PlaybackCommandWorker {
                     );
 
                     roomContext.setCurrentAudio(
-                        audioQueryService.getAudioByQueueItem(entry.getId())
+                        entry.getAudio()
                     );
 
                 }

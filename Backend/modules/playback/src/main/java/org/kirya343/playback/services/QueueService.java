@@ -39,6 +39,8 @@ public class QueueService {
 
             Long prevEntryId = existingState.getEntryId();
 
+            log.debug("prevEntryId: {}, playlistId: {}", prevEntryId, playlist.getId());
+
             queueItem = switch (existingState.getPlaybackMode()) {
 
                 case NORMAL ->
@@ -53,7 +55,7 @@ public class QueueService {
 
                     if (next == null) {
                         next = queueItemRepository
-                            .findFirstByPlaylistIdOrderByPositionAsc(playlist.getId())
+                            .findFirstInPlaylist(playlist.getId())
                             .orElse(null);
                     }
 
@@ -75,7 +77,7 @@ public class QueueService {
             log.debug("Режим проигрывания: {}", existingState.getPlaybackMode());
         } else {
             queueItem = queueItemRepository
-                .findFirstByPlaylistIdOrderByPositionAsc(playlist.getId())
+                .findFirstInPlaylist(playlist.getId())
                 .orElse(null);
         }
 
@@ -103,7 +105,7 @@ public class QueueService {
         }
 
         if (queueItem == null) {
-            queueItem = queueItemRepository.findFirstByPlaylistIdOrderByPositionDesc(playlist.getId()).orElse(null);
+            queueItem = queueItemRepository.findLastInPlaylist(playlist.getId()).orElse(null);
         }
 
         if (queueItem == null) {

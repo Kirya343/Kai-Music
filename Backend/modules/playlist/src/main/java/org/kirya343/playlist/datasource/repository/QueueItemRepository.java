@@ -2,7 +2,6 @@ package org.kirya343.playlist.datasource.repository;
 
 import java.util.Optional;
 
-import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -37,7 +36,23 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         @Param("userId") Long userId
     );
 
-    Optional<QueueItem> findByPlaylistIdAndId(Long playlistId, Long entryId);
+    @Query("""
+        SELECT q FROM QueueItem q
+        JOIN FETCH q.audio
+        WHERE q.id = :entryId
+        """)
+    Optional<QueueItem> findByIdWithAudio(@Param("entryId") Long entryId);
+
+    @Query("""
+        SELECT q FROM QueueItem q
+        JOIN FETCH q.audio
+        WHERE q.playlist.id = :playlistId
+        AND q.id = :entryId
+        """)
+    Optional<QueueItem> findByPlaylistIdAndId(
+        @Param("playlistId") Long playlistId, 
+        @Param("entryId") Long entryId
+    );
 
     @Query("""
         SELECT COALESCE(MAX(q.position), -1)
@@ -46,19 +61,9 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         """)
     int getMaxPosition(@Param("playlistId") Long playlistId);
 
-    @Query("""
-        SELECT q.audio
-        FROM QueueItem q
-        WHERE q.playlist.id = :playlistId
-        AND q.id = :queueEntryId
-    """)
-    Optional<AudioFile> findAudioInRoomQueue(Long playlistId, Long queueEntryId);
-
-    @Query("SELECT q.audio FROM QueueItem q WHERE q.id = :queueItemId")
-    Optional<AudioFile> findAudioById(@Param("queueItemId") Long queueItemId);
-
     @Query(value = """
-        SELECT * FROM queue_items q
+        SELECT q.* FROM queue_items q
+        JOIN audio_file a ON a.id = q.audio_id
         WHERE q.playlist_id = :playlistId
         AND q.position > (
             SELECT q2.position FROM queue_items q2
@@ -72,7 +77,8 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     Optional<QueueItem> findNextTrack(Long playlistId, Long entryId);
 
     @Query(value = """
-        SELECT * FROM queue_items q
+        SELECT q.* FROM queue_items q
+        JOIN audio_file a ON a.id = q.audio_id
         WHERE q.playlist_id = :playlistId
         AND q.position < (
             SELECT q2.position FROM queue_items q2
@@ -85,8 +91,27 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     """, nativeQuery = true)
     Optional<QueueItem> findPrevTrack(Long playlistId, Long entryId);
 
-    Optional<QueueItem> findFirstByPlaylistIdOrderByPositionAsc(Long playlistId);
-    Optional<QueueItem> findFirstByPlaylistIdOrderByPositionDesc(Long playlistId);
+    @Query("""
+        SELECT q
+        FROM QueueItem q
+        JOIN FETCH q.audio
+        WHERE q.playlist.id = :playlistId
+        ORDER BY q.position ASC
+        """)
+    Optional<QueueItem> findFirstInPlaylist(
+        @Param("playlistId") Long playlistId
+    );
+
+    @Query("""
+        SELECT q
+        FROM QueueItem q
+        JOIN FETCH q.audio
+        WHERE q.playlist.id = :playlistId
+        ORDER BY q.position DESC
+        """)
+    Optional<QueueItem> findLastInPlaylist(
+        @Param("playlistId") Long playlistId
+    );
 
     @Query(value = """
         SELECT * FROM queue_items

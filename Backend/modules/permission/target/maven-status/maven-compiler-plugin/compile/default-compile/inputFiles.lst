@@ -1,9 +1,0 @@
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/controller/PermissionController.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/datasource/model/Permission.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/datasource/model/Role.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/datasource/repository/PermissionRepository.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/datasource/repository/RoleRepository.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/dto/PermissionDTO.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/dto/RoleDTO.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/services/PermissionCommandSevice.java
-/home/kirya343/projects/pet-projects/Kai/Backend/modules/permission/src/main/java/org/kirya343/permission/services/PermissionQueryService.java

@@ -42,3 +42,15 @@ export interface IPlaybackState {
     /** Is track paused */
     pause: boolean;
 }
+
+export enum PlaybackMode {
+    NORMAL = "NORMAL",
+    REPEAT_ALL = "REPEAT_ALL",
+    SHUFFLE = "SHUFFLE",
+    REPEAT_ONE = "REPEAT_ONE"
+}
+
+export enum PlaybackTargetType {
+    ROOM = "ROOM",
+    USER = "USER"
+}

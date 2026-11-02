@@ -7,7 +7,7 @@ public record ShortRoomDTO(
     String title,
     Long ownerId,
     String code,
-    Integer membersCount,
+    Long membersCount,
     Long playlistId
 ) {
 
@@ -17,7 +17,7 @@ public record ShortRoomDTO(
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room", 
             room.getOwner().getId(),
             room.getCode(),
-            room.getMembers().size(),
+            0L,
             room.getPlaylist().getId()
         );
     }

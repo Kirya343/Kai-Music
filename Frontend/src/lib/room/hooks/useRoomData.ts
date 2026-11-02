@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IListeningRoom } from "../roomTypes";
+import { IListeningRoom, IShortRoom } from "../roomTypes";
 import { roomService } from "../services";
 import { useWebSocket } from "@websocket";
 import { Playlist } from "@playlist";
@@ -33,8 +33,15 @@ export function useRoomData() {
     const syncRoom = useCallback(async () => {
         try {
             const res = await roomService.loadCurrentRoom();
+
             setRoom(res.data)
-            setPlaylist(res.data.playlist)
+
+            logger.debug("roomService.loadCurrentRoom:", res.data)
+
+            if (res.data.playlist) {
+                setPlaylist(res.data.playlist)
+            }
+
             setSynced(true)
         } finally {
             
@@ -67,34 +74,52 @@ export function useRoomData() {
     }, [room?.id, synced, reconnectToRoom])
 
     useEffect(() => {
-        const unsubscribe = addOnConnectHandler((client, isReconnect) => {
+        const unsubscribe = addOnConnectHandler((client) => {
 
             const roomSub = client.subscribe(`/user/queue/room`, (message) => {
-                const room: IListeningRoom = JSON.parse(message.body);
+                const shortRoom: IShortRoom = JSON.parse(message.body);
                 
-                setRoom(room);
-                currentRoomIdRef.current = room.id
-            });
+                // Mapping from Short to full listing room
+                setRoom(prev => {
+                    if (!prev?.playlist) return null;
 
-            const playlistSub = client.subscribe(`/user/queue/playlist.room`, (message) => {
-                setPlaylist(JSON.parse(message.body));
-            });
+                    return {
+                        ...prev,
+                        ...shortRoom,
+                        playlist: {
+                            ...prev.playlist,
+                            id: shortRoom.playlistId
+                        }
+                    };
+                });
 
-            const playbackModeSub = client.subscribe(`/user/queue/playback-mode`, (message) => {
-                const mode = JSON.parse(message.body);
-
-                setPlaylist(prev => prev ? ({...prev, mode}) : prev);
+                currentRoomIdRef.current = shortRoom.id
             });
 
             return () => {
                 roomSub.unsubscribe();
-                playbackModeSub.unsubscribe();
-                playlistSub.unsubscribe();
             }
         });
 
         return unsubscribe;
     }, [addOnConnectHandler]);
+
+    useEffect(() => {
+        if (room?.playlist?.id) return; 
+
+        const unsubscribe = addOnConnectHandler((client) => {
+
+            const playlistSub = client.subscribe(`/topic/playlist/${room?.playlist?.id}`, (message) => {
+                setPlaylist(JSON.parse(message.body));
+            });
+
+            return () => {
+                playlistSub.unsubscribe();
+            }
+        });
+
+        return unsubscribe;
+    }, [room?.playlist?.id, addOnConnectHandler])
 
     return {
         room,

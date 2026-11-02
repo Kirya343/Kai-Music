@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.kirya343.audio.dto.AudioChunk;
 import org.kirya343.playback.dto.PlaybackStateDTO;
+import org.kirya343.playback.enums.PlaybackMode;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -52,6 +53,14 @@ public class PlaybackWebsocketService {
             "/queue/audio",
             chunk.data(),
             headers
+        );
+    }
+
+    public void sendPlaybackMode(String user, PlaybackMode mode) {
+        messagingTemplate.convertAndSendToUser(
+            user, 
+            "/queue/playback-mode", 
+            mode
         );
     }
 }

@@ -2,12 +2,13 @@ package org.kirya343.room.services;
 
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.user.datasource.User;
-import org.kirya343.user.datasource.UserRepository;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.room.datasource.ListeningRoomRepository;
-import org.kirya343.playlist.dto.PlaylistDTO;
-import org.kirya343.playlist.service.PlaylistWebSocketService;
+import org.kirya343.common.event.room.RoomConnectedEvent;
+import org.kirya343.common.event.room.RoomDeletedEvent;
+import org.kirya343.common.event.room.RoomDisconnectedEvent;
 import org.kirya343.room.dto.ShortRoomDTO;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomCommandService {
 
     private final ListeningRoomRepository listeningRoomRepository;
-    private final UserRepository userRepository;
     private final RoomWebSocketService roomWebSocketService;
     private final EntityManager entityManager;
-    private final PlaylistWebSocketService playlistWebSocketService;
+    private final ApplicationEventPublisher eventPublisher;
     
     @Transactional 
     public ListeningRoom createRoom(UserAuthData authData) {
@@ -36,8 +36,9 @@ public class RoomCommandService {
         );
 
         ListeningRoom saved = listeningRoomRepository.save(room);
-        userRepository.updateListeningRoom(authData.id(), saved.getId());
 
+        eventPublisher.publishEvent(new RoomConnectedEvent(authData.openId(), room.getId()));
+        
         roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(saved));
 
         return saved;
@@ -45,10 +46,28 @@ public class RoomCommandService {
 
     @Transactional
     public void deleteRoom(ListeningRoom room) {
-        for (User member : room.getMembers()) {
-            member.setListeningRoom(null);
-        }
+        eventPublisher.publishEvent(new RoomDeletedEvent(room.getId()));
 
         listeningRoomRepository.delete(room);
+    }
+
+    public void joinRoom(String code, UserAuthData authData) {
+        ListeningRoom prevRoom = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
+
+        if (prevRoom != null) {
+            eventPublisher.publishEvent(new RoomDisconnectedEvent(authData.openId(), prevRoom.getId()));
+        }
+
+        ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
+
+        eventPublisher.publishEvent(new RoomConnectedEvent(authData.openId(), newRoom.getId()));
+
+        roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(newRoom));
+    }
+
+    public void leaveRoom(UserAuthData authData) {
+        ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
+
+        eventPublisher.publishEvent(new RoomDisconnectedEvent(authData.openId(), room.getId()));
     }
 }

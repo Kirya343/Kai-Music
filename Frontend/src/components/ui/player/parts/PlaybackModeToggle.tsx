@@ -1,16 +1,18 @@
 import { RepeatAllIcon, NoRepeatIcon, RepeatOneIcon, ShuffleIcon } from "@/assets/icons";
 import { useData } from "@common";
-import { PlaybackMode, playlistService } from "@playlist";
+import { PlaybackMode, useRoomPlayback, playbackService, PlaybackTargetType } from "@playback";
 
 /**
  * PlaybackModeToggle is component that switches playbackMode of playlist that playing at the moment
  */
 export const PlaybackModeToggle = () => {
 
+    const { playbackMode } = useRoomPlayback();
     const { roomData } = useData();
 
     const nextMode = async () => {
-        if (!roomData.playlist) return;
+
+        if (!roomData.room) return;
         
         const modes = [
             PlaybackMode.NORMAL,
@@ -19,14 +21,15 @@ export const PlaybackModeToggle = () => {
             PlaybackMode.REPEAT_ONE
         ];
 
-        const index = modes.indexOf(roomData.playlist.mode);
+        const index = modes.indexOf(playbackMode);
         const next = modes[(index + 1) % modes.length];
 
-        await playlistService.setPlaylistPlaybackMode(roomData.playlist?.id, next);
+        // Пока только на комнату
+        await playbackService.setPlaylistPlaybackMode(roomData.room.id, PlaybackTargetType.ROOM, next);
     };
 
     const icon = (() => {
-        switch (roomData.playlist?.mode) {
+        switch (playbackMode) {
             case PlaybackMode.NORMAL: return <NoRepeatIcon />;
             case PlaybackMode.REPEAT_ALL: return <RepeatAllIcon />;
             case PlaybackMode.SHUFFLE: return <ShuffleIcon />;

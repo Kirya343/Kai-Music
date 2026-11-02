@@ -2,7 +2,6 @@ package org.kirya343.playlist.controller;
 
 import java.util.List;
 
-import org.kirya343.playlist.enums.PlaybackMode;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.dto.PlaylistCreateDTO;
@@ -14,7 +13,6 @@ import org.kirya343.security.core.annotations.parameters.AuthUser;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -81,15 +79,6 @@ public class PlaylistController {
         @AuthUser UserAuthData authData
     ) {
         playlistRepository.deleteById(playlistId);
-    }
-
-    @PatchMapping("/{playlistId}/mode")
-    @Authenticated
-    public void updatePlaybackMode(
-        @PathVariable Long playlistId, 
-        @RequestParam PlaybackMode mode
-    ) {
-        playlistCommandService.updatePlaybackMode(playlistId, mode);
     }
 
     @PostMapping("/{playlistId}/queue")

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.kirya343.audio.datasource.AudioFileRepository;
 import org.kirya343.common.event.playback.QueueChangedEvent;
-import org.kirya343.playlist.enums.PlaybackMode;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
@@ -50,25 +49,6 @@ public class PlaylistCommandService {
         }
 
         return PlaylistDTO.ofPlaylistShort(saved);
-    }
-
-    // TODO перенести playbackMode в playbackState, Разорвать цикл playback <-> playlist
-    public void updatePlaybackMode(Long playlistId, PlaybackMode mode) {
-        // playlistRepository.updatePlaybackMode(playlistId, mode);
-
-        // ListeningRoom room = roomQueryService.findByPlaylistId(playlistId);
-
-        // if (room != null) {
-        //     Set<String> listners = roomPlaybackContextStore.get(room.getId()).getListeners();
-
-        //     for (String user : listners) {
-        //         messagingTemplate.convertAndSendToUser(
-        //             user, 
-        //             "/queue/playback-mode", 
-        //             mode
-        //         );
-        //     }
-        // }
     }
 
     @Transactional

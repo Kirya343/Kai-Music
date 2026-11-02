@@ -36,11 +36,12 @@ public class DataSourceConfig {
     @Primary
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
-            EntityManagerFactoryBuilder builder
+            EntityManagerFactoryBuilder builder,
+            DataSource dataSource
     ) {
         return builder
-                .dataSource(dataSource())
-                .packages("org.kirya343") // Пакет с @Entity
+                .dataSource(dataSource)
+                .packages("org.kirya343")
                 .persistenceUnit("central")
                 .build();
     }
@@ -50,11 +51,6 @@ public class DataSourceConfig {
     public PlatformTransactionManager transactionManager(
             @Qualifier("entityManagerFactory") EntityManagerFactory emf
     ) {
-
-        if (emf == null) {
-            throw new IllegalArgumentException("EntityManagerFactory не найден (null)");
-        }
-
         return new JpaTransactionManager(emf);
     }
 }

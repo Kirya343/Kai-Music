@@ -6,7 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.datasource.AudioFileRepository;
+import org.kirya343.playback.datasource.repository.PlaybackRepository;
 import org.kirya343.playback.dto.PlaybackStateDTO;
+import org.kirya343.playback.enums.PlaybackTargetType;
 import org.kirya343.room.datasource.ListeningRoomRepository;
 import org.kirya343.room.dto.ShortRoomDTO;
 import org.kirya343.room.services.RoomWebSocketService;
@@ -21,6 +23,7 @@ public class RoomPlaybackContextStore {
     private final RoomWebSocketService roomWebSocketService;
     private final Map<Long, RoomPlaybackContext> rooms = new ConcurrentHashMap<>();
     private final ListeningRoomRepository listeningRoomRepository;
+    private final PlaybackRepository playbackRepository;
     private final AudioFileRepository audioFileRepository;
 
     public RoomPlaybackContext get(Long roomId) {
@@ -47,7 +50,7 @@ public class RoomPlaybackContextStore {
 
         ShortRoomDTO room = listeningRoomRepository.findShortRoomById(roomId).orElseThrow();
 
-        AudioFile audioFile = audioFileRepository.findCurrentAudioByRoom(roomId).orElse(null);
+        AudioFile audioFile = playbackRepository.findCurrentAudio(roomId, PlaybackTargetType.ROOM).orElse(null);
 
         return new RoomPlaybackContext(
             room.id(),

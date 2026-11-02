@@ -3,5 +3,5 @@
 /mvnw
 /mvnw.cmd
 /ssl
-/target
+**/target/
 logs/application.log

@@ -2,7 +2,6 @@ package org.kirya343.playlist.dto;
 
 import java.util.List;
 
-import org.kirya343.playlist.enums.PlaybackMode;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.dto.queue.QueueItemDTO;
 
@@ -10,7 +9,6 @@ public record PlaylistDTO(
     Long id,
     Long ownerId,
     String title,
-    PlaybackMode mode,
     List<QueueItemDTO> queue
 ) {
     public static PlaylistDTO ofPlaylist(Playlist playlist) {
@@ -19,7 +17,6 @@ public record PlaylistDTO(
             playlist.getId(),
             playlist.getOwner().getId(),
             playlist.getTitle(),
-            playlist.getPlaybackMode(),
             QueueItemDTO.ofList(playlist.getQueue())
         );
     }
@@ -30,7 +27,6 @@ public record PlaylistDTO(
             playlist.getId(),
             playlist.getOwner().getId(),
             playlist.getTitle(),
-            playlist.getPlaybackMode(),
             null
         );
     }

@@ -7,7 +7,6 @@ import org.kirya343.room.services.RoomCommandService;
 import org.kirya343.room.services.RoomQueryService;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
-import org.kirya343.user.datasource.UserRepository;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.controllers.PublicEndpoint;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
@@ -38,7 +37,6 @@ public class RoomController {
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomQueryService roomQueryService;
     private final PresenceService presenceService;
-    private final UserRepository userRepository;
     private final RoomCommandService roomCommandService;
 
     @GetMapping
@@ -55,25 +53,11 @@ public class RoomController {
 
     @PostMapping("/join")
     @Authenticated
-    public void setUserRoom(
+    public void joinRoom(
         @RequestParam String code,
         @AuthUser UserAuthData authData
     ) {
-
-        ListeningRoom prevRoom = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
-
-        // TODO Разорвать цикл room <-> playback, сделать на ивентах
-
-        // if (prevRoom != null) {
-        //     RoomPlaybackContext context = roomPlaybackContextStore.get(prevRoom.getId());
-        //     if (context != null) {
-        //         context.getListeners().remove(authData.openId());
-        //     }
-        // }
-
-        // ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
-
-        // roomCommandService.connectUserToRoom(newRoom, authData);
+        roomCommandService.joinRoom(code, authData);
     }
 
     @PostMapping("/leave")
@@ -81,21 +65,7 @@ public class RoomController {
     public void leaveRoom(
         @AuthUser UserAuthData authData
     ) {
-
-        ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
-
-        // TODO Разорвать цикл room <-> playback, сделать на ивентах
-
-        // if (room != null) {
-        //     RoomPlaybackContext context = roomPlaybackContextStore.get(room.getId());
-        //     if (context != null) {
-        //         context.getListeners().remove(authData.openId());
-        //     }
-        //     userAudioStreamWorkerManager.removeWorker(authData.openId());
-        // }
-
-        // log.debug("Пользователь {} покинул комнату {}", authData.name(), room.getId());
-        // userRepository.updateListeningRoom(authData.id(), null);
+        roomCommandService.leaveRoom(authData);
     }
 
     @GetMapping("/list/page")

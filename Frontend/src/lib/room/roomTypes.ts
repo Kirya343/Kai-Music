@@ -3,7 +3,7 @@ import { IAudio } from "../audio";
 
 export interface IListeningRoom extends RoomTemplate {
     audio: IAudio;
-    playlist: Playlist;
+    playlist?: Playlist;
 }
 
 interface RoomTemplate {

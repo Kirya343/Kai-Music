@@ -62,7 +62,7 @@ const RoomPage = () => {
     }
 
     if (!room) {
-        return <Navigate to={"/"}/>
+        return <Navigate to={"/app"}/>
     }
     
     return (
@@ -120,16 +120,19 @@ const RoomPage = () => {
                         </div>
 
                         <div className={styles.trackList}>
-                            {playlist?.queue.map(qi => (
-                                <RoomTrack
-                                    key={qi.id}
-                                    queueItem={qi}
-                                    selected={selectedTracks.some(t => t == qi.id)}
-                                    selectMode={selectMode}
-                                    toggleTrack={toggleTrack}
-                                    playing={playbackState?.entryId === qi.id}
-                                />
-                            ))}
+                            {playlist?.queue.slice()
+                                .sort((a, b) => a.position - b.position)
+                                .map(qi => (
+                                    <RoomTrack
+                                        key={qi.id}
+                                        queueItem={qi}
+                                        selected={selectedTracks.some(t => t == qi.id)}
+                                        selectMode={selectMode}
+                                        toggleTrack={toggleTrack}
+                                        playing={playbackState?.entryId === qi.id}
+                                    />
+                                ))
+                            }
                         </div>
 
                         <button className={styles.addTrack} onClick={() => setImportOpen(true)}>

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
-import org.kirya343.playlist.enums.PlaybackMode;
 import org.kirya343.user.datasource.User;
 import org.kirya343.common.config.datasource.Constants;
 
@@ -14,8 +13,6 @@ import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,10 +46,6 @@ public class Playlist {
 
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QueueItem> queue = new ArrayList<>();
-
-    @Setter
-    @Enumerated(EnumType.STRING)
-    private PlaybackMode playbackMode = PlaybackMode.NORMAL;
 
     @CreationTimestamp
     private Instant createdAt;

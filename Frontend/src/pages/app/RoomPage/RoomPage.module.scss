@@ -54,7 +54,6 @@
 }
 
 .code {
-    border: 1px solid;
     border-radius: 10px;
     padding: 5px 20px;
     display: flex;
@@ -65,7 +64,6 @@
 }
 
 .members {
-    border: 1px solid;
     border-radius: 10px;
     padding: 10px 20px;
 
@@ -85,7 +83,6 @@
 
     overflow: hidden;
 
-    border: 1px solid;
     border-radius: 1rem;
 
     @include glass;

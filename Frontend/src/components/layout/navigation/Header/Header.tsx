@@ -46,18 +46,22 @@ const Header = () => {
     return (
         <header className={styles.header}>
             <div className={styles.headerContainer}>
-                <Logo/>
+                <div className={styles.logoContainer}>
+                    <Logo/>
+                </div>
                 <div className={styles.navigation}>
                     {links.map(l => <NavigationLink key={l.title} link={l} />)}
                 </div>
-                {isAuthenticated ? (
-                    <Link to="/app/profile" className={styles.auth}>
-                        <UserIcon className={styles.icon}/>
-                        <span className={styles.userName}>{user?.name}</span>
-                    </Link>
-                ) : (
-                    <Link to="/login">Sign In</Link>
-                )}
+                <div className={styles.authenticationContainer}>
+                    {isAuthenticated ? (
+                        <Link to="/app/profile" className={styles.auth}>
+                            <UserIcon className={styles.icon}/>
+                            <span className={styles.userName}>{user?.name}</span>
+                        </Link>
+                    ) : (
+                        <Link to="/login">Sign In</Link>
+                    )}
+                </div>
             </div>
         </header>
     )

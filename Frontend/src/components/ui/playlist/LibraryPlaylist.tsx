@@ -35,7 +35,7 @@ const LibraryPlaylist = ({
         }
     ]
 
-    return <PlaylistCard onClick={() => navigate(`/playlists/${playlist.id}`)} playlist={playlist} extraActions={extraActions}/>
+    return <PlaylistCard onClick={() => navigate(`/app/playlists/${playlist.id}`)} playlist={playlist} extraActions={extraActions}/>
 }
 
 export default LibraryPlaylist;

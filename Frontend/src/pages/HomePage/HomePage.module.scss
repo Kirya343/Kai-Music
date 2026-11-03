@@ -137,6 +137,10 @@
     background: rgba(255, 163, 72, 0.1);
     color: var(--accent);
     font-size: 17px;
+
+    svg {
+        width: 23px;
+    }
 }
 
 .heroVisual {
@@ -260,7 +264,10 @@
 
 .trackIcon {
     color: var(--accent);
-    font-size: 25px;
+
+    svg {
+        width: 30px;
+    }
 }
 
 .equalizer,
@@ -308,7 +315,10 @@
     align-items: center;
     gap: 20px;
     color: var(--text-color);
-    font-size: 13px;
+    
+    svg {
+        width: 18px;
+    }
 }
 
 .playButton {
@@ -319,6 +329,10 @@
     border-radius: 50%;
     background: var(--accent);
     color: #17120c;
+
+    svg {
+        width: 12px;
+    }
 }
 
 .floatingCard {
@@ -329,6 +343,7 @@
     gap: 12px;
     padding: 13px 16px;
     border-radius: 12px;
+
     @include glass;
 
     strong,
@@ -511,6 +526,11 @@
     background: rgba(255, 163, 72, 0.1);
     color: var(--accent);
     font-size: 22px;
+
+    svg {
+        width: 35px;
+        height: 35px;
+    }
 }
 
 .featureNumber {
@@ -526,6 +546,7 @@
     font-size: 16px;
     opacity: 0;
     transition: opacity 0.2s;
+    cursor: pointer;
 
     .featureCard:hover & {
         opacity: 1;
@@ -598,9 +619,9 @@
         radial-gradient(circle at 50% 50%, rgba(255, 163, 72, 0.4), transparent 50%),
         linear-gradient(135deg, #53351e, #17120e);
 
-    span {
+    svg {
         color: var(--accent);
-        font-size: 90px;
+        width: 60px;
     }
 }
 

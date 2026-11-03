@@ -1,5 +1,14 @@
 @use "@/css/components/mixins/" as *;
 
+.layout {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-height: 100vh;
+    font-family: inherit;
+    overflow: auto;
+}
+
 .header {
     position: relative;
     z-index: 5;

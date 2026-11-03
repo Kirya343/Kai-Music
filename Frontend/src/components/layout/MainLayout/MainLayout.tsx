@@ -14,7 +14,7 @@ const navigation = [
 const MainLayout = () => {
 
     return (
-        <>
+        <div className={styles.layout}>
             <header className={styles.header}>
                 <Logo />
 
@@ -33,7 +33,7 @@ const MainLayout = () => {
             </header>
 
             <Outlet />
-        </>
+        </div>
     )
 }
 

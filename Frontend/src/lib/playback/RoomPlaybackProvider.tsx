@@ -111,9 +111,9 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
             album: playingAudio.album || "",
             artwork: [
                 {
-                    src: "https://music.workswap.org/image/face.webp",
-                    sizes: "512x512",
-                    type: "image/webp"
+                    src: "https://music.workswap.org/image/logo.svg",
+                    sizes: "400x400",
+                    type: "image/svg"
                 }
             ]
         });

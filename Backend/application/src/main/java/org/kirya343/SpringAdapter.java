@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 
-import io.github.kirya343.terminal.components.DiagnosticCommandProvider;
+import io.github.kirya343.terminal.api.provider.DiagnosticCommandProvider;
 import io.github.kirya343.terminal.runtime.ApplicationAdapter;
 import io.github.kirya343.terminal.runtime.ApplicationLifecycle;
 

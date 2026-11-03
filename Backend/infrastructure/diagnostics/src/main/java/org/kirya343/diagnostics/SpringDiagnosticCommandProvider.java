@@ -2,11 +2,12 @@ package org.kirya343.diagnostics;
 
 import java.util.List;
 
-import io.github.kirya343.terminal.components.DiagnosticCommandProvider;
-import io.github.kirya343.terminal.components.DiagnosticComponent;
-import io.github.kirya343.terminal.components.commands.DiagnosticCommand;
+
 import org.springframework.stereotype.Component;
 
+import io.github.kirya343.terminal.api.command.DiagnosticCommand;
+import io.github.kirya343.terminal.api.component.DiagnosticComponent;
+import io.github.kirya343.terminal.api.provider.DiagnosticCommandProvider;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

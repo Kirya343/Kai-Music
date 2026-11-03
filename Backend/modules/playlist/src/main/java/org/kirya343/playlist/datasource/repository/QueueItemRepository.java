@@ -28,7 +28,7 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
                         WHERE r.playlist.id = q.playlist.id
                     )
                     AND up.targetType =
-                        org.kirya343.playback.enums.PlaybackTargetType.ROOM
+                        org.kirya343.playback.domain.enums.PlaybackTargetType.ROOM
             )
         """)
     int deleteByIdAndUserRoom(

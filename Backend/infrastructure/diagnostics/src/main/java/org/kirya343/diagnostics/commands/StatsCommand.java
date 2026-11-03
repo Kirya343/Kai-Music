@@ -3,16 +3,16 @@ package org.kirya343.diagnostics.commands;
 
 import java.lang.management.ManagementFactory;
 
-import org.kirya343.playback.services.streaming.RoomStreamWorkerManager;
-import org.kirya343.playback.services.streaming.UserAudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorkerManager;
 import org.kirya343.presence.services.PresenceService;
-import io.github.kirya343.terminal.components.commands.DiagnosticCommand;
-import io.github.kirya343.terminal.components.commands.TerminalCommand;
-import io.github.kirya343.terminal.core.DiagnosticTextBuilder;
-import io.github.kirya343.terminal.models.StreamMode;
-import io.github.kirya343.terminal.models.StreamingResult;
 import org.springframework.stereotype.Component;
 
+import io.github.kirya343.terminal.api.command.DiagnosticCommand;
+import io.github.kirya343.terminal.api.command.TerminalCommand;
+import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
+import io.github.kirya343.terminal.result.StreamMode;
+import io.github.kirya343.terminal.result.StreamingResult;
 import lombok.RequiredArgsConstructor;
 
 @Component

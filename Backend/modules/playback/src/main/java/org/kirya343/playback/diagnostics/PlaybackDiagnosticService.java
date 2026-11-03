@@ -1,12 +1,12 @@
 package org.kirya343.playback.diagnostics;
 
 import org.kirya343.audio.datasource.AudioFile;
-import org.kirya343.playback.services.cache.RoomPlaybackContext;
-import org.kirya343.playback.services.cache.RoomPlaybackContextStore;
-import org.kirya343.playback.services.streaming.RoomStreamWorkerManager;
-import io.github.kirya343.terminal.core.DiagnosticTextBuilder;
+import org.kirya343.playback.domain.model.RoomPlaybackContext;
+import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
+import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
 import org.springframework.stereotype.Service;
 
+import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
 import lombok.RequiredArgsConstructor;
 
 @Service 

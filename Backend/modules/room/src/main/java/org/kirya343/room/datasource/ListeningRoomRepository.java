@@ -20,7 +20,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         JOIN UserPlayback up ON up.targetId = r.id
         WHERE up.userId = :userId
             AND up.targetType =
-                org.kirya343.playback.enums.PlaybackTargetType.ROOM
+                org.kirya343.playback.domain.enums.PlaybackTargetType.ROOM
         """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
     

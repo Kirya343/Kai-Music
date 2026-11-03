@@ -25,21 +25,7 @@ export const useLibrary = () => {
     /** List of current uploads */
     const [uploading, setUploading] = useState<IUploadingAudio[]>([]);
 
-    /** 
-     * HTML element reference. 
-     * Should be placed on the element, that can be scrolled to contain the tracks list 
-     */
-    const parentRef = useRef<HTMLDivElement>(null);
-
-    /** Count of visibple items on page */
-    const [visibleCount, setVisibleCount] = useState(50);
-
     const { filteredList, searchQuery, setSearchQuery } = useSearch(audiosData.data);
-
-    /** Audios that should be currently visible */
-    const visibleAudios = useMemo(() => {
-        return filteredList.slice(0, visibleCount);
-    }, [filteredList, visibleCount]);
 
     /** Uploads audios on server */
     const uploadAudios = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,48 +91,9 @@ export const useLibrary = () => {
         }
     };
 
-    /** ReactVirtualizer optimizes the tracks list */
-    const rowVirtualizer = useVirtualizer({
-        count: visibleAudios.length,
-        getScrollElement: () => parentRef.current,
-        estimateSize: () => 80,
-        overscan: 10,
-
-        onChange: (instance, sync) => {
-            if (!sync) {
-                return;
-            }
-
-            const items = instance.getVirtualItems();
-
-            if (!items.length) {
-                return;
-            }
-
-            const lastItem = items[items.length - 1];
-
-            if (
-                lastItem.index >= visibleAudios.length - 10 &&
-                visibleCount < filteredList.length
-            ) {
-                setVisibleCount(count =>
-                    Math.min(
-                        count + 50,
-                        filteredList.length
-                    )
-                );
-            }
-        },
-    });
-
-    useEffect(() => {
-        setVisibleCount(50);
-    }, [searchQuery]);
-
     return { 
-        visibleAudios, setSearchQuery,
-        searchQuery, uploadAudios,
-        uploading, rowVirtualizer,
-        parentRef, filteredList
+        setSearchQuery, searchQuery, 
+        uploadAudios, uploading,
+        filteredList
     };
 }

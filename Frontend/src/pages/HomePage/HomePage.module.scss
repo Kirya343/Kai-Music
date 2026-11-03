@@ -1,16 +1,1155 @@
 @use "@/css/components/mixins/" as *;
 
+
 .page {
+    --accent: #c97bf6;
+    --accent-light: #e9aefb;
+    /* --accent: #ffa348;
+    --accent-light: #ffc17e; */
+    --background: #0d0e11;
+    --surface: #15171b;
+    --text: #f5f5f5;
+    --muted: #92949c;
+
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background: var(--background);
+    color: var(--text);
+    font-family: inherit;
+
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
+}
+
+.backgroundGlow {
+    position: absolute;
+    top: -450px;
+    left: 50%;
+    width: 1000px;
+    height: 800px;
+    transform: translateX(-50%);
+    background: radial-gradient(
+        ellipse,
+        rgba(255, 163, 72, 0.11),
+        transparent 65%
+    );
+    pointer-events: none;
+}
+
+.header {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1440px;
+    height: 90px;
+    padding: 0 64px;
+    margin: 0 auto;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.logoIcon {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    background: var(--accent);
+    color: #17120c;
+    font-size: 21px;
+    font-weight: 900;
+}
+
+.navigation {
+    display: flex;
+    align-items: center;
+    gap: 38px;
+
+    a {
+        color: var(--muted);
+        font-size: 13px;
+        transition: color 0.2s;
+
+        &:hover {
+            color: var(--text);
+        }
+    }
+}
+
+.headerButton {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 11px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+
+    &:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+}
+
+.hero {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 0.9fr;
+    align-items: center;
+    gap: 50px;
+    max-width: 1440px;
+    min-height: 690px;
+    padding: 70px 100px 110px;
+    margin: 0 auto;
+}
+
+.heroContent {
+    max-width: 620px;
+}
+
+.eyebrow,
+.sectionLabel {
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+}
+
+.statusDot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+}
+
+.hero h1 {
+    margin: 0;
+    font-size: clamp(48px, 5.5vw, 78px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -4px;
+
+    span {
+        color: var(--accent);
+    }
+}
+
+.heroDescription {
+    max-width: 470px;
+    margin: 28px 0 32px;
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.8;
+}
+
+.heroActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+}
+
+.primaryButton,
+.secondaryButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    min-height: 48px;
+    padding: 0 22px;
+    border-radius: 11px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s;
+}
+
+.primaryButton {
+    @include dirty-glass;
+
+    color: #17120c;
+    background-color: var(--accent);
+
+    &:hover {
+        background-color: var(--accent-light);
+        transform: translateY(-2px);
+    }
+}
+
+.secondaryButton {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text);
+
+    &:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+}
+
+.heroNote {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 55px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.heroNoteIcon {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: rgba(255, 163, 72, 0.1);
+    color: var(--accent);
+    font-size: 17px;
+}
+
+.heroVisual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 490px;
+}
+
+.orbit {
+    position: absolute;
+    width: 440px;
+    height: 440px;
+    border: 1px solid rgba(255, 163, 72, 0.08);
+    border-radius: 50%;
+}
+
+.orbitOne {
+    transform: scale(1.1);
+}
+
+.orbitTwo {
+    transform: scale(1.35);
+    border-color: rgba(255, 255, 255, 0.025);
+}
+
+.playerCard {
+    position: relative;
+    z-index: 2;
+    width: 330px;
+    padding: 22px;
+    @include glass;
+}
+
+.playerTop,
+.playerControls,
+.trackInfo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.playerTop {
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.liveIndicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #80d89a;
+    font-size: 9px;
+
+    i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #80d89a;
+        box-shadow: 0 0 8px #80d89a;
+    }
+}
+
+.albumArtwork {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+    margin: 23px 0;
+    overflow: hidden;
+    border-radius: 13px;
+    background:
+        radial-gradient(circle at 70% 25%, rgba(255, 193, 126, 0.9), transparent 30%),
+        radial-gradient(circle at 30% 70%, #a74e22, transparent 50%),
+        linear-gradient(135deg, #5a2e19, #17120e 75%);
+
+    > span {
+        position: relative;
+        z-index: 1;
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 90px;
+        font-weight: 800;
+    }
+}
+
+.artworkCircle {
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    box-shadow:
+        0 0 0 25px rgba(255, 255, 255, 0.04),
+        0 0 0 50px rgba(255, 255, 255, 0.03);
+}
+
+.artworkLabel {
+    position: absolute;
+    bottom: 16px;
+    left: 17px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 9px;
+    letter-spacing: 3px;
+}
+
+.trackInfo {
+    h3 {
+        margin: 0 0 5px;
+        font-size: 14px;
+    }
+
+    p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 11px;
+    }
+}
+
+.trackIcon {
+    color: var(--accent);
+    font-size: 25px;
+}
+
+.equalizer,
+.roomWave {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1;
+    gap: 3px;
+    height: 35px;
+    margin: 15px 0;
+
+    span {
+        width: 3px;
+        height: var(--bar-height);
+        min-height: 4px;
+        border-radius: 5px;
+        background: var(--accent);
+        opacity: 0.85;
+    }
 }
 
-.link {
-    border: 1px solid;
-    padding: 10px 16px;
-    border-radius: 30px;
+.progressTrack {
+    height: 3px;
+    overflow: hidden;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
 
+    span {
+        display: block;
+        width: 58%;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--accent);
+    }
+}
+
+.playerControls {
+    margin-top: 13px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.controlButtons {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    color: var(--text);
+    font-size: 13px;
+}
+
+.playButton {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #17120c;
+}
+
+.floatingCard {
+    position: absolute;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 12px;
     @include glass;
+
+    strong,
+    small {
+        display: block;
+    }
+
+    strong {
+        font-size: 11px;
+    }
+
+    small {
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 9px;
+    }
+}
+
+.libraryFloat {
+    top: 65px;
+    right: -10px;
+}
+
+.roomFloat {
+    bottom: 55px;
+    left: -30px;
+}
+
+.floatIcon {
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 9px;
+    background: rgba(255, 163, 72, 0.12);
+    color: var(--accent);
+    font-size: 20px;
+}
+
+.avatarStack,
+.memberAvatars {
+    display: flex;
+    align-items: center;
+
+    span {
+        display: grid;
+        place-items: center;
+        width: 26px;
+        height: 26px;
+        margin-left: -5px;
+        border: 2px solid #1a1a1d;
+        border-radius: 50%;
+        background: #b76e3a;
+        color: white;
+        font-size: 9px;
+        font-weight: 700;
+
+        &:first-child {
+            margin-left: 0;
+        }
+
+        &:nth-child(2) {
+            background: #765a9b;
+        }
+
+        &:nth-child(3) {
+            background: #527e83;
+        }
+    }
+}
+
+.intro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    max-width: 1240px;
+    padding: 25px 40px;
+    margin: 0 auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+    p {
+        color: var(--text);
+        font-size: 15px;
+        font-weight: 600;
+
+        span {
+            color: var(--muted);
+            font-weight: 400;
+        }
+    }
+}
+
+.introLine {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.featuresSection,
+.stepsSection {
+    max-width: 1240px;
+    padding: 130px 40px;
+    margin: 0 auto;
+}
+
+.sectionHeading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 40px;
+    margin-bottom: 55px;
+
+    h2 {
+        margin: 20px 0 0;
+        font-size: clamp(36px, 4vw, 52px);
+        line-height: 1.12;
+        letter-spacing: -2px;
+
+        span {
+            color: var(--muted);
+        }
+    }
+
+    > p {
+        max-width: 380px;
+        margin: 0 0 5px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+}
+
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.featureCard {
+    position: relative;
+    min-height: 260px;
+    padding: 25px;
+    overflow: hidden;
+    @include glass;
+
+    transition: transform 0.25s, border-color 0.25s;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
+
+    h3 {
+        margin: 35px 0 12px;
+        font-size: 17px;
+        letter-spacing: -0.4px;
+    }
+
+    p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.8;
+    }
+}
+
+.featureTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.featureIcon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: rgba(255, 163, 72, 0.1);
+    color: var(--accent);
+    font-size: 22px;
+}
+
+.featureNumber {
+    color: #62646c;
+    font-size: 11px;
+}
+
+.featureArrow {
+    position: absolute;
+    right: 23px;
+    bottom: 22px;
+    color: var(--accent);
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    .featureCard:hover & {
+        opacity: 1;
+    }
+}
+
+.roomsSection {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 100px;
+    max-width: 1240px;
+    padding: 100px 40px;
+    margin: 0 auto;
+}
+
+.roomVisual {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 480px;
+}
+
+.roomGlow {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: rgba(255, 163, 72, 0.1);
+    filter: blur(100px);
+}
+
+.roomWindow {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 390px);
+    padding: 25px;
+    @include glass;
+}
+
+.roomWindowHeader {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    > div {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+}
+
+.roomStatus {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #80d89a;
+}
+
+.roomArtwork {
+    display: grid;
+    place-items: center;
+    height: 180px;
+    margin: 25px 0;
+    border-radius: 12px;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(255, 163, 72, 0.4), transparent 50%),
+        linear-gradient(135deg, #53351e, #17120e);
+
+    span {
+        color: var(--accent);
+        font-size: 90px;
+    }
+}
+
+.roomWindow {
+    h3 {
+        margin: 0;
+        font-size: 19px;
+        letter-spacing: -0.5px;
+    }
+
+    > p {
+        margin: 7px 0 20px;
+        color: var(--muted);
+        font-size: 11px;
+    }
+}
+
+.roomMembers {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+    > span {
+        color: var(--muted);
+        font-size: 10px;
+    }
+}
+
+.roomWave {
+    height: 35px;
+    margin-bottom: 0;
+
+    span {
+        height: var(--wave-height);
+    }
+}
+
+.roomContent {
+    .sectionLabel {
+        display: block;
+        margin-bottom: 20px;
+    }
+
+    h2 {
+        margin: 0 0 25px;
+        font-size: clamp(38px, 4vw, 55px);
+        line-height: 1.1;
+        letter-spacing: -2px;
+
+        span {
+            color: var(--accent);
+        }
+    }
+
+    > p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.9;
+    }
+
+    .primaryButton {
+        margin-top: 20px;
+    }
+}
+
+.roomBenefits {
+    display: grid;
+    gap: 15px;
+    padding: 0;
+    margin: 30px 0;
+    list-style: none;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #d4d4d4;
+        font-size: 12px;
+
+        span {
+            display: grid;
+            place-items: center;
+            width: 21px;
+            height: 21px;
+            border-radius: 50%;
+            background: rgba(255, 163, 72, 0.1);
+            color: var(--accent);
+            font-size: 11px;
+        }
+    }
+}
+
+.philosophySection {
+    position: relative;
+    padding: 120px 30px;
+    overflow: hidden;
+    background:
+        radial-gradient(ellipse at 50% 100%, rgba(255, 163, 72, 0.1), transparent 65%),
+        #111215;
+    text-align: center;
+
+    h2 {
+        position: relative;
+        margin: 25px 0;
+        font-size: clamp(42px, 6vw, 72px);
+        line-height: 1.1;
+        letter-spacing: -3px;
+
+        span {
+            color: var(--accent);
+        }
+    }
+
+    p {
+        max-width: 440px;
+        margin: 0 auto;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+}
+
+.stepsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.stepCard {
+    padding: 28px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+
+    > span {
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    h3 {
+        margin: 28px 0 12px;
+        font-size: 19px;
+    }
+
+    p {
+        max-width: 280px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.8;
+    }
+}
+
+.ctaSection {
+    max-width: 1240px;
+    padding: 0 40px 120px;
+    margin: 0 auto;
+}
+
+.ctaCard {
+    position: relative;
+    padding: 90px 30px;
+    overflow: hidden;
+    border-radius: 24px;
+    background:
+        linear-gradient(120deg, rgba(255, 163, 72, 0.12), transparent 60%),
+        #17181c;
+    text-align: center;
+
+    h2 {
+        position: relative;
+        margin: 22px 0;
+        font-size: clamp(40px, 5vw, 62px);
+        line-height: 1.1;
+        letter-spacing: -2.5px;
+
+        span {
+            color: var(--accent);
+        }
+    }
+
+    > p {
+        position: relative;
+        max-width: 430px;
+        margin: 0 auto 30px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .primaryButton {
+        position: relative;
+    }
+}
+
+.ctaGlow {
+    position: absolute;
+    top: -250px;
+    left: 50%;
+    width: 600px;
+    height: 500px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: rgba(255, 163, 72, 0.12);
+    filter: blur(100px);
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    max-width: 1440px;
+    min-height: 100px;
+    padding: 20px 64px;
+    margin: 0 auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.footerText,
+.copyright {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+@media (max-width: 1100px) {
+    .header {
+        padding: 0 35px;
+    }
+
+    .hero {
+        padding-right: 55px;
+        padding-left: 55px;
+    }
+
+    .featuresGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .roomsSection {
+        gap: 50px;
+    }
+
+    .libraryFloat {
+        right: -5px;
+    }
+
+    .roomFloat {
+        left: -5px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        height: 75px;
+        padding: 0 22px;
+    }
+
+    .navigation {
+        display: none;
+    }
+
+    .headerButton {
+        padding: 9px 12px;
+        font-size: 11px;
+    }
+
+    .hero {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 65px 25px 75px;
+    }
+
+    .hero h1 {
+        font-size: clamp(48px, 11vw, 68px);
+        letter-spacing: -3px;
+    }
+
+    .heroDescription {
+        font-size: 14px;
+    }
+
+    .heroNote {
+        margin-top: 30px;
+    }
+
+    .heroVisual {
+        min-height: 450px;
+    }
+
+    .playerCard {
+        width: min(330px, 85%);
+    }
+
+    .orbit {
+        width: 300px;
+        height: 300px;
+    }
+
+    .libraryFloat {
+        top: 30px;
+        right: 0;
+    }
+
+    .roomFloat {
+        bottom: 25px;
+        left: 0;
+    }
+
+    .intro {
+        gap: 10px;
+        padding: 15px 20px;
+        text-align: center;
+
+        p {
+            font-size: 11px;
+            line-height: 1.6;
+        }
+    }
+
+    .featuresSection,
+    .stepsSection {
+        padding: 85px 22px;
+    }
+
+    .sectionHeading {
+        display: block;
+        margin-bottom: 35px;
+
+        h2 {
+            font-size: 42px;
+        }
+
+        > p {
+            margin-top: 20px;
+            font-size: 13px;
+        }
+    }
+
+    .featuresGrid {
+        gap: 12px;
+    }
+
+    .featureCard {
+        min-height: 250px;
+        padding: 20px;
+
+        h3 {
+            font-size: 15px;
+        }
+
+        p {
+            font-size: 11px;
+        }
+    }
+
+    .roomsSection {
+        grid-template-columns: 1fr;
+        gap: 35px;
+        padding: 60px 22px;
+    }
+
+    .roomVisual {
+        min-height: 400px;
+    }
+
+    .roomContent h2 {
+        font-size: 45px;
+    }
+
+    .philosophySection {
+        padding: 90px 22px;
+
+        h2 {
+            font-size: 48px;
+            letter-spacing: -2px;
+        }
+    }
+
+    .stepsGrid {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .stepCard {
+        padding: 20px 10px;
+
+        h3 {
+            margin-top: 18px;
+        }
+    }
+
+    .ctaSection {
+        padding: 0 20px 80px;
+    }
+
+    .ctaCard {
+        padding: 75px 20px;
+
+        h2 {
+            font-size: 44px;
+        }
+    }
+
+    .footer {
+        flex-wrap: wrap;
+        padding: 25px 22px;
+    }
+}
+
+@media (max-width: 420px) {
+    .logo {
+        font-size: 16px;
+    }
+
+    .logoIcon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .heroActions {
+        align-items: stretch;
+        flex-direction: column;
+
+        a {
+            width: 100%;
+        }
+    }
+
+    .featuresGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .featureCard {
+        min-height: 210px;
+    }
+
+    .roomWindow {
+        padding: 18px;
+    }
+
+    .floatingCard {
+        padding: 10px;
+    }
+
+    .footerText {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .page *,
+    .page *::before,
+    .page *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }

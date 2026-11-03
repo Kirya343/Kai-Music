@@ -105,13 +105,18 @@ export function useRoomData() {
     }, [addOnConnectHandler]);
 
     useEffect(() => {
-        if (room?.playlist?.id) return; 
+
+        if (!room?.playlist?.id) return; 
 
         const unsubscribe = addOnConnectHandler((client) => {
 
             const playlistSub = client.subscribe(`/topic/playlist/${room?.playlist?.id}`, (message) => {
+                logger.debug(`пришло обновление плейлиста на ${room?.playlist?.id}`)
+
                 setPlaylist(JSON.parse(message.body));
             });
+
+            logger.debug(`подписались на /topic/playlist/${room?.playlist?.id}`)
 
             return () => {
                 playlistSub.unsubscribe();

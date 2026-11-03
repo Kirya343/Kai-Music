@@ -1,6 +1,6 @@
 import { useGlobal } from "@common";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { IPlaybackState, PlaybackMode } from "../playbackTypes";
+import { PlaybackState, PlaybackMode } from "../playbackTypes";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
 import { loggerFactory } from "@common";
@@ -32,11 +32,12 @@ export const usePlayback = ({
     const { started } = useGlobal();
     const { addOnConnectHandler } = useWebSocket();
 
-    const unsyncedStateRef = useRef<IPlaybackState | null>(null);
+    const unsyncedStateRef = useRef<PlaybackState | null>(null);
     const debounceTimeoutRef = useRef<number | null>(null);
+    const pendingSeekRef = useRef(false);
 
     // audio state
-    const [playbackState, setPlaybackState] = useState<IPlaybackState | null>(null);
+    const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
 
     /**
@@ -94,6 +95,8 @@ export const usePlayback = ({
 
         if (!playbackState?.entryId || !roomId) return;
 
+        pendingSeekRef.current = true;
+
         try {
             pausePlayback();
         } finally {
@@ -124,7 +127,7 @@ export const usePlayback = ({
     const playIfBuffered = useCallback(() => {
         logger.debug("попытка начать воспроизведение", started)
 
-        if (!started) return;
+        if (!started || pendingSeekRef.current) return;
 
         const state = unsyncedStateRef.current;
 
@@ -236,13 +239,15 @@ export const usePlayback = ({
         const unsubscribe = addOnConnectHandler((client) => {
 
             const playbackSub = client.subscribe(`/user/queue/playback`, (message) => {
-                const state: IPlaybackState = JSON.parse(message.body);
+                const state: PlaybackState = JSON.parse(message.body);
 
                 logger.debug("Пришло обновление playback: ", state)
 
                 if (currentEntryIdRef.current !== state.entryId) {
                     startNewAudio(state.entryId);
                 }
+
+                pendingSeekRef.current = false;
 
                 setPlaybackState(state);
                 unsyncedStateRef.current = state;

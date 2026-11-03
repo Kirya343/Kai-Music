@@ -1,5 +1,5 @@
 import { createApi } from "@common";
-import { IPlaybackState, PlaybackMode, PlaybackTargetType } from "@playback";
+import { PlaybackState, PlaybackMode, PlaybackTargetType } from "@playback";
 
 const playbackApi = createApi("/playback")
 
@@ -8,7 +8,7 @@ const playbackApi = createApi("/playback")
  *  
  * @param roomId - ID of the room.
  */
-export const getCurrentRoomState = (roomId: number) => playbackApi.get<IPlaybackState>(`/${roomId}/playback-state`);
+export const getCurrentRoomState = (roomId: number) => playbackApi.get<PlaybackState>(`/${roomId}/playback-state`);
 
 /**
  * Changes track in playback.
@@ -25,7 +25,7 @@ export const playTrack = (roomId: number, track: "next" | "prev" | number) =>
  * @param roomId - ID of the room.
  * @param state - is playback state
  */
-export const updateTrackPosition = (roomId: number, state: IPlaybackState) => 
+export const updateTrackPosition = (roomId: number, state: PlaybackState) => 
     playbackApi.post<void>(`/${roomId}/update-state`, state);
 
 export const setPlaylistPlaybackMode = (targetId: number, targetType: PlaybackTargetType, mode: PlaybackMode) => 

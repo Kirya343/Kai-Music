@@ -7,9 +7,9 @@ const config: LoggerConfig = {
 
     categories: {
         Audio: {
-            // Buffer: "DEBUG",
-            // MediaSource: "DEBUG",
-            Playback: "DEBUG",
+            Buffer: "INFO",
+            MediaSource: "INFO",
+            Playback: "INFO",
         },
         WebSocket: "ERROR",
         GlobalContext: "DEBUG",
@@ -22,7 +22,7 @@ const config: LoggerConfig = {
         },
 
         Data: {
-            Room: "DEBUG"
+            Room: "INFO"
         }
     },
 

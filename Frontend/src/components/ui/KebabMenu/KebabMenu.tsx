@@ -46,7 +46,7 @@ const KebabMenu = ({ actions, className }: KebabMenuProps) => {
             <DropdownMenu.Trigger asChild>
                 <button
                     type="button"
-                    className={clsx(styles.button, className, "hover")}
+                    className={clsx(styles.button, className)}
                     aria-label="Действия"
                 >
                     <EllipsisVerticalIcon className={styles.icon} />
@@ -62,7 +62,7 @@ const KebabMenu = ({ actions, className }: KebabMenuProps) => {
                     {filtered.map((action) => (
                         <DropdownMenu.Item
                             key={action.title}
-                            className={`${styles.item} hover`}
+                            className={styles.item}
                             onSelect={action.func}
                         >
                             {action.icon && (

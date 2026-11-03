@@ -28,7 +28,7 @@ export interface IQueueItemCreate {
 /**
  * Represents the state of playback
  */
-export interface IPlaybackState {
+export interface PlaybackState {
 
     /** User that initialized the update */
     user?: string;
@@ -41,6 +41,12 @@ export interface IPlaybackState {
 
     /** Is track paused */
     pause: boolean;
+}
+
+export interface PlaybackSyncState {
+    server: PlaybackState | null;
+    desired: PlaybackState | null;
+    pending: boolean;
 }
 
 export enum PlaybackMode {

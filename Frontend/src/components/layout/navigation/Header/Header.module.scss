@@ -4,14 +4,7 @@
     height: var(--header-height);
     display: flex;
     justify-content: center;
-    border-bottom: 1px solid;
     z-index: 100;
-
-    @include mobile {
-        height: var(--mobile-header-height);
-    }
-
-    @include glass;
 }
 
 .headerContainer {

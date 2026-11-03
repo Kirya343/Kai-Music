@@ -4,7 +4,6 @@
     /* --accent: #ffa348;
     --accent-light: #ffc17e; */
     --background: #0d0e11;
-    --surface: #15171b;
 
     --text-color: #f5f5f5;
     --text-color-l1: #92949c;
@@ -28,9 +27,12 @@
     --glass-background: #a1a1a123;
     --glass-background-hover: #a1a1a131;
 
+    --surface: #15171b;
+    --surface-border: #292d35;
+    --surface-hover: #272a30;
+
     --orange: #e48c44;
 
-    --header-height: 100px;
-    --mobile-header-height: 80px;
+    --header-height: 90px;
     --mobile-nav-height: 70px;
 }

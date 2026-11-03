@@ -10,8 +10,8 @@
     border-top: 1px solid;
     flex-shrink: 0;
     gap: 1rem;
-
-    @include glass;
+    
+    @include surface;
 
     & > div {
         display: flex;

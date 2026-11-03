@@ -22,7 +22,7 @@
 }
 
 .rundomBtn {
-    @include glass;
+    @include glass(true);
     
     padding: 5px 15px;
     width: fit-content;

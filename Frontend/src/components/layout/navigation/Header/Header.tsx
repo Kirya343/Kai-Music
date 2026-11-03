@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import styles from "./Header.module.scss"
 import { useAuth } from "@user";
 import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon, HomeIcon } from "@/assets/icons";
@@ -30,7 +30,6 @@ const Header = () => {
     const { user, isAuthenticated } = useAuth();
     const { roomData } = useData();
     const { isMobile } = useGlobal();
-    const navigate = useNavigate();
 
     /**
      * disabling on mobile displays

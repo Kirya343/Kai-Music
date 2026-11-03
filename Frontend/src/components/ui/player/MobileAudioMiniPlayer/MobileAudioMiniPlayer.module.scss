@@ -3,13 +3,14 @@
 .miniPlayer {
     position: sticky;
     bottom: 5px;
+    width: 100%;
     margin-top: auto;
     display: flex;
     padding: 12px 10px;
     border-radius: 10px;
     justify-content: space-between;
     align-items: center;
-    border: 1px;
+    border: 1px solid;
 
     flex-shrink: 0;
     gap: 1rem;

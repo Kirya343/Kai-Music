@@ -46,7 +46,7 @@ const AppLayout = () => {
     }, [loadingPercent])
 
     return (
-        <div className={clsx(styles.layout, started && styles.started)}>
+        <>
             {started ? (
                 <div className={styles.content}>
                     <Header/>
@@ -66,19 +66,26 @@ const AppLayout = () => {
             ) : (
                 <div className={styles.loadingWrapper}>
                     <div className={styles.loadingContent}>
-                        <div 
-                            className={styles.loading}
-                            style={{ 
-                                background: `
-                                    linear-gradient(to right, #a0f781d0 ${loadingPercent}%, 
-                                    #444 ${loadingPercent}%)
-                                `
-                            }}
-                        />
+                        <div className={styles.musicVisualizer}>
+                            {Array.from({ length: 9 }, (_, i) => (
+                                <span key={i} />
+                            ))}
+                        </div>
+
+                        <span className={styles.loadingText}>
+                            Loading music... {loadingPercent}%
+                        </span>
+
+                        <div className={styles.loading}>
+                            <div
+                                className={styles.progress}
+                                style={{ width: `${Math.min(100, Math.max(0, loadingPercent))}%` }}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     )
 }
 

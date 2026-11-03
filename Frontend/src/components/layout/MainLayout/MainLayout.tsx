@@ -1,6 +1,12 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import styles from "./MainLayout.module.scss"
-import Header from "../navigation/Header/Header";
+import Logo from "@/components/ui/Logo/Logo";
+
+const navigation = [
+    { label: "Features", href: "#features" },
+    { label: "Listening rooms", href: "#rooms" },
+    { label: "How it works", href: "#how-it-works" },
+];
 
 /**
  * MainLayout is layout for the entire application to keep same style
@@ -8,13 +14,26 @@ import Header from "../navigation/Header/Header";
 const MainLayout = () => {
 
     return (
-        <div className={styles.layout}>
-            <Header/>
+        <>
+            <header className={styles.header}>
+                <Logo />
 
-            <main className={styles.main}>
-                <Outlet />
-            </main>
-        </div>
+                <nav className={styles.navigation} aria-label="Main navigation">
+                    {navigation.map((item) => (
+                        <a key={item.href} href={item.href}>
+                            {item.label}
+                        </a>
+                    ))}
+                </nav>
+
+                <Link to="/app" className={styles.headerButton}>
+                    Open app
+                    <span aria-hidden="true">↗</span>
+                </Link>
+            </header>
+
+            <Outlet />
+        </>
     )
 }
 

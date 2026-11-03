@@ -5,6 +5,7 @@ import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon, HomeIcon } from "@/asset
 import { useData, useGlobal } from "@common";
 import { ReactNode } from "react";
 import clsx from "clsx";
+import Logo from "@/components/ui/Logo/Logo";
 
 /**
  * interface for NavigationLink conponents
@@ -46,7 +47,7 @@ const Header = () => {
     return (
         <header className={styles.header}>
             <div className={styles.headerContainer}>
-                <img className={styles.logo} src="/image/logo.png" onClick={() => navigate("/")}/>
+                <Logo/>
                 <div className={styles.navigation}>
                     {links.map(l => <NavigationLink key={l.title} link={l} />)}
                 </div>

@@ -1,0 +1,14 @@
+.backgroundGlow {
+    position: absolute;
+    top: -450px;
+    left: 50%;
+    width: 1000px;
+    height: 800px;
+    transform: translateX(-50%);
+    background: radial-gradient(
+        ellipse,
+        rgba(255, 163, 72, 0.11),
+        transparent 65%
+    );
+    pointer-events: none;
+}

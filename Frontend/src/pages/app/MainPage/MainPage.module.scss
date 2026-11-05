@@ -117,7 +117,7 @@
     gap: 0.5rem;
     font-weight: 600;
 
-    @include dirty-glass(true);
+    @include dirty-glass-light(true);
 
     svg {
         width: 40px;

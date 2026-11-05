@@ -98,7 +98,7 @@
 }
 
 .primaryButton {
-    @include dirty-glass;
+    @include dirty-glass-light;
 
     color: #17120c;
     background-color: var(--accent);

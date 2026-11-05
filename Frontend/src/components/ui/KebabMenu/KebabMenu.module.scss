@@ -34,7 +34,7 @@
 
     z-index: 20;
 
-    @include glass;
+    @include dirty-glass;
 
     // Radix сам задаёт позицию через transform/left/top
     // Поэтому position: absolute здесь НЕ нужен.

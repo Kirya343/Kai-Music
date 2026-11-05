@@ -43,6 +43,12 @@
 }
 
 @mixin dirty-glass($hover: false) {
+    @include glass($hover);
+
+    background-color: var(--glass-background-o100);
+}
+
+@mixin dirty-glass-light($hover: false) {
     background-color: rgb(221, 221, 221);
     color: #000;
     backdrop-filter: blur(3px);

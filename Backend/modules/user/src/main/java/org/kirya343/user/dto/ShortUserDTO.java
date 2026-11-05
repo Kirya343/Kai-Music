@@ -6,13 +6,13 @@ import java.util.List;
 import org.kirya343.user.datasource.User;
 
 public record ShortUserDTO(
-    String openId,
+    String sub,
     String name,
     String avatarUrl
 ) {
 
     public static ShortUserDTO ofUser(User user) {
-        return new ShortUserDTO(user.getOpenId(), user.getName(), user.getAvatarUrl());
+        return new ShortUserDTO(user.getSub(), user.getName(), user.getAvatarUrl());
     }
 
     public static List<ShortUserDTO> ofList(Collection<User> users) {

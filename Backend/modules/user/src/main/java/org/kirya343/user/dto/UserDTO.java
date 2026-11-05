@@ -10,7 +10,7 @@ import org.kirya343.user.datasource.User;
 
 public record UserDTO(
     Long id,
-    String openId,
+    String sub,
     String name,
     String avatarUrl,
     List<RoleDTO> roles,
@@ -25,7 +25,7 @@ public record UserDTO(
          
         return new UserDTO(
             user.getId(), 
-            user.getOpenId(), 
+            user.getSub(), 
             user.getName(), 
             user.getAvatarUrl(),
             RoleDTO.ofList(user.getRoles()),

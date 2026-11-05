@@ -14,14 +14,14 @@ public class RoomWebSocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void broadcastRoomInfo(String userOpenId, ShortRoomDTO dto) {
+    public void broadcastRoomInfo(String userSub, ShortRoomDTO dto) {
         
         if (dto == null) return;
 
-        log.debug("Sending room({}) info to user {}", dto.id(), userOpenId);
+        log.debug("Sending room({}) info to user {}", dto.id(), userSub);
 
         messagingTemplate.convertAndSendToUser(
-            userOpenId,
+            userSub,
             "/queue/room",
             dto
         );

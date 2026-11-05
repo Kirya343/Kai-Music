@@ -96,7 +96,7 @@ public class AudioFileManager {
 
             AudioFile saved = audioFileRepository.save(audio);
 
-            audioWebsocketService.broadcastAudio(authData.openId(), AudioDTO.ofAudioFile(saved));
+            audioWebsocketService.broadcastAudio(authData.sub(), AudioDTO.ofAudioFile(saved));
 
         } catch (Exception e) {
             throw new RuntimeException("Ошибка загрузки аудио", e);

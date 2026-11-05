@@ -31,7 +31,7 @@ public class CachedPermissionsJwtTokenConverter implements Converter<Jwt, Abstra
 
         UserAuthData authData = new UserAuthData(
             Objects.requireNonNull(userId),
-            Objects.requireNonNull(jwt.getClaim("openId")),
+            Objects.requireNonNull(jwt.getClaim("sub")),
             jwt.getClaim("name"),
             UserStatus.valueOf(jwt.getClaim("status"))
         );

@@ -1,7 +1,7 @@
 package org.kirya343.common.event.room;
 
 public record RoomDisconnectedEvent(
-    String userOpenId,
+    String userSub,
     Long roomId
 ) {
 }

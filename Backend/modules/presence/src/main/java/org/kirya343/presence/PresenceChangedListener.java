@@ -19,8 +19,8 @@ public class PresenceChangedListener {
     public void onPresenceChanged(PresenceChangedEvent event) {
 
         switch (event.presence()) {
-            case ONLINE -> presenceService.userConnected(event.userOpenId());
-            case OFFLINE -> presenceService.userDisconnected(event.userOpenId());
+            case ONLINE -> presenceService.userConnected(event.userSub());
+            case OFFLINE -> presenceService.userDisconnected(event.userSub());
             default -> throw new IllegalStateException();
         }
     }

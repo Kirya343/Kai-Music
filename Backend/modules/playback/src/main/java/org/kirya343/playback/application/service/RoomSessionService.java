@@ -32,31 +32,31 @@ public class RoomSessionService {
     private final UserPlaybackRepository userPlaybackRepository;
     private final UserRepository userRepository;
     
-    public void initializeRoom(Long roomId, String userOpenId) {
+    public void initializeRoom(Long roomId, String userSub) {
 
-        roomPlaybackContextStore.computeIfAbsent(roomId).getListeners().add(userOpenId);
+        roomPlaybackContextStore.computeIfAbsent(roomId).getListeners().add(userSub);
 
         roomPlaybackContextStore.listenersUpdated(roomId);
     }
 
-    public void connectUserToRoom(Long roomId, String userOpenId) {
-        log.debug("Пользователь {} присоединяется к комнате {}", userOpenId, roomId);
+    public void connectUserToRoom(Long roomId, String userSub) {
+        log.debug("Пользователь {} присоединяется к комнате {}", userSub, roomId);
 
         //TODO Убрать, перенеделать на простую модель
 
-        Long userId = userRepository.findByOpenId(userOpenId).orElseThrow().getId();
+        Long userId = userRepository.findBySub(userSub).orElseThrow().getId();
 
         userPlaybackRepository.save(new UserPlayback(userId, roomId, PlaybackTargetType.ROOM));
 
         Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
 
         if (playbackState.isPresent()) {
-            playbackWebsocketService.broadcastPlaybackState(userOpenId, PlaybackStateDTO.ofState(playbackState.get()));
+            playbackWebsocketService.broadcastPlaybackState(userSub, PlaybackStateDTO.ofState(playbackState.get()));
         }
 
-        initializeRoom(roomId, userOpenId);
+        initializeRoom(roomId, userSub);
 
-        UserAudioStreamWorker userWorker = userAudioStreamWorkerManager.getWorker(userOpenId);
+        UserAudioStreamWorker userWorker = userAudioStreamWorkerManager.getWorker(userSub);
 
         // Reloads worker
         roomStreamWorkerManager.getWorker(roomId).addUserWorker(userWorker);

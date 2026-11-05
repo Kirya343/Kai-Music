@@ -14,9 +14,9 @@ public class PlaylistWebSocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void broadcastPlaylist(String userOpenId, PlaylistDTO playlist) {
+    public void broadcastPlaylist(String userSub, PlaylistDTO playlist) {
         messagingTemplate.convertAndSendToUser(
-            userOpenId, 
+            userSub, 
             "/queue/playlists", 
             playlist
         );

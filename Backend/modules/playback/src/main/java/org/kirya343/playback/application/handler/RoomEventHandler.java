@@ -40,7 +40,7 @@ public class RoomEventHandler {
     @Async
     @EventListener
     public void handleRoomConnected(RoomConnectedEvent event) {
-        roomSessionService.connectUserToRoom(event.roomId(), event.userOpenId());
+        roomSessionService.connectUserToRoom(event.roomId(), event.userSub());
     }
 
     @Async

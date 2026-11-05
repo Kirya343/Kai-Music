@@ -9,9 +9,7 @@ import { ShuffleIcon } from "@/assets/icons";
 const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playlist, onClose: () => void }) => {
 
     const { 
-        visibleAudios,
         setSearchQuery, searchQuery,
-        rowVirtualizer, parentRef,
         filteredList
     } = useLibrary();
 
@@ -30,7 +28,7 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
     }
 
     return (
-        <div className={styles.page} ref={parentRef}>
+        <div className={styles.page}>
             <div className={styles.sorting}>
 
                 <div className={styles.row}>
@@ -49,37 +47,16 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
                 <button onClick={addRandomTracks} className={styles.rundomBtn}>
                     Добавить случайные <ShuffleIcon/>
                 </button>
-                <div
-                    style={{
-                        height: `${rowVirtualizer.getTotalSize()}px`,
-                        position: "relative",
-                    }}
-                >
-                    {rowVirtualizer.getVirtualItems().map(item => {
-                        const audio = visibleAudios[item.index];
-
-                        return (
-                            <div
-                                key={audio.id}
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    transform: `translateY(${item.start}px)`,
-                                }}
-                            >
-                                <ImportingTrack
-                                    audio={audio}
-                                    trackNumber={item.index + 1}
-                                    isInPlaylist={playlistAudioIds.has(audio.id)}
-                                    importPlaylistId={importPlaylist.id}
-                                    className={styles.track}
-                                />
-                            </div>
-                        );
-                    })}
-                </div>
+                {filteredList.map((audio, idx) => (
+                    <ImportingTrack
+                        key={idx}
+                        audio={audio}
+                        trackNumber={idx + 1}
+                        isInPlaylist={playlistAudioIds.has(audio.id)}
+                        importPlaylistId={importPlaylist.id}
+                        className={styles.track}
+                    />
+                ))}
             </div>
         </div>
     )

@@ -72,6 +72,7 @@ const LibraryPage = () => {
             <div className={styles.trackList}>
                 {filteredList.map((audio, idx) => (
                     <LibraryTrack
+                        key={idx}
                         audio={audio}
                         trackNumber={idx + 1}
                         importPlaylistId={roomData.playlist?.id}

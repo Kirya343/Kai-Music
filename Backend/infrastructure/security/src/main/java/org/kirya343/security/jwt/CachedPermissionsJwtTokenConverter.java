@@ -1,11 +1,10 @@
 package org.kirya343.security.jwt;
 
 import java.util.Collection;
-import java.util.Objects;
 
-import org.kirya343.security.core.enums.UserStatus;
 import org.kirya343.security.services.PermissionsService;
 import org.kirya343.security.core.dto.UserAuthData;
+import org.kirya343.security.core.enums.UserStatus;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -24,14 +23,14 @@ public class CachedPermissionsJwtTokenConverter implements Converter<Jwt, Abstra
     @Override
     public AbstractAuthenticationToken convert(@NonNull Jwt jwt) {
 
-        Long userId = Objects.requireNonNull(Long.valueOf(jwt.getSubject()));
+        Long userId = jwt.getClaim("userId");
 
         Collection<GrantedAuthority> authorities =
             permissionsService.getUserPermissions(userId);
 
         UserAuthData authData = new UserAuthData(
-            Objects.requireNonNull(userId),
-            Objects.requireNonNull(jwt.getClaim("sub")),
+            jwt.getClaim("userId"),
+            jwt.getSubject(),
             jwt.getClaim("name"),
             UserStatus.valueOf(jwt.getClaim("status"))
         );

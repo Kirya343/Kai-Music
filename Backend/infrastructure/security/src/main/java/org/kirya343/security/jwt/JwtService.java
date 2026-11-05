@@ -119,12 +119,16 @@ public class JwtService {
 
     public Long validateAndGetUserId(String token) {
         JWTClaimsSet claims = validate(token);
-        return (claims != null) ? Long.valueOf(claims.getSubject()) : null;
-    }
 
-    public String validateAndGetUserIdStr(String token) {
-        JWTClaimsSet claims = validate(token);
-        return (claims != null) ? claims.getSubject() : null;
+        Long userId;
+        try {
+            userId = claims.getLongClaim("userId");
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+        
+        return userId;
     }
 
     public String validateAndGetEmail(String token) {
@@ -143,14 +147,6 @@ public class JwtService {
 
     public String validateAndGetSub(String token) {
         JWTClaimsSet claims = validate(token);
-        String sub = null;
-        try {
-
-            sub = claims.getStringClaim("sub");
-
-        } catch(ParseException e) {
-            log.debug("exception: {}", e);
-        }
-        return sub;
+        return (claims != null) ? claims.getSubject() : null;
     }
 }

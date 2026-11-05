@@ -50,6 +50,7 @@ const TrackImportPlaylist = ({
             <div className={styles.trackList}>
                 {filteredList.map((qi, idx) => (
                     <ImportingTrack
+                        key={idx}
                         audio={qi.audio}
                         trackNumber={idx + 1}
                         isInPlaylist={playlistAudioIds.has(qi.audio.id)}

@@ -19,7 +19,7 @@ const PageLayout = ({ header, children }: PageLayoutProps) => {
 
     return (
         <div className={styles.layout}>
-            {header && <h2 className={styles.header}>{header}</h2>}
+            {header && <div className={styles.header}>{header}</div>}
 
             <div className={styles.page}>
                 {children}

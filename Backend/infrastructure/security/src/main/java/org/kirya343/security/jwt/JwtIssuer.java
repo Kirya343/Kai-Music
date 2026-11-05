@@ -33,10 +33,10 @@ public class JwtIssuer {
 
         // Строим JWT
         JWTClaimsSet set = new JWTClaimsSet.Builder()
-                .subject(auth.id().toString())
+                .subject(auth.sub())
                 .issueTime(Date.from(now))
                 .expirationTime(Date.from(now.plus(Duration.ofDays(1))))
-                .claim("sub", auth.sub())
+                .claim("userId", auth.id())
                 .claim("name", auth.name())
                 .claim("status", auth.status())
                 .jwtID(UUID.randomUUID().toString())
@@ -58,11 +58,10 @@ public class JwtIssuer {
         JWSSigner signer = new RSASSASigner(rsaKey);
 
         JWTClaimsSet set = new JWTClaimsSet.Builder()
-                .subject(auth.id().toString())
+                .subject(auth.sub())
                 .issueTime(Date.from(now))
                 .expirationTime(Date.from(now.plus(Duration.ofDays(30))))
-                .claim("uid", auth.id())
-                .claim("sub", auth.sub())
+                .claim("userId", auth.id())
                 .claim("type", "refresh")
                 .jwtID(UUID.randomUUID().toString())
                 .build();

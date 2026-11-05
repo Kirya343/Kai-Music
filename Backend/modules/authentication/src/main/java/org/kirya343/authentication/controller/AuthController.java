@@ -80,28 +80,24 @@ public class AuthController {
             String refreshToken = getTokenFromCookies(request, "refreshToken");
             logger.debug("Токен найден? {}", refreshToken);
 
-            Long userId = null;
-            if (refreshToken != null) {
-                userId = Long.valueOf(jwtService.validateAndGetUserIdStr(refreshToken));
-            }
+            if (refreshToken == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nothing to refresh");
+
+            Long userId = jwtService.validateAndGetUserId(refreshToken);
 
             logger.debug("userId: {}", userId);
 
-            User user = null;
+            if (userId == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "UserId is undefined");
 
-            if (userId != null) {
-                user = userRepository.findById(userId).orElse(null);
-                logger.debug("Пользователь найден");
-            }
+            User user = userRepository.findById(userId).orElse(null);
 
-            logger.debug("Айди пользователя: {}", user != null ? user.getId() : 0);
+            logger.debug("Пользователь найден");
 
             if (user == null) throw new ResponseStatusException(HttpStatus.NO_CONTENT, "User does not exist");
 
             cookiesService.setAuthCookies(response, user);
 
             return ResponseEntity.ok().build();
-        } catch (Exception e) {
+        } catch (ServletException e) {
             logger.debug("Ошибка генерации токена: {}", e);
             
             return ResponseEntity.internalServerError()

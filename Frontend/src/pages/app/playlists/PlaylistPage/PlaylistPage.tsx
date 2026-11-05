@@ -53,6 +53,7 @@ const PlaylistPage = ({}: {}) => {
             <div className={styles.trackList}>
                 {filteredList.map((qi, idx) => (
                     <PlaylistTrack
+                        key={idx}
                         queueItem={qi}
                         trackNumber={idx + 1}
                         isInPlaylist={false}

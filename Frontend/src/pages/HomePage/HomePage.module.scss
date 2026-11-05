@@ -878,19 +878,6 @@
 }
 
 @media (max-width: 768px) {
-    .header {
-        height: 75px;
-        padding: 0 22px;
-    }
-
-    .navigation {
-        display: none;
-    }
-
-    .headerButton {
-        padding: 9px 12px;
-        font-size: 11px;
-    }
 
     .hero {
         grid-template-columns: 1fr;

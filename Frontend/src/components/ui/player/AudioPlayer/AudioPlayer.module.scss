@@ -1,21 +1,5 @@
 @use "@/css/components/mixins/" as *;
 
-.header {
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    
-    .headerText {
-        display: inline-block;
-
-        &.animate {
-            animation: trackerScroll 10s linear infinite alternate;
-        }
-    }
-}
-
 .update {
     position: absolute;
     bottom: 110px;
@@ -52,7 +36,7 @@
     align-items: center;
     z-index: 101;
 
-    animation: slideUp 0.3s ease;
+    animation: slideUp 0.15s ease-in-out;
 
     .header {
         max-width: 100%;
@@ -89,19 +73,12 @@
 
 @keyframes slideUp {
     from {
+        opacity: 0;
         transform: translateY(100%);
     }
     to {
+        opacity: 1;
         transform: translateY(0);
-    }
-}
-
-@keyframes trackerScroll {
-    0% {
-        transform: translateX(calc(50% - 120px));
-    }
-    100% {
-        transform: translateX(calc(-50% + 120px));
     }
 }
 

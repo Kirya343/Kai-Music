@@ -20,12 +20,21 @@
     height: 90px;
     padding: 0 64px;
     margin: 0 auto;
+
+    @include mobile {
+        height: 75px;
+        padding: 0 22px;
+    }
 }
 
 .navigation {
     display: flex;
     align-items: center;
     gap: 38px;
+
+    @include mobile {
+        display: none;
+    }
 
     a {
         color: var(--text-color-l1);
@@ -39,6 +48,7 @@
 }
 
 .headerButton {
+
     display: flex;
     align-items: center;
     gap: 15px;
@@ -52,5 +62,10 @@
     &:hover {
         border-color: var(--accent);
         color: var(--accent);
+    }
+
+    @include mobile {
+        padding: 9px 12px;
+        font-size: 11px;
     }
 }

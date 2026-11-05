@@ -5,7 +5,7 @@ import AudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/Mobile
 import { useData, useGlobal } from "@common";
 import { useWebSocket } from "@websocket";
 import KebabMenu from "@/components/ui/KebabMenu/KebabMenu";
-import { CheckBoxIcon } from "@/assets/icons";
+import { CheckBoxIcon, PlusIcon } from "@/assets/icons";
 import Loader from "@/components/ui/Loader/Loader";
 import { playlistService } from "@playlist";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
@@ -114,6 +114,11 @@ const RoomPage = () => {
                                         icon: <CheckBoxIcon/>,
                                         title: "Select tracks",
                                         func: () => setSelectMode(prev => !prev)
+                                    },
+                                    {
+                                        icon: <PlusIcon />,
+                                        title: "Add tracks",
+                                        func: () => setImportOpen(true)
                                     }
                                 ]}
                             />
@@ -135,7 +140,10 @@ const RoomPage = () => {
                             }
                         </div>
 
-                        <button className={styles.addTrack} onClick={() => setImportOpen(true)}>
+                        <button 
+                            className={styles.addTrack} 
+                            onClick={() => setImportOpen(true)}
+                        >
                             Add track
                         </button>
                     </div>

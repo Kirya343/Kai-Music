@@ -1,6 +1,0 @@
-cors:
-  domains:
-    - http://10.165.91.178:30000
-    - http://localhost:30000
-    - http://localhost:30004
-    - http://localhost:8080

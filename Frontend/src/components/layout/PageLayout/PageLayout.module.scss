@@ -5,7 +5,8 @@
     flex-direction: column;
     flex: 1;
 
-    overflow: hidden;
+    min-height: 0;
+    overflow: auto;
     gap: .5rem;
 
     @include mobile {
@@ -21,13 +22,21 @@
     min-width: 0;
 
     gap: 0.5rem;
-
-    overflow: visible;
+    overflow: auto;
 }
 
 .header {
+    position: sticky;
+    top: 0;
     text-align: center;
     padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+
+    h1 {
+        font-size: 1.4rem;
+    }
 
     @include mobile {
         padding: .5rem 0;

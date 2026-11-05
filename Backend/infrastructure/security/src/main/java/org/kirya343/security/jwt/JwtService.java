@@ -141,16 +141,16 @@ public class JwtService {
         return email;
     }
 
-    public String validateAndGetOpenId(String token) {
+    public String validateAndGetSub(String token) {
         JWTClaimsSet claims = validate(token);
-        String openId = null;
+        String sub = null;
         try {
 
-            openId = claims.getStringClaim("openId");
+            sub = claims.getStringClaim("sub");
 
         } catch(ParseException e) {
             log.debug("exception: {}", e);
         }
-        return openId;
+        return sub;
     }
 }

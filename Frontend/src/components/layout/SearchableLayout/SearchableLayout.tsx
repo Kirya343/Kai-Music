@@ -30,20 +30,23 @@ const SearchableLayout = <T extends { id: number }>({
 }: SearchableLayoutProps<T>) => {
 
     return (
-        <PageLayout title={title}>
-            <div className={styles.sorting}>
+        <PageLayout header={
+            <>
+                <h1>{title}</h1>
+                <div className={styles.sorting}>
 
-                <div className={styles.row}>
-                    {extraActions}
+                    <div className={styles.row}>
+                        {extraActions}
 
-                    <SearchInput 
-                        value={search.searchQuery} 
-                        onChange={(value) => search.setSearchQuery(value)}
-                        foundCount={search.filteredList.length}
-                    />
+                        <SearchInput 
+                            value={search.searchQuery} 
+                            onChange={(value) => search.setSearchQuery(value)}
+                            foundCount={search.filteredList.length}
+                        />
+                    </div>
                 </div>
-            </div>
-
+            </>
+        }>
             {children}
         </PageLayout>
     );

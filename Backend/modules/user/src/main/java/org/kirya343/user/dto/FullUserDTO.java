@@ -9,7 +9,7 @@ import org.kirya343.security.core.enums.UserStatus;
 import org.kirya343.permission.dto.RoleDTO;
 
 public record FullUserDTO(
-    String openId,
+    String sub,
     String name,
     String avatarUrl,
     UserStatus status,
@@ -22,7 +22,7 @@ public record FullUserDTO(
         if (user == null) return null;
 
         return new FullUserDTO(
-            user.getOpenId(),
+            user.getSub(),
             user.getName(),
             user.getAvatarUrl(),
             user.getStatus(),

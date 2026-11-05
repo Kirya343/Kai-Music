@@ -12,12 +12,10 @@ const LibraryPage = () => {
 
     const { audiosData, roomData } = useData();
 
-    const { 
-        visibleAudios,
+    const {
         setSearchQuery,
         searchQuery, uploadAudios,
-        uploading, filteredList,
-        rowVirtualizer, parentRef
+        uploading, filteredList
     } = useLibrary();
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
@@ -71,39 +69,17 @@ const LibraryPage = () => {
                 </>
             )}
                 
-            <div className={styles.trackList} ref={parentRef}>
-                <div
-                    style={{
-                        height: `${rowVirtualizer.getTotalSize()}px`,
-                        position: "relative",
-                    }}
-                >
-                    {rowVirtualizer.getVirtualItems().map(item => {
-                        const audio = visibleAudios[item.index];
-
-                        return (
-                            <div
-                                key={audio.id}
-                                style={{
-                                    position: "absolute",
-                                    top: 0,
-                                    left: 0,
-                                    width: "100%",
-                                    transform: `translateY(${item.start}px)`,
-                                }}
-                            >
-                                <LibraryTrack
-                                    audio={audio}
-                                    trackNumber={item.index + 1}
-                                    importPlaylistId={roomData.playlist?.id}
-                                    openEditModal={setAudioFileView}
-                                    handleDelete={audiosData.deleteAudio}
-                                    playing={playingAudioId === audio.id}
-                                />
-                            </div>
-                        );
-                    })}
-                </div>
+            <div className={styles.trackList}>
+                {filteredList.map((audio, idx) => (
+                    <LibraryTrack
+                        audio={audio}
+                        trackNumber={idx + 1}
+                        importPlaylistId={roomData.playlist?.id}
+                        openEditModal={setAudioFileView}
+                        handleDelete={audiosData.deleteAudio}
+                        playing={playingAudioId === audio.id}
+                    />
+                ))}
             </div>
 
             <input 

@@ -28,6 +28,6 @@ public class RoomWebSocketController {
     ) {
         ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
 
-        eventPublisher.publishEvent(new RoomConnectedEvent(authData.openId(), room.getId()));
+        eventPublisher.publishEvent(new RoomConnectedEvent(authData.sub(), room.getId()));
     }
 }

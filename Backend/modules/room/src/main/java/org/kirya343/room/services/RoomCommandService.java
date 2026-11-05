@@ -37,9 +37,9 @@ public class RoomCommandService {
 
         ListeningRoom saved = listeningRoomRepository.save(room);
 
-        eventPublisher.publishEvent(new RoomConnectedEvent(authData.openId(), room.getId()));
+        eventPublisher.publishEvent(new RoomConnectedEvent(authData.sub(), room.getId()));
         
-        roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(saved));
+        roomWebSocketService.broadcastRoomInfo(authData.sub(), ShortRoomDTO.ofRoom(saved));
 
         return saved;
     }
@@ -55,19 +55,19 @@ public class RoomCommandService {
         ListeningRoom prevRoom = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
 
         if (prevRoom != null) {
-            eventPublisher.publishEvent(new RoomDisconnectedEvent(authData.openId(), prevRoom.getId()));
+            eventPublisher.publishEvent(new RoomDisconnectedEvent(authData.sub(), prevRoom.getId()));
         }
 
         ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
 
-        eventPublisher.publishEvent(new RoomConnectedEvent(authData.openId(), newRoom.getId()));
+        eventPublisher.publishEvent(new RoomConnectedEvent(authData.sub(), newRoom.getId()));
 
-        roomWebSocketService.broadcastRoomInfo(authData.openId(), ShortRoomDTO.ofRoom(newRoom));
+        roomWebSocketService.broadcastRoomInfo(authData.sub(), ShortRoomDTO.ofRoom(newRoom));
     }
 
     public void leaveRoom(UserAuthData authData) {
         ListeningRoom room = listeningRoomRepository.findRoomByUserId(authData.id()).orElseThrow();
 
-        eventPublisher.publishEvent(new RoomDisconnectedEvent(authData.openId(), room.getId()));
+        eventPublisher.publishEvent(new RoomDisconnectedEvent(authData.sub(), room.getId()));
     }
 }

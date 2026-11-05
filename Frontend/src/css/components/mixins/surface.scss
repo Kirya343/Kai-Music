@@ -1,0 +1,42 @@
+@use "./breakpoints" as *;
+
+@mixin surface($hover: false) {
+
+    background-color: var(--surface);
+    border-color: var(--surface-border);
+    
+    /* backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px); */
+
+    transition:
+        outline-color 0.1s ease,
+        background-color 0.2s ease;
+
+    outline: 2px solid transparent;
+
+    &:is(input, textarea, select):focus {
+        outline-color: var(--surface-border);
+    }
+
+    &:is(button):active {
+        transition: transform 0.2s ease, filter 0.2s ease;
+
+        &:active {
+            transform: scale(0.96);
+            filter: brightness(0.8);
+        }
+    }
+
+    @include mobile {
+        backdrop-filter: blur(3px);
+        //-webkit-backdrop-filter: blur(3px);           
+    }
+
+    @if $hover {
+        cursor: pointer;
+
+        &:hover {
+            background-color: var(--surface-hover);
+        }
+    }
+}

@@ -1,10 +1,11 @@
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import styles from "./Header.module.scss"
 import { useAuth } from "@user";
 import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon, HomeIcon } from "@/assets/icons";
 import { useData, useGlobal } from "@common";
 import { ReactNode } from "react";
 import clsx from "clsx";
+import Logo from "@/components/ui/Logo/Logo";
 
 /**
  * interface for NavigationLink conponents
@@ -29,7 +30,6 @@ const Header = () => {
     const { user, isAuthenticated } = useAuth();
     const { roomData } = useData();
     const { isMobile } = useGlobal();
-    const navigate = useNavigate();
 
     /**
      * disabling on mobile displays
@@ -46,18 +46,22 @@ const Header = () => {
     return (
         <header className={styles.header}>
             <div className={styles.headerContainer}>
-                <img className={styles.logo} src="/image/logo.png" onClick={() => navigate("/")}/>
+                <div className={styles.logoContainer}>
+                    <Logo/>
+                </div>
                 <div className={styles.navigation}>
                     {links.map(l => <NavigationLink key={l.title} link={l} />)}
                 </div>
-                {isAuthenticated ? (
-                    <Link to="/app/profile" className={styles.auth}>
-                        <UserIcon className={styles.icon}/>
-                        <span className={styles.userName}>{user?.name}</span>
-                    </Link>
-                ) : (
-                    <Link to="/login">Sign In</Link>
-                )}
+                <div className={styles.authenticationContainer}>
+                    {isAuthenticated ? (
+                        <Link to="/app/profile" className={styles.auth}>
+                            <UserIcon className={styles.icon}/>
+                            <span className={styles.userName}>{user?.name}</span>
+                        </Link>
+                    ) : (
+                        <Link to="/login">Sign In</Link>
+                    )}
+                </div>
             </div>
         </header>
     )

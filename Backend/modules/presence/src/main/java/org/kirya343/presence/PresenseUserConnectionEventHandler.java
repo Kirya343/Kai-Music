@@ -17,12 +17,12 @@ public class PresenseUserConnectionEventHandler {
     @EventListener
     public void handleConnected(UserConnectedEvent event) {
         
-        presenceService.userConnected(event.authData().openId());
+        presenceService.userConnected(event.authData().sub());
     }
 
     @EventListener
     public void handleDisconnected(UserDisconnectedEvent event) {
         
-        presenceService.userDisconnected(event.authData().openId());
+        presenceService.userDisconnected(event.authData().sub());
     }
 }

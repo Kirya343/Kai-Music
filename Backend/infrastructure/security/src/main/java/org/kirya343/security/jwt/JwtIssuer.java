@@ -36,7 +36,7 @@ public class JwtIssuer {
                 .subject(auth.id().toString())
                 .issueTime(Date.from(now))
                 .expirationTime(Date.from(now.plus(Duration.ofDays(1))))
-                .claim("openId", auth.openId())
+                .claim("sub", auth.sub())
                 .claim("name", auth.name())
                 .claim("status", auth.status())
                 .jwtID(UUID.randomUUID().toString())
@@ -62,7 +62,7 @@ public class JwtIssuer {
                 .issueTime(Date.from(now))
                 .expirationTime(Date.from(now.plus(Duration.ofDays(30))))
                 .claim("uid", auth.id())
-                .claim("openId", auth.openId())
+                .claim("sub", auth.sub())
                 .claim("type", "refresh")
                 .jwtID(UUID.randomUUID().toString())
                 .build();

@@ -19,27 +19,27 @@ public class PlaybackWebsocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void broadcastPlaybackState(String userOpenId, PlaybackStateDTO state) {
+    public void broadcastPlaybackState(String userSub, PlaybackStateDTO state) {
 
         if (state == null) return;
 
-        log.debug("Sending state info to user {}, pos {}, qi {}", userOpenId, state.position(), state.entryId());
+        log.debug("Sending state info to user {}, pos {}, qi {}", userSub, state.position(), state.entryId());
 
         messagingTemplate.convertAndSendToUser(
-            userOpenId,
+            userSub,
             "/queue/playback",
             state
         );
     }
     
-    public void sendChunk(String user, AudioChunk chunk, Long entryId) {
+    public void sendChunk(String userSub, AudioChunk chunk, Long entryId) {
         
         Map<String, Object> headers = new HashMap<>();
 
         log.debug(
             "Sending {} chunk to {}: chunk={}, audio={}", 
             chunk.initialization() ? "initialization" : "media", 
-            user, 
+            userSub, 
             chunk.sequence());
 
         headers.put("content-type", "audio/mp4");
@@ -49,16 +49,16 @@ public class PlaybackWebsocketService {
         headers.put("initialization", chunk.initialization());
 
         messagingTemplate.convertAndSendToUser(
-            user,
+            userSub,
             "/queue/audio",
             chunk.data(),
             headers
         );
     }
 
-    public void sendPlaybackMode(String user, PlaybackMode mode) {
+    public void sendPlaybackMode(String userSub, PlaybackMode mode) {
         messagingTemplate.convertAndSendToUser(
-            user, 
+            userSub, 
             "/queue/playback-mode", 
             mode
         );

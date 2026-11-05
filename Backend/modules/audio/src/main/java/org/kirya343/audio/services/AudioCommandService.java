@@ -109,7 +109,7 @@ public class AudioCommandService {
 
         audioFileRepository.save(audio);
 
-        audioWebsocketService.broadcastAudio(authData.openId(), AudioDTO.ofAudioFile(audio));
+        audioWebsocketService.broadcastAudio(authData.sub(), AudioDTO.ofAudioFile(audio));
     }
 
     public void deleteAudio(Long audioId) {

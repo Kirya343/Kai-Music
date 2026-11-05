@@ -1,11 +1,15 @@
 :root {
-    --text-color: #fff;
-    --text-color-l1: #a7a7a7;
+    --accent: #c97bf6;
+    --accent-light: #e9aefb;
+    /* --accent: #ffa348;
+    --accent-light: #ffc17e; */
+    --background: #0d0e11;
+
+    --text-color: #f5f5f5;
+    --text-color-l1: #92949c;
     --text-color-l2: #777777;
 
     --hover-overlay: rgba(99, 102, 241, 0.11);
-    
-    --background-l1: #212125;
 
     --radius: 12px;
 
@@ -23,9 +27,12 @@
     --glass-background: #a1a1a123;
     --glass-background-hover: #a1a1a131;
 
+    --surface: #15171b;
+    --surface-border: #292d35;
+    --surface-hover: #272a30;
+
     --orange: #e48c44;
 
-    --header-height: 100px;
-    --mobile-header-height: 80px;
+    --header-height: 90px;
     --mobile-nav-height: 70px;
 }

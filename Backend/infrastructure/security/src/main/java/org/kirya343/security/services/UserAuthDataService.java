@@ -26,7 +26,7 @@ public class UserAuthDataService {
 
         return new UserAuthData(
             Objects.requireNonNull(user.getId()),
-            Objects.requireNonNull(user.getOpenId()),
+            Objects.requireNonNull(user.getSub()),
             user.getName(),
             Objects.requireNonNull(user.getStatus())
         );
@@ -40,7 +40,7 @@ public class UserAuthDataService {
 
         return new UserAuthData(
             Objects.requireNonNull(user.getId()),
-            Objects.requireNonNull(user.getOpenId()),
+            Objects.requireNonNull(user.getSub()),
             user.getName(),
             Objects.requireNonNull(user.getStatus())
         );

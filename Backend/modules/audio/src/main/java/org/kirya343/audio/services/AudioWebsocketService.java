@@ -14,14 +14,14 @@ public class AudioWebsocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
     
-    public void broadcastAudio(String userOpenId, AudioDTO dto) {
+    public void broadcastAudio(String userSub, AudioDTO dto) {
 
         if (dto == null) return;
 
-        log.debug("Sending audio({}) info to user {}", dto.id(), userOpenId);
+        log.debug("Sending audio({}) info to user {}", dto.id(), userSub);
 
         messagingTemplate.convertAndSendToUser(
-            userOpenId,
+            userSub,
             "/queue/audios",
             dto
         );

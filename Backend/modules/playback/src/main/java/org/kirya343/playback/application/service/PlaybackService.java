@@ -36,7 +36,7 @@ public class PlaybackService {
         
             case USER:
 
-                playbackWebsocketService.sendPlaybackMode(authData.openId(), mode);
+                playbackWebsocketService.sendPlaybackMode(authData.sub(), mode);
 
                 break;
         }

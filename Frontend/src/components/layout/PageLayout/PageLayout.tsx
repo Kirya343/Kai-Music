@@ -3,7 +3,7 @@ import styles from "./PageLayout.module.scss";
 import { useRoomPlayback } from "@playback";
 
 interface PageLayoutProps {
-    title?: string;
+    header?: React.ReactNode;
     children: React.ReactNode;
 }
 
@@ -13,19 +13,19 @@ interface PageLayoutProps {
  * @param title is string title for page
  * @param children is page content
  */
-const PageLayout = ({ title, children }: PageLayoutProps) => {
+const PageLayout = ({ header, children }: PageLayoutProps) => {
 
     const { roomLoaded } = useRoomPlayback();
 
     return (
         <div className={styles.layout}>
-            {title && <h2 className={styles.header}>{title}</h2>}
+            {header && <h2 className={styles.header}>{header}</h2>}
 
             <div className={styles.page}>
                 {children}
-            </div>
 
-            {roomLoaded && <MobileAudioMiniPlayer />}
+                {roomLoaded && <MobileAudioMiniPlayer />}
+            </div>
         </div>
     );
 };

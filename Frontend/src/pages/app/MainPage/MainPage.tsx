@@ -70,9 +70,9 @@ const MainPage = () => {
                         </div>
 
                         <div className={styles.statItem}>
-                            <DiscIcon className={clsx(styles.icon, "spin")}/>
+                            <DiscIcon className={clsx(styles.icon, Number(stat?.activeRooms) > 0 && "spin")}/>
 
-                            <span>Total Rooms Active: <br/><strong>{stat?.activeRooms || 0}</strong></span>
+                            <span>Total Rooms Active: <br/><strong>{Number(stat?.activeRooms)}</strong></span>
                         </div>
                     </div>
                 </div>

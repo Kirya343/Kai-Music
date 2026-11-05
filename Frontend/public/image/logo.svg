@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <!-- Темный фон -->
+
+  <!-- Фиолетовая плашка со скругленными углами в стиле iOS -->
+  <rect width="100%" height="100%" rx="115" ry="115" fill="#c97bf6" />
+
+  <!-- Буква K в точном начертании SF Pro Display Heavy -->
+  <text x="200" y="290" font-family="Arial, sans-serif" font-size="270" font-weight="bold" fill="#181818" text-anchor="middle">K</text>
+</svg>

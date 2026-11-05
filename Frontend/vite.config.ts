@@ -31,7 +31,8 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
-        assetsDir: 'assets'
+        assetsDir: 'assets',
+        cssMinify: false
     },
     server: {
         host: '0.0.0.0',

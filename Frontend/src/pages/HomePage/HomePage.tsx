@@ -10,31 +10,33 @@ import { Link } from "react-router-dom";
  */
 import styles from "./HomePage.module.scss";
 import clsx from "clsx";
+import Logo from "@/components/ui/Logo/Logo";
+import { ArrowIcon, DiscIcon, LeftIcon, MusicNoteIcon, PauseIcon, PlaylistIcon, RightIcon } from "@/assets/icons";
 
 const features = [
     {
-        icon: "♫",
+        icon: <MusicNoteIcon />,
         title: "Your music library",
         description:
             "Upload your favorite tracks and keep your entire music collection in one place. Your music, always accessible.",
         number: "01",
     },
     {
-        icon: "▤",
+        icon: <PlaylistIcon />,
         title: "Personal playlists",
         description:
             "Create playlists, organize your favorite tracks and build the perfect soundtrack for every moment.",
         number: "02",
     },
     {
-        icon: "◎",
+        icon: <DiscIcon />,
         title: "Listening rooms",
         description:
             "Create a room, invite your friends and listen to music together in real time, wherever you are.",
         number: "03",
     },
     {
-        icon: "↗",
+        icon: <ArrowIcon direction="right" />,
         title: "Your music, your way",
         description:
             "Enjoy a seamless listening experience with synchronized playback and intuitive controls.",
@@ -63,12 +65,6 @@ const steps = [
     },
 ];
 
-const navigation = [
-    { label: "Features", href: "#features" },
-    { label: "Listening rooms", href: "#rooms" },
-    { label: "How it works", href: "#how-it-works" },
-];
-
 function Equalizer() {
     return (
         <div className={styles.equalizer} aria-hidden="true">
@@ -86,28 +82,7 @@ function Equalizer() {
 
 export default function HomePage() {
     return (
-        <main className={styles.page}>
-            <div className={styles.backgroundGlow} aria-hidden="true" />
-
-            <header className={styles.header}>
-                <a href="/" className={styles.logo} aria-label="Kai Music home">
-                    <span className={styles.logoIcon}>K</span>
-                    <span>Kai Music</span>
-                </a>
-
-                <nav className={styles.navigation} aria-label="Main navigation">
-                    {navigation.map((item) => (
-                        <a key={item.href} href={item.href}>
-                            {item.label}
-                        </a>
-                    ))}
-                </nav>
-
-                <a href="/library" className={styles.headerButton}>
-                    Open app
-                    <span aria-hidden="true">↗</span>
-                </a>
-            </header>
+        <>
 
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
@@ -129,10 +104,10 @@ export default function HomePage() {
                     </p>
 
                     <div className={styles.heroActions}>
-                        <a href="/library" className={styles.primaryButton}>
+                        <Link to="/app/library" className={styles.primaryButton}>
                             Start listening
-                            <span aria-hidden="true">↗</span>
-                        </a>
+                            <span aria-hidden="true"><ArrowIcon direction="right" /></span>
+                        </Link>
 
                         <a href="#features" className={styles.secondaryButton}>
                             Explore features
@@ -140,7 +115,7 @@ export default function HomePage() {
                     </div>
 
                     <div className={styles.heroNote}>
-                        <span className={styles.heroNoteIcon}>♫</span>
+                        <span className={styles.heroNoteIcon}><MusicNoteIcon /></span>
                         Your personal music experience.
                     </div>
                 </div>
@@ -171,7 +146,7 @@ export default function HomePage() {
                                 <h3>Your next favorite</h3>
                                 <p>Discover your sound</p>
                             </div>
-                            <span className={styles.trackIcon}>♫</span>
+                            <span className={styles.trackIcon}><MusicNoteIcon /></span>
                         </div>
 
                         <Equalizer />
@@ -183,9 +158,9 @@ export default function HomePage() {
                         <div className={styles.playerControls}>
                             <span>02:34</span>
                             <div className={styles.controlButtons}>
-                                <span>◀</span>
-                                <span className={styles.playButton}>Ⅱ</span>
-                                <span>▶</span>
+                                <LeftIcon />
+                                <span className={styles.playButton}><PauseIcon /></span>
+                                <RightIcon />
                             </div>
                             <span>04:12</span>
                         </div>
@@ -257,7 +232,7 @@ export default function HomePage() {
                             <h3>{feature.title}</h3>
                             <p>{feature.description}</p>
 
-                            <span className={styles.featureArrow}>↗</span>
+                            <span className={styles.featureArrow}><ArrowIcon direction="right" /></span>
                         </article>
                     ))}
                 </div>
@@ -277,7 +252,7 @@ export default function HomePage() {
                         </div>
 
                         <div className={styles.roomArtwork}>
-                            <span>♫</span>
+                            <MusicNoteIcon />
                         </div>
 
                         <h3>Music brings us together.</h3>
@@ -343,10 +318,10 @@ export default function HomePage() {
                         </li>
                     </ul>
 
-                    <a href="/library" className={styles.primaryButton}>
+                    <Link to="/app/library" className={styles.primaryButton}>
                         Explore Kai Music
-                        <span aria-hidden="true">↗</span>
-                    </a>
+                        <ArrowIcon direction="right" />
+                    </Link>
                 </div>
             </section>
 
@@ -414,18 +389,15 @@ export default function HomePage() {
                         listening experience with Kai Music.
                     </p>
 
-                    <a href="/library" className={styles.primaryButton}>
+                    <Link to="/app/library" className={styles.primaryButton}>
                         Open Kai Music
-                        <span aria-hidden="true">↗</span>
-                    </a>
+                        <ArrowIcon direction="right" />
+                    </Link>
                 </div>
             </section>
 
             <footer className={styles.footer}>
-                <a href="/" className={styles.logo}>
-                    <span className={styles.logoIcon}>K</span>
-                    <span>Kai Music</span>
-                </a>
+                <Logo />
 
                 <span className={styles.footerText}>
                     Made for the love of music.
@@ -435,6 +407,6 @@ export default function HomePage() {
                     © {new Date().getFullYear()} Kai Music
                 </span>
             </footer>
-        </main>
+        </>
     );
 }

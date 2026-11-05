@@ -5,7 +5,7 @@ import AudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/Mobile
 import { useData, useGlobal } from "@common";
 import { useWebSocket } from "@websocket";
 import KebabMenu from "@/components/ui/KebabMenu/KebabMenu";
-import { CheckBoxIcon, PlusIcon } from "@/assets/icons";
+import { CheckBoxIcon, PlusIcon, ShuffleIcon } from "@/assets/icons";
 import Loader from "@/components/ui/Loader/Loader";
 import { playlistService } from "@playlist";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
@@ -119,6 +119,13 @@ const RoomPage = () => {
                                         icon: <PlusIcon />,
                                         title: "Add tracks",
                                         func: () => setImportOpen(true)
+                                    },
+                                    {
+                                        icon: <ShuffleIcon />,
+                                        title: "Add rundom",
+                                        func: async () => {
+                                            if (playlist) await playlistService.addRandomTracks(playlist.id, 30)
+                                        }
                                     }
                                 ]}
                             />
@@ -171,6 +178,21 @@ const RoomPage = () => {
                             >
                                 Cancel
                             </button>
+                            {selectedTracks.length === playlist?.queue.length ? (
+                                <button 
+                                    onClick={() => setSelectedTracks([])}
+                                    className={styles.action}
+                                >
+                                    Unselect all
+                                </button>
+                            ) : (
+                                <button 
+                                    onClick={() => setSelectedTracks(playlist?.queue.map(qi => qi.id) || [])}
+                                    className={styles.action}
+                                >
+                                    Select all
+                                </button>
+                            )}
                         </div>
                     )}
                 </Loader>

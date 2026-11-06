@@ -8,6 +8,7 @@ import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.application.service.QueueService;
+import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.domain.model.RoomPlaybackContext;
 import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
 
@@ -28,7 +29,7 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
 
     private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
-    private final PlaybackStateRepository roomPlaybackStateRepository;
+    private final PlaybackStateRepository playbackStateRepository;
     private final QueueService queueService;
 
     private final Map<Long, RoomStreamWorker> workers =
@@ -52,7 +53,9 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
 
             log.debug("Создаём новый воркер для комнаты {}", roomId);
 
-            PlaybackState state = roomPlaybackStateRepository.findById(roomId).orElse(null);
+            PlaybackState state = playbackStateRepository
+                .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM)
+                .orElse(null);
 
             RoomPlaybackContext context = roomPlaybackContextStore.computeIfAbsent(roomId);
 

@@ -7,20 +7,20 @@ const logger = loggerFactory.getLogger("Audio.Buffer");
 
 interface useAudioBufferProps {
     mediaSourceRef: RefObject<MediaSource | null>;
-    currentEntryIdRef: RefObject<number | null>
+    currentStreamIdRef: RefObject<string | null>
 }
 
-export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBufferProps) {
+export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioBufferProps) {
 
     const sourceBufferRef = useRef<SourceBuffer | null>(null);
-    const [bufferedRanges, setBufferedRanges] = useState<Map<number, TimeRange[]>>(new Map());
-    const onBufferUpdateRef = useRef<((entryId: number) => void) | null>(null);
+    const [bufferedRanges, setBufferedRanges] = useState<Map<string, TimeRange[]>>(new Map());
+    const onBufferUpdateRef = useRef<((streamId: string) => void) | null>(null);
     const queueRef = useRef<AudioChunk[]>([]);
 
     const { addOnConnectHandler } = useWebSocket();
 
     const setBufferUpdateHandler = useCallback(
-        (callback: (entryId: number) => void) => {
+        (callback: (streamId: string) => void) => {
             onBufferUpdateRef.current = callback;
         }, []);
 
@@ -29,7 +29,7 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
      * 
      * @param entryId - ID of the current entry
      */
-    const updateBufferedRanges = useCallback((entryId: number) => {
+    const updateBufferedRanges = useCallback((streamId: string) => {
         const sourceBuffer = sourceBufferRef.current;
 
         if (!sourceBuffer) {
@@ -47,14 +47,14 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
 
         setBufferedRanges(prev => {
             const updated = new Map(prev);
-            updated.set(entryId, ranges);
+            updated.set(streamId, ranges);
             
             logger.debug("buffer", updated)
 
             return updated;
         });
 
-        onBufferUpdateRef.current?.(entryId)
+        onBufferUpdateRef.current?.(streamId)
     }, []);
 
     /**
@@ -94,7 +94,9 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
         sourceBufferRef.current = null;
     }, []);
 
-    const processQueue = useCallback((entryId: number) => {
+    const processQueue = useCallback((streamId: string) => {
+
+        logger.debug('Собираем очередь: ', streamId);
 
         const sourceBuffer = sourceBufferRef.current;
         const mediaSource = mediaSourceRef.current;
@@ -102,6 +104,8 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
         if (!sourceBuffer || !mediaSource) {
             return;
         }
+
+        logger.debug('Собираем очередь: ', streamId);
 
         if (
             mediaSource.readyState !== 'open' ||
@@ -111,7 +115,7 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
         }
 
         const chunks = queueRef.current
-            .filter(chunk => chunk.entryId === entryId);
+            .filter(chunk => chunk.streamId === streamId);
 
         const initializationChunk = chunks.find(
             chunk => chunk.initialization
@@ -163,9 +167,9 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
 
         queueRef.current.push(chunk);
 
-        const entryId = currentEntryIdRef.current;
+        const streamId = currentStreamIdRef.current;
 
-        if (entryId) processQueue(entryId);
+        if (streamId) processQueue(streamId);
     }, [processQueue]);
 
     useEffect(() => {
@@ -177,6 +181,7 @@ export function useAudioBuffer({ mediaSourceRef, currentEntryIdRef }: useAudioBu
                     sequence: Number(message.headers["sequence"]),
                     duration: Number(message.headers["duration"]),
                     entryId: Number(message.headers["entry-id"]),
+                    streamId: message.headers["stream-id"],
                     initialization: message.headers["initialization"] === "true"
                 };
 

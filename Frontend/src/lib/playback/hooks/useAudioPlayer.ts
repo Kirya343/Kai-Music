@@ -10,7 +10,7 @@ export const useAudioPlayer = (roomId: number | null) => {
         audio: mediaResource.audio,
         createMediaSource: mediaResource.createMediaSource,
         cleanupMediaSource: mediaResource.cleanupMediaSource,
-        currentEntryIdRef: mediaResource.currentEntryIdRef,
+        currentStreamIdRef: mediaResource.currentStreamIdRef,
 
         setBufferUpdateHandler: mediaResource.setBufferUpdateHandler,
     });

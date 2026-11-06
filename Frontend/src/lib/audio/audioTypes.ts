@@ -18,6 +18,8 @@ export interface AudioChunk {
 
     /** ID of the queue entry associated with this chunk. */
     entryId: number;
+
+    streamId: string;
 };
 
 /**

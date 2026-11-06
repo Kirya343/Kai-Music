@@ -29,7 +29,8 @@ public class QueueService {
         Playlist playlist = playlistRepository.findByRoomId(roomId).orElseThrow(
             () -> new EntityNotFoundException("Playlist by room (%s) not found".formatted(roomId)));
 
-        Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
+        Optional<PlaybackState> playbackState = playbackStateRepository
+            .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
 
         QueueItem queueItem = null;
 
@@ -92,7 +93,8 @@ public class QueueService {
 
     public QueueItem prevTrack(Long roomId) {
 
-        Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
+        Optional<PlaybackState> playbackState = playbackStateRepository
+            .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
 
         QueueItem queueItem = null;
         Playlist playlist = playlistRepository.findByRoomId(roomId).orElseThrow(

@@ -6,9 +6,7 @@ const logger = loggerFactory.getLogger("Audio.MediaSource");
 
 export const useMediaSource = () => {
 
-    logger.debug("Creating hook")
-
-    const currentEntryIdRef = useRef<number | null>(null)
+    const currentStreamIdRef = useRef<string | null>(null)
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const mediaSourceRef = useRef<MediaSource | null>(null);
@@ -23,15 +21,16 @@ export const useMediaSource = () => {
         bufferedRanges, 
         appendChunks,
         resetBuffer
-    } = useAudioBuffer({ currentEntryIdRef, mediaSourceRef });
+    } = useAudioBuffer({ currentStreamIdRef, mediaSourceRef });
 
-    const createMediaSource = useCallback<(entryId: number) => HTMLAudioElement | null>((entryId: number) => {
-        logger.debug("создаём новый mediaSource")
+    const createMediaSource = useCallback<(streamId: string) => HTMLAudioElement | null>((streamId: string) => {
+        logger.debug("создаём новый mediaSource, streamId:", streamId)
+
         if (mediaSourceRef.current) {
             return audioRef.current;
         }
 
-        currentEntryIdRef.current = entryId;
+        currentStreamIdRef.current = streamId;
 
         const audio = new Audio();
         const mediaSource = new MediaSource();
@@ -60,13 +59,13 @@ export const useMediaSource = () => {
                 sourceBufferRef.current = sourceBuffer;
 
                 sourceBuffer.addEventListener('updateend', () => {
-                    const currentEntryId = currentEntryIdRef.current;
+                    const currentStreamId = currentStreamIdRef.current;
 
-                    if (!currentEntryId) {
+                    if (!currentStreamId) {
                         return;
                     }
 
-                    updateBufferedRanges(entryId);
+                    updateBufferedRanges(streamId);
                 });
 
                 sourceBuffer.addEventListener('error', event => {
@@ -122,7 +121,7 @@ export const useMediaSource = () => {
         mediaSourceRef,
         createMediaSource,
         cleanupMediaSource,
-        currentEntryIdRef,
+        currentStreamIdRef,
 
         setBufferUpdateHandler,
         bufferedRanges, 

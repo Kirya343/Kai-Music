@@ -9,10 +9,10 @@ const config: LoggerConfig = {
         Audio: {
             Buffer: "INFO",
             MediaSource: "INFO",
-            Playback: "INFO",
+            Playback: "DEBUG",
         },
         WebSocket: "ERROR",
-        GlobalContext: "DEBUG",
+        GlobalContext: "INFO",
 
         HTTP: "NONE",
 
@@ -22,7 +22,7 @@ const config: LoggerConfig = {
         },
 
         Data: {
-            Room: "INFO"
+            Room: "DEBUG"
         }
     },
 

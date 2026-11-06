@@ -4,6 +4,7 @@ import { roomService } from "../services";
 import { useWebSocket } from "@websocket";
 import { Playlist } from "@playlist";
 import { loggerFactory } from "@common";
+import { Client } from "@stomp/stompjs";
 
 const logger = loggerFactory.getLogger("Data.Room");
 
@@ -49,7 +50,7 @@ export function useRoomData() {
     }, [])
 
     const reconnectToRoom = useCallback(() => {
-        if (!client) return;
+        if (!client || !room?.id) return;
 
         logger.debug("переподключаемся к комнате")
 
@@ -60,18 +61,16 @@ export function useRoomData() {
     }, [client])
 
     useEffect(() => {
+        reconnectToRoom()
+    }, [room?.id, client])
+
+    useEffect(() => {
         syncRoom()
     }, [])
 
     useEffect(() => {
         localStorage.setItem("room", JSON.stringify(room));
     }, [room])
-
-    useEffect(() => {
-        if (room && synced) {
-            reconnectToRoom()
-        }
-    }, [room?.id, synced, reconnectToRoom])
 
     useEffect(() => {
         const unsubscribe = addOnConnectHandler((client) => {

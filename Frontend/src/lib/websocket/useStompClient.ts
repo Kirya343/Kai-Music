@@ -104,6 +104,8 @@ export function useStompClient(): UseStompClientResult {
             }
 
             try {
+                logger.info("Trying to refresh token")
+
                 await api.post("/auth/refresh", null, {});
 
                 await stompClient.deactivate();

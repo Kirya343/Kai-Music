@@ -1,14 +1,8 @@
 package org.kirya343.playback.application.service;
 
-import java.util.Optional;
-
-import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
-import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
-import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
-import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
 import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorker;
@@ -25,10 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 public class RoomSessionService {
 
     private final RoomPlaybackContextStore roomPlaybackContextStore;
-    private final PlaybackWebsocketService playbackWebsocketService;
     private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
     private final RoomStreamWorkerManager roomStreamWorkerManager;
-    private final PlaybackStateRepository playbackStateRepository;  
     private final UserPlaybackRepository userPlaybackRepository;
     private final UserRepository userRepository;
     
@@ -47,12 +39,6 @@ public class RoomSessionService {
         Long userId = userRepository.findBySub(userSub).orElseThrow().getId();
 
         userPlaybackRepository.save(new UserPlayback(userId, roomId, PlaybackTargetType.ROOM));
-
-        Optional<PlaybackState> playbackState = playbackStateRepository.findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
-
-        if (playbackState.isPresent()) {
-            playbackWebsocketService.broadcastPlaybackState(userSub, PlaybackStateDTO.ofState(playbackState.get()));
-        }
 
         initializeRoom(roomId, userSub);
 

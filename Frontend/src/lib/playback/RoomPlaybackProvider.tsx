@@ -113,7 +113,7 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
                 {
                     src: "https://music.workswap.org/image/logo.svg",
                     sizes: "400x400",
-                    type: "image/svg"
+                    type: "image/svg+xml"
                 }
             ]
         });

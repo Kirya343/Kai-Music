@@ -1,21 +1,5 @@
 @use "@/css/components/mixins/" as *;
 
-.header {
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    
-    .headerText {
-        display: inline-block;
-
-        &.animate {
-            animation: trackerScroll 10s linear infinite alternate;
-        }
-    }
-}
-
 .update {
     position: absolute;
     bottom: 110px;
@@ -25,7 +9,7 @@
     justify-content: center;
     translate: -50%;
     padding: 7px;
-    background-color: #0f0f0f;
+    background-color: var(--surface);
     border-radius: 20px;
     border: 1px solid var(--border-color);
 
@@ -41,18 +25,19 @@
 }
 
 .audioPlayer {
+    @include dirty-glass;
+
     position: fixed;
     width: 100vw;
     height: 100dvh;
     display: flex;
-    background-color: #0c0909;
     flex-direction: column;
     padding: 0.7rem 1.5rem;
     gap: 1.2rem;
     align-items: center;
     z-index: 101;
 
-    animation: slideUp 0.3s ease;
+    animation: slideUp 0.3s ease-in-out;
 
     .header {
         max-width: 100%;
@@ -89,19 +74,12 @@
 
 @keyframes slideUp {
     from {
+        opacity: 0;
         transform: translateY(100%);
     }
     to {
+        opacity: 1;
         transform: translateY(0);
-    }
-}
-
-@keyframes trackerScroll {
-    0% {
-        transform: translateX(calc(50% - 120px));
-    }
-    100% {
-        transform: translateX(calc(-50% + 120px));
     }
 }
 

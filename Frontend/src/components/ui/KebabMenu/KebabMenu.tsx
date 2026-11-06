@@ -47,7 +47,7 @@ const KebabMenu = ({ actions, className }: KebabMenuProps) => {
                 <button
                     type="button"
                     className={clsx(styles.button, className)}
-                    aria-label="Действия"
+                    aria-label="Actions"
                 >
                     <EllipsisVerticalIcon className={styles.icon} />
                 </button>

@@ -112,14 +112,6 @@ const Track = ({
         >
             <div className={styles.body} onClick={onClick}>
 
-                {selectionMode && (
-                    <input
-                        type="checkbox"
-                        checked={selected}
-                        readOnly
-                    />
-                )}
-
                 <div className={styles.audioCover}>
                     <MusicNoteIcon/>
                 </div>

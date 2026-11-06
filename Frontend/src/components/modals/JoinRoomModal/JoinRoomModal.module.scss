@@ -7,7 +7,7 @@
     border-radius: 10px;
     font-size: medium;
     
-    @include dirty-glass(true);
+    @include dirty-glass-light(true);
 }
 
 .input {

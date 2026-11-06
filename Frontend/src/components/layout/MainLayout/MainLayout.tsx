@@ -3,9 +3,9 @@ import styles from "./MainLayout.module.scss"
 import Logo from "@/components/ui/Logo/Logo";
 
 const navigation = [
-    { label: "Features", href: "#features" },
-    { label: "Listening rooms", href: "#rooms" },
-    { label: "How it works", href: "#how-it-works" },
+    { label: "Features", href: "/#features" },
+    { label: "Listening rooms", href: "/#rooms" },
+    { label: "How it works", href: "/#how-it-works" },
 ];
 
 /**
@@ -20,9 +20,9 @@ const MainLayout = () => {
 
                 <nav className={styles.navigation} aria-label="Main navigation">
                     {navigation.map((item) => (
-                        <a key={item.href} href={item.href}>
+                        <Link  key={item.href} to={item.href}>
                             {item.label}
-                        </a>
+                        </Link>
                     ))}
                 </nav>
 

@@ -1,6 +1,6 @@
-@mixin mask-fade($from, $to) {
+@mixin mask-fade($from, $to, $direction: bottom) {
     mask-image: linear-gradient(
-        to bottom,
+        to $direction,
         rgba(0,0,0,0) $from,
         rgba(0,0,0,1) $to
     );

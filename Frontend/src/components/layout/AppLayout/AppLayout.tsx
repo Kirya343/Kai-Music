@@ -3,8 +3,6 @@ import { Outlet } from "react-router-dom";
 import styles from "./AppLayout.module.scss"
 import Header from "../navigation/Header/Header";
 import MobileNav from "../navigation/MobileNav/MobileNav";
-import RoomReturnModal from "@/components/modals/RoomReturnModal/RoomReturnModal";
-import clsx from "clsx";
 import { useAuth } from "@user";
 import { useEffect, useState } from "react";
 import { useWebSocket } from "@websocket";

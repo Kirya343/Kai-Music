@@ -45,7 +45,7 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
             
             <div className={styles.trackList}>
                 <button onClick={addRandomTracks} className={styles.rundomBtn}>
-                    Добавить случайные <ShuffleIcon/>
+                    Add rundom <ShuffleIcon/>
                 </button>
                 {filteredList.map((audio, idx) => (
                     <ImportingTrack

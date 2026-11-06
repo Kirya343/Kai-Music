@@ -77,7 +77,7 @@ const LoginPage = () => {
                     <button className="btn" onClick={handleLogin}>Sign In</button>
                 </>
             )}
-            links={(<Link to="/register">Luo Tili</Link>)}
+            links={(<Link to="/register">Sign up</Link>)}
         />
     );
 };

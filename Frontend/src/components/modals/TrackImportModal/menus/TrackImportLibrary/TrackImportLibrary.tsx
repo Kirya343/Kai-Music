@@ -10,7 +10,8 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
 
     const { 
         setSearchQuery, searchQuery,
-        filteredList
+        visibleAudios, filteredList,
+        visibleItems, setVisiblItems
     } = useLibrary();
 
     const playlistAudioIds = useMemo(() => {
@@ -47,7 +48,8 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
                 <button onClick={addRandomTracks} className={styles.rundomBtn}>
                     Add rundom <ShuffleIcon/>
                 </button>
-                {filteredList.map((audio, idx) => (
+                
+                {visibleAudios.map((audio, idx) => (
                     <ImportingTrack
                         key={idx}
                         audio={audio}
@@ -57,6 +59,10 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
                         className={styles.track}
                     />
                 ))}
+
+                {visibleItems < filteredList.length && (
+                    <button className={styles.loadMore} onClick={() => setVisiblItems(prev => prev + 50)}>Load more</button>
+                )}
             </div>
         </div>
     )

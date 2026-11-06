@@ -1,12 +1,5 @@
 @use "@/css/components/mixins/" as *;
 
-.synchronization {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-}
-
 .trackList {
     display: flex;
     flex-direction: column;
@@ -19,6 +12,14 @@
     @include mobile {
         width: 100%;
     }
+}
+
+.loadMore {
+    border-radius: 8px;
+    border: 1px solid;
+    padding: 10px 16px;
+
+    @include glass(true);
 }
 
 .track {

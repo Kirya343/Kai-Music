@@ -102,6 +102,10 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
+
+        @include mobile {
+            padding: 5px 10px;
+        }
     }
 
     .addTrack {
@@ -127,6 +131,11 @@
     overflow: auto;
     scrollbar-width: thin;
     gap: 0.5rem;
+
+    border-radius: 0 0 10px 10px;
+    border-bottom: 1px solid;
+
+    @include mask-fade(0%, 5%, top);
 }
 
 .error {

@@ -15,7 +15,8 @@ const LibraryPage = () => {
     const {
         setSearchQuery,
         searchQuery, uploadAudios,
-        uploading, filteredList
+        uploading, visibleAudios, filteredList,
+        visibleItems, setVisiblItems
     } = useLibrary();
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
@@ -70,7 +71,7 @@ const LibraryPage = () => {
             )}
                 
             <div className={styles.trackList}>
-                {filteredList.map((audio, idx) => (
+                {visibleAudios.map((audio, idx) => (
                     <LibraryTrack
                         key={idx}
                         audio={audio}
@@ -81,6 +82,11 @@ const LibraryPage = () => {
                         playing={playingAudioId === audio.id}
                     />
                 ))}
+
+                {visibleItems < filteredList.length && (
+                    <button className={styles.loadMore} onClick={() => setVisiblItems(prev => prev + 50)}>Load more</button>
+                )}
+                
             </div>
 
             <input 

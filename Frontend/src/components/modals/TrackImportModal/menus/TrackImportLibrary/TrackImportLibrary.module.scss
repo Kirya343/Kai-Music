@@ -43,15 +43,16 @@
     }
 }
 
-.header {
-    text-align: center;
+.loadMore {
+    border-radius: 8px;
+    border: 1px solid;
+    padding: 10px 16px;
+
+    @include glass(true);
 }
 
-.synchronization {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
+.header {
+    text-align: center;
 }
 
 .trackList {

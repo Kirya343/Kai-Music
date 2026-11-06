@@ -17,7 +17,7 @@ interface UseStompClientResult {
 }
 
 export function useStompClient(): UseStompClientResult {
-    const { user } = useAuth();
+    const { user, clearUser } = useAuth();
 
     const clientRef = useRef<Client | null>(null);
     const hasConnectedRef = useRef(false);
@@ -119,6 +119,7 @@ export function useStompClient(): UseStompClientResult {
                 await connect();
             } catch (error) {
                 logger.error("Failed to refresh token:", error);
+                clearUser();
                 setError(true);
             }
         };

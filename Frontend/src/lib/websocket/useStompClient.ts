@@ -98,7 +98,11 @@ export function useStompClient(): UseStompClientResult {
 
             logger.error("❌ Broker error:", message);
 
-            if (!message.includes("invalidToken")) {
+            const isAuthError =
+                message.includes("invalidToken") ||
+                message.includes("Missing access token");
+
+            if (!isAuthError) {
                 setError(true);
                 return;
             }

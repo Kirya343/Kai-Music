@@ -33,6 +33,11 @@ html, body {
         width: 100%;
         overflow: hidden;
     }
+
+    #modal-root {
+        position: fixed;
+        top: 0;
+    }
 }
 
 button {

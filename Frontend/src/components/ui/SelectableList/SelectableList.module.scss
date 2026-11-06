@@ -1,0 +1,45 @@
+@use "@/css/components/mixins/" as *;
+
+.menu {
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100dvh;
+    z-index: 100;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    @include dirty-glass;
+}
+
+.selectedTracksActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    width: 100%;
+    max-width: 1000px;
+
+    .action {
+        padding: 10px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+
+        @include glass;
+    }
+}
+
+.selectableItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+
+    > :last-child {
+        flex: 1;
+        min-width: 0;
+    }
+}

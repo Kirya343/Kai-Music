@@ -3,33 +3,23 @@ import Track, { ITrackAction } from "./Track/Track";
 import { TrashIcon } from "@/assets/icons";
 import { playbackService, IQueueItem, useRoomPlayback } from "@playback";
 import { useData } from "@common";
+import { HTMLAttributes } from "react";
 
 /** Props for the RoomTrack component */
-interface RoomTrackProps {
+interface RoomTrackProps extends HTMLAttributes<HTMLDivElement> {
 
     /** Playlist queue item with audio metadata to display */
     queueItem: IQueueItem, 
-
-    /** Whether the track is currently selected. */
-    selected: boolean, 
-
-    /** Display a checkbox for track selection. */
-    selectMode: boolean,
-
-    /** Callback that toggles current track selection */
-    toggleTrack: (id: number) => void,
-
+    
     /** Apply the playing style and display the playback indicator. */
     playing: boolean
 }
 
 /** Displays audio track in the RoomPage */
 const RoomTrack = ({
-    queueItem, 
-    selected, 
-    selectMode, 
-    toggleTrack, 
-    playing
+    queueItem,
+    playing,
+    ...props
 }: RoomTrackProps) => {
 
     const { 
@@ -44,14 +34,10 @@ const RoomTrack = ({
     const handleTrackClick = async (qiId: number) => {
         if (!room?.id) return;
 
-        if (selectMode) {
-            toggleTrack(qiId)
+        if (playbackState?.entryId === qiId) {
+            togglePlay()
         } else {
-            if (playbackState?.entryId === qiId) {
-                togglePlay()
-            } else {
-                playTrack(qiId)
-            }
+            playTrack(qiId)
         }
     }
 
@@ -77,11 +63,10 @@ const RoomTrack = ({
                 title: true,
                 artist: true
             }}
-            
-            selectionMode={selectMode}
-            selected={selected}
 
             playing={playing}
+
+            {...props}
         />
     )
 }

@@ -149,25 +149,3 @@
     text-align: center;
     font-size: large;
 }
-
-.selectedTracksActions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    position: fixed;
-    bottom: 70px;
-    z-index: 100;
-    justify-content: center;
-    width: 100%;
-    max-width: 1000px;
-
-    .action {
-        padding: 10px;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        border: 1px solid;
-
-        @include glass;
-    }
-}

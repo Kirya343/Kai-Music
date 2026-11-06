@@ -13,11 +13,11 @@ import RoomTrack from "@/components/ui/track/RoomTrack";
 import { useRoomPlayback } from "@playback";
 import { Navigate } from "react-router-dom";
 import { loggerFactory } from "@common";
+import SelectableList from "@/components/ui/SelectableList/SelectableList";
 
 const logger = loggerFactory.getLogger("Pages.Room");
 
 const RoomPage = () => {
-    const [selectedTracks, setSelectedTracks] = useState<number[]>([]);
     const [selectMode, setSelectMode] = useState<boolean>(false);
     const { playbackState } = useRoomPlayback();
     const { room, playlist } = useData().roomData;
@@ -29,22 +29,14 @@ const RoomPage = () => {
 
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
-    const toggleTrack = (id: number) => {
-        setSelectedTracks(prev =>
-            prev?.includes(id)
-                ? prev.filter(trackId => trackId !== id)
-                : [...prev, id]
-        );
-    };
-
-    const deleteFromRoom = async () => {
+    const deleteFromRoom = async (id: number) => {
         if (!playlist?.id) return;
 
-        for (const trackId of selectedTracks) {
-            setSelectedTracks(prev => prev.filter(id => id !== trackId))
-        }
+        try {
+            await playlistService.removeFromQueue(playlist?.id, [id])
+        } finally {
 
-        await playlistService.removeFromQueue(playlist?.id, selectedTracks)
+        }
     }
 
     const saveRoom = async () => {
@@ -131,21 +123,31 @@ const RoomPage = () => {
                             />
                         </div>
 
-                        <div className={styles.trackList}>
-                            {playlist?.queue.slice()
-                                .sort((a, b) => a.position - b.position)
-                                .map(qi => (
-                                    <RoomTrack
-                                        key={qi.id}
-                                        queueItem={qi}
-                                        selected={selectedTracks.some(t => t == qi.id)}
-                                        selectMode={selectMode}
-                                        toggleTrack={toggleTrack}
-                                        playing={playbackState?.entryId === qi.id}
-                                    />
-                                ))
-                            }
-                        </div>
+                        <SelectableList
+                            className={styles.trackList}
+                            data={Object.fromEntries(
+                                    (playlist?.queue ?? [])
+                                        .slice()
+                                        .sort((a, b) => a.position - b.position)
+                                        .map(qi => [
+                                            qi.id,
+                                            <RoomTrack
+                                                key={qi.id}
+                                                queueItem={qi}
+                                                playing={playbackState?.entryId === qi.id}
+                                            />
+                                        ])
+                                )}
+                            extraActions={[
+                                {
+                                    title: "Remove from queue",
+                                    func: async (id: number) => await deleteFromRoom(id),
+                                    influence: "selected"
+                                }
+                            ]}
+                            selectMode={selectMode}
+                            setSelectMode={setSelectMode}
+                        />
 
                         <button 
                             className={styles.addTrack} 
@@ -154,47 +156,6 @@ const RoomPage = () => {
                             Add track
                         </button>
                     </div>
-
-                    {selectMode && (
-                        <div className={styles.selectedTracksActions}>
-                            <button 
-                                onClick={deleteFromRoom}
-                                className={styles.action}
-                            >
-                                Remove from queue
-                            </button>
-                            <button 
-                                className={styles.action}
-                                onClick={() => setSelectedTracks([])}
-                            >
-                                Clean selected
-                            </button>
-                            <button 
-                                className={styles.action}
-                                onClick={() =>  {
-                                    setSelectMode(false)
-                                    setSelectedTracks([])
-                                }}
-                            >
-                                Cancel
-                            </button>
-                            {selectedTracks.length === playlist?.queue.length ? (
-                                <button 
-                                    onClick={() => setSelectedTracks([])}
-                                    className={styles.action}
-                                >
-                                    Unselect all
-                                </button>
-                            ) : (
-                                <button 
-                                    onClick={() => setSelectedTracks(playlist?.queue.map(qi => qi.id) || [])}
-                                    className={styles.action}
-                                >
-                                    Select all
-                                </button>
-                            )}
-                        </div>
-                    )}
                 </Loader>
 
                 {started && <AudioMiniPlayer />}

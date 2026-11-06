@@ -49,16 +49,20 @@ export function useRoomData() {
         }
     }, [])
 
-    const reconnectToRoom = useCallback((client: Client, roomId: number) => {
-        if (!client) return;
+    const reconnectToRoom = useCallback(() => {
+        if (!client || !room?.id) return;
 
         logger.debug("переподключаемся к комнате")
 
         client.publish({
             destination: "/app/room/reconnect",
-            body: JSON.stringify({ roomId })
+            body: JSON.stringify({ roomId: room?.id })
         });
     }, [client])
+
+    useEffect(() => {
+        reconnectToRoom()
+    }, [room?.id, client])
 
     useEffect(() => {
         syncRoom()
@@ -89,8 +93,6 @@ export function useRoomData() {
                 });
 
                 currentRoomIdRef.current = shortRoom.id
-
-                reconnectToRoom(client, shortRoom.id)
             });
 
             return () => {

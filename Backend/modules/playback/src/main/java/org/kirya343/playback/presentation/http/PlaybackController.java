@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/playback")
 public class PlaybackController {
 
-    private final PlaybackStateRepository roomPlaybackStateRepository;
+    private final PlaybackStateRepository playbackStateRepository;
     private final PlaybackCommandWorker playbackCommandWorker;
     private final PlaybackService playbackService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
@@ -46,8 +46,9 @@ public class PlaybackController {
         @AuthUser UserAuthData authData
     ) {
 
-        PlaybackState state = roomPlaybackStateRepository.findById(roomId).orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        PlaybackState state = playbackStateRepository
+            .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return PlaybackStateDTO.ofState(state);
     }

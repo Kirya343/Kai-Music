@@ -67,6 +67,7 @@ public class UserAudioStreamWorker
 
         addLog("START STATE: entryId=%s, position=%s", state.entryId(), state.position());
 
+        initializeUser();
         tick();
     }
 
@@ -82,32 +83,32 @@ public class UserAudioStreamWorker
     private void fillBuffer() {
         try {
 
-        addLog("fillBuffer to user %s", userSub);
+            addLog("fillBuffer to user %s", userSub);
 
-        double buffered = bufferedUntil;
-        double target = getCurrentPosition() + BUFFER_SECONDS;
+            double buffered = bufferedUntil;
+            double target = getCurrentPosition() + BUFFER_SECONDS;
 
-        while (
-            buffered < target &&
-            chunker.hasNext()
-        ) {
-            addLog("buffered %s, target %s", buffered, target);
+            while (
+                buffered < target &&
+                chunker.hasNext()
+            ) {
+                addLog("buffered %s, target %s", buffered, target);
 
-            AudioChunk chunk;
+                AudioChunk chunk;
 
-            chunk = chunker.nextAudioChunk();
+                chunk = chunker.nextAudioChunk();
 
-            playbackWebsocketService.sendChunk(
-                userSub,
-                chunk,
-                currentState.entryId(),
-                streamId
-            );
+                playbackWebsocketService.sendChunk(
+                    userSub,
+                    chunk,
+                    currentState.entryId(),
+                    streamId
+                );
 
-            buffered += chunk.durationMs() / 1000.0;
-        }
+                buffered += chunk.durationMs() / 1000.0;
+            }
 
-        bufferedUntil = buffered;
+            bufferedUntil = buffered;
 
         } catch (IOException e) {
 
@@ -152,12 +153,6 @@ public class UserAudioStreamWorker
 
             bufferedUntil = 0.0;
             reloadChunker(currentState);
-            try {
-                initializeUser();
-                fillBuffer();
-            } catch (Exception e) {
-                log.error("Ошибка заполнения буфера пользователя {}: {}", userSub, e);
-            }
         }
 
         if (positionChanged && !trackChanged) {
@@ -208,8 +203,7 @@ public class UserAudioStreamWorker
             return currentState.position();
         }
 
-        double elapsed =
-            (System.currentTimeMillis() - playbackStartedAt) / 1000.0;
+        double elapsed = (System.currentTimeMillis() - playbackStartedAt) / 1000.0;
 
         return currentState.position() + elapsed;
     }

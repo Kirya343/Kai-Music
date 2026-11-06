@@ -15,3 +15,6 @@ acrcloud:
   access-key: ${ACRCLOUD_ACCESS_KEY}
   access-secret: ${ACRCLOUD_ACCESS_SECRET}
   timeout: 10s
+
+token:
+  threshold: "2026-11-06"

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.nimbusds.jose.jwk.RSAKey;
 
+import org.kirya343.security.config.AuthTokenConfiguration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +33,7 @@ import java.util.Map;
 public class JwtService {
 
     private final RSAKey rsaKey;
+    private final AuthTokenConfiguration authTokenConfiguration;
 
     /**
      * Проверяет токен, валидирует подпись и срок жизни
@@ -129,6 +133,19 @@ public class JwtService {
         }
         
         return userId;
+    }
+
+    public boolean isTokenOld(String token) {
+
+        if (authTokenConfiguration.getThreshold() == null) return false;
+
+        JWTClaimsSet claims = validate(token);
+
+        return claims.getIssueTime().before(Date.from(
+            LocalDate.parse(authTokenConfiguration.getThreshold())
+                .atStartOfDay(ZoneId.systemDefault())
+                .toInstant()
+        ));
     }
 
     public String validateAndGetEmail(String token) {

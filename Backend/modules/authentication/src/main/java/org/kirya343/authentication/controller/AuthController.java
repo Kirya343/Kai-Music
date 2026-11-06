@@ -82,6 +82,17 @@ public class AuthController {
 
             if (refreshToken == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nothing to refresh");
 
+            Boolean isTokenOld = jwtService.isTokenOld(refreshToken);
+
+            if (isTokenOld) {
+                cookiesService.deleteAuthCookies(response);
+
+                logger.debug("Token of user is old! Deleting...");
+
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("UserId is undefined");
+            }
+
             Long userId = jwtService.validateAndGetUserId(refreshToken);
 
             logger.debug("userId: {}", userId);

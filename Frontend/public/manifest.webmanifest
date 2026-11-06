@@ -12,7 +12,7 @@
     "prefer_related_applications": false,
     "icons": [
         {
-            "src": "/icons/logo.svg",
+            "src": "/image/logo.svg",
             "type": "image/svg+xml",
             "sizes": "400x400",
             "purpose": "any"

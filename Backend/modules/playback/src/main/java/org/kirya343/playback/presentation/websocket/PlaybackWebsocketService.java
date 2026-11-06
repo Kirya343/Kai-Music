@@ -26,7 +26,7 @@ public class PlaybackWebsocketService {
 
         Map<String, Object> headers = new HashMap<>();
 
-        headers.put("streamId", streamId);
+        headers.put("stream-id", streamId);
 
         log.debug("Sending state info to user {}, pos {}, qi {}", userSub, state.position(), state.entryId());
 

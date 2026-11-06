@@ -6,8 +6,6 @@ const logger = loggerFactory.getLogger("Audio.MediaSource");
 
 export const useMediaSource = () => {
 
-    logger.debug("Creating hook")
-
     const currentStreamIdRef = useRef<string | null>(null)
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -26,7 +24,8 @@ export const useMediaSource = () => {
     } = useAudioBuffer({ currentStreamIdRef, mediaSourceRef });
 
     const createMediaSource = useCallback<(streamId: string) => HTMLAudioElement | null>((streamId: string) => {
-        logger.debug("создаём новый mediaSource")
+        logger.debug("создаём новый mediaSource, streamId:", streamId)
+
         if (mediaSourceRef.current) {
             return audioRef.current;
         }

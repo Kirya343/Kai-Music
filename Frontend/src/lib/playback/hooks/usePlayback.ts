@@ -243,7 +243,7 @@ export const usePlayback = ({
 
                 const streamId = message.headers["stream-id"];
 
-                logger.debug("Пришло обновление playback: ", state)
+                logger.debug("Пришло обновление playback: ", state, streamId)
 
                 if (currentStreamIdRef.current !== streamId) {
                     startNewStream(streamId);

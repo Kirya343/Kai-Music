@@ -96,12 +96,16 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
 
     const processQueue = useCallback((streamId: string) => {
 
+        logger.debug('Собираем очередь: ', streamId);
+
         const sourceBuffer = sourceBufferRef.current;
         const mediaSource = mediaSourceRef.current;
 
         if (!sourceBuffer || !mediaSource) {
             return;
         }
+
+        logger.debug('Собираем очередь: ', streamId);
 
         if (
             mediaSource.readyState !== 'open' ||

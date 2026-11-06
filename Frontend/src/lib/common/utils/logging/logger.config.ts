@@ -12,7 +12,7 @@ const config: LoggerConfig = {
             Playback: "INFO",
         },
         WebSocket: "ERROR",
-        GlobalContext: "DEBUG",
+        GlobalContext: "INFO",
 
         HTTP: "NONE",
 

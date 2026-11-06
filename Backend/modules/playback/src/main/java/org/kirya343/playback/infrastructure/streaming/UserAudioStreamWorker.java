@@ -68,6 +68,7 @@ public class UserAudioStreamWorker
         addLog("START STATE: entryId=%s, position=%s", state.entryId(), state.position());
 
         initializeUser();
+
         tick();
     }
 
@@ -126,12 +127,6 @@ public class UserAudioStreamWorker
                 currentState != null &&
                 !currentState.entryId().equals(state.entryId())
             );
-        
-        boolean positionChanged =
-            currentState == null || (
-                currentState != null &&
-                !currentState.position().equals(state.position())
-            );
 
         currentState = state;
 
@@ -155,16 +150,14 @@ public class UserAudioStreamWorker
             reloadChunker(currentState);
         }
 
-        if (positionChanged && !trackChanged) {
-            addLog(
-                "SEEK POSITION: %s => %s",
-                previousState != null ? previousState.position() : "null",
-                currentState.position()
-            );
+        addLog(
+            "SEEK POSITION: %s => %s",
+            previousState != null ? previousState.position() : "null",
+            currentState.position()
+        );
 
-            chunker.seek(currentState.position());
-            bufferedUntil = currentState.position();
-        }
+        chunker.seek(currentState.position());
+        bufferedUntil = currentState.position();
     }
 
     private void initializeUser() {

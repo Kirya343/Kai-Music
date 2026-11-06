@@ -7,8 +7,8 @@
     "start_url": "https://music.workswap.org/?launchedfrom=homescreen",
     "scope": "https://music.workswap.org/",
     "display": "standalone",
-    "background_color": "#ffa348",
-    "theme_color": "#ffa348",
+    "background_color": "#15171b",
+    "theme_color": "#15171b",
     "prefer_related_applications": false,
     "icons": [
         {

@@ -11,11 +11,11 @@ interface usePlaybackProps {
     roomId: number | null;
 
     audio: HTMLAudioElement | null,
-    createMediaSource: (entryId: number) => HTMLAudioElement | null,
+    createMediaSource: (entryId: string) => HTMLAudioElement | null,
     cleanupMediaSource: () => void,
-    currentEntryIdRef: RefObject<number | null>
+    currentStreamIdRef: RefObject<string | null>
 
-    setBufferUpdateHandler: (callback: (entryId: number) => void) => void
+    setBufferUpdateHandler: (callback: (streamId: string) => void) => void
 }
 
 export const usePlayback = ({
@@ -24,7 +24,7 @@ export const usePlayback = ({
     audio, 
     createMediaSource, 
     cleanupMediaSource, 
-    currentEntryIdRef,
+    currentStreamIdRef,
 
     setBufferUpdateHandler
 }: usePlaybackProps) => {
@@ -219,20 +219,20 @@ export const usePlayback = ({
     /**
      * Inits media resource, when came new entryId
      */
-    const initMediaSource = useCallback((entryId: number) => {
+    const initMediaSource = useCallback((streamId: string) => {
 
-        const audio = createMediaSource(entryId);
+        const audio = createMediaSource(streamId);
 
         if (!audio) return;
 
         addTimeUpdateListener(audio);
     }, [addTimeUpdateListener, createMediaSource]);
 
-    const startNewAudio = useCallback((entryId: number) => {
+    const startNewStream = useCallback((streamId: string) => {
         logger.debug("Начинаем новый media resource");
 
         cleanupMediaSource();
-        initMediaSource(entryId);
+        initMediaSource(streamId);
     }, [cleanupMediaSource, initMediaSource]);
 
     useEffect(() => {
@@ -241,10 +241,12 @@ export const usePlayback = ({
             const playbackSub = client.subscribe(`/user/queue/playback`, (message) => {
                 const state: PlaybackState = JSON.parse(message.body);
 
+                const streamId = message.headers["stream-id"];
+
                 logger.debug("Пришло обновление playback: ", state)
 
-                if (currentEntryIdRef.current !== state.entryId) {
-                    startNewAudio(state.entryId);
+                if (currentStreamIdRef.current !== streamId) {
+                    startNewStream(streamId);
                 }
 
                 pendingSeekRef.current = false;

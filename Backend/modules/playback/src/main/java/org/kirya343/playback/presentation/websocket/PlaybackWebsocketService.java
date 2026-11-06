@@ -2,6 +2,7 @@ package org.kirya343.playback.presentation.websocket;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.kirya343.audio.dto.AudioChunk;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
@@ -19,20 +20,25 @@ public class PlaybackWebsocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void broadcastPlaybackState(String userSub, PlaybackStateDTO state) {
+    public void sendPlaybackState(String userSub, PlaybackStateDTO state, UUID streamId) {
 
         if (state == null) return;
+
+        Map<String, Object> headers = new HashMap<>();
+
+        headers.put("streamId", streamId);
 
         log.debug("Sending state info to user {}, pos {}, qi {}", userSub, state.position(), state.entryId());
 
         messagingTemplate.convertAndSendToUser(
             userSub,
             "/queue/playback",
-            state
+            state,
+            headers
         );
     }
     
-    public void sendChunk(String userSub, AudioChunk chunk, Long entryId) {
+    public void sendChunk(String userSub, AudioChunk chunk, Long entryId, UUID streamId) {
         
         Map<String, Object> headers = new HashMap<>();
 
@@ -47,6 +53,8 @@ public class PlaybackWebsocketService {
         headers.put("duration", chunk.durationMs());
         headers.put("entry-id", entryId);
         headers.put("initialization", chunk.initialization());
+
+        headers.put("stream-id", streamId);
 
         messagingTemplate.convertAndSendToUser(
             userSub,

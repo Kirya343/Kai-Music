@@ -7,7 +7,6 @@ import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.RoomCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
 import org.kirya343.playback.application.event.RoomPlaybackEvent;
-import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.model.RoomPlaybackContext;
 import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
@@ -30,7 +29,6 @@ public class PlaybackCommandWorker {
     private final ApplicationEventPublisher publisher;
     private final RoomPlaybackContextStore rooms;
     private final QueueService queueService;
-    private final PlaybackWebsocketService webSocketService;
     private final PlaybackExecutorRegistry executorRegistry;
     private final RoomStreamWorkerManager roomStreamWorkerManager;
     private final QueueItemRepository queueItemRepository;
@@ -116,9 +114,6 @@ public class PlaybackCommandWorker {
                     authData
                 ));
 
-            for (String user : roomContext.getListeners()) {
-                webSocketService.broadcastPlaybackState(user, state);
-            }   
         } catch (Exception e) {
             log.debug("Ошибка обработки команды комнаты: {}", e);
         }

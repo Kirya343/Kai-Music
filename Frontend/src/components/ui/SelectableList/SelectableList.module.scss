@@ -10,8 +10,31 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
 
     @include dirty-glass;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem;
+
+    .close {
+        aspect-ratio: 1;
+        padding: 0 0.7rem;
+        border-radius: 0.7rem;
+
+        @include glass;
+    }
+}
+
+.list {
+    width: 100%;
+    max-width: 800px;
 }
 
 .selectedTracksActions {

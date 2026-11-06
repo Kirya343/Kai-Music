@@ -111,6 +111,12 @@ export default function SelectableList<T extends ItemKey>({
 
     return selectMode && modalRoot ? createPortal(
         <div className={styles.menu}>
+            <div className={styles.header}>
+                <h2>Select tracks</h2>
+
+                <button className={styles.close} onClick={() => setSelectMode(false)}>✖</button>
+            </div>
+
             {renderList()}
 
             <div className={styles.selectedTracksActions}>

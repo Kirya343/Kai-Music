@@ -51,7 +51,7 @@ export function useRoomData() {
     const reconnectToRoom = useCallback(() => {
         if (!client || !room?.id) return;
 
-        logger.debug("переподключаемся к комнате")
+        logger.debug("переподключаемся к комнате", room?.id)
 
         client.publish({
             destination: "/app/room/reconnect",
@@ -127,6 +127,7 @@ export function useRoomData() {
     return {
         room,
         playlist,
-        synced
+        synced,
+        syncRoom
     }
 }

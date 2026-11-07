@@ -26,8 +26,8 @@ const AppRouter = () => {
                         <Route path="logout" element={<LogoutPage />} />
                     </Route>
 
-                    <Route path="app" element={<AppLayout />}>
-                        <Route element={<PrivateRoute/> }>
+                    <Route element={<PrivateRoute/> }>
+                        <Route path="app" element={<AppLayout />}>
 
                             <Route index element={<MainPage />} />
                         

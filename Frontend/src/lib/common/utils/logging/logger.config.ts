@@ -22,7 +22,7 @@ const config: LoggerConfig = {
         },
 
         Data: {
-            Room: "INFO"
+            Room: "DEBUG"
         }
     },
 

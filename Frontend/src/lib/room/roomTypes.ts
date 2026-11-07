@@ -12,7 +12,7 @@ interface RoomTemplate {
     title: string;
     ownerId: number;
     code: string;
-    listeners: IShortUser[];
+    listeners: IShortUser[] | null;
 }
 
 export interface IShortRoom extends RoomTemplate {

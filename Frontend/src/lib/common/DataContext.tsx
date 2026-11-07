@@ -66,6 +66,8 @@ interface IRoomData {
 
     /** Shows is data already synced or not */
     synced: boolean;
+
+    syncRoom: () => void
 }
 
 /**

@@ -61,8 +61,6 @@ public class RoomCommandService {
         ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
 
         eventPublisher.publishEvent(new RoomConnectedEvent(authData.sub(), newRoom.getId()));
-
-        roomWebSocketService.broadcastRoomInfo(authData.sub(), ShortRoomDTO.ofRoom(newRoom));
     }
 
     public void leaveRoom(UserAuthData authData) {

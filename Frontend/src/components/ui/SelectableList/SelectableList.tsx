@@ -190,7 +190,7 @@ export default function SelectableList<T extends ItemKey>({
             {renderList()}
 
             <button 
-                className={clsx(styles.trackingBtn, trackedItem && !isTrackingVisible && styles.active)} 
+                className={clsx(styles.trackingBtn, !!trackedItem && !isTrackingVisible && styles.active)} 
                 onClick={scrollToItem}
             >
                 {"Playing ->"}

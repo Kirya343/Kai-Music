@@ -103,7 +103,7 @@ const RoomPage = () => {
                         </div>
 
                         <div className={styles.members}>
-                            <AvatarStack users={room?.listeners} />
+                            <AvatarStack users={room?.listeners || []} />
                             {room?.listeners?.length || 0} Listners
                         </div>
                     </div>

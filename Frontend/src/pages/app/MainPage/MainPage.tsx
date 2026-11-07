@@ -10,11 +10,13 @@ import {
 import JoinRoomModal from "@/components/modals/JoinRoomModal/JoinRoomModal";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout/PageLayout";
-import { loggerFactory } from "@common";
+import { loggerFactory, useData } from "@common";
 
 const logger = loggerFactory.getLogger("Pages.Main");
 
 const MainPage = () => {
+
+    const { roomData } = useData()
 
     const [rooms, setRooms] = useState<IShortRoom[] | null>(null);
     const [isOpen, setOpen] = useState<boolean>(false);
@@ -46,6 +48,7 @@ const MainPage = () => {
     const joinRoom = async (code: string) => {
         try {
             await roomService.joinRoom(code);
+            roomData.syncRoom();
             navigate("/app/room");
         } catch (e) {
             logger.error(e);

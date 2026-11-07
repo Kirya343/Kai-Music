@@ -10,7 +10,7 @@ const ProfilePage = () => {
         <div className={styles.page}>
             Your name is {user?.name}
 
-            <Link to={"/logout"} className="btn">Выйти из аккаунта</Link>
+            <Link to={"/logout"} className={styles.logout}>Logout</Link>
         </div>
     );
 }

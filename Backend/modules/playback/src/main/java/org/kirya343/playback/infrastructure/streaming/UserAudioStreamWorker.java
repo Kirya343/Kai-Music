@@ -145,9 +145,6 @@ public class UserAudioStreamWorker
                 previousState != null ? previousState.entryId() : "null",
                 currentState.entryId()
             );
-
-            bufferedUntil = 0.0;
-            reloadChunker(currentState);
         }
 
         addLog(
@@ -156,6 +153,7 @@ public class UserAudioStreamWorker
             currentState.position()
         );
 
+        reloadChunker(currentState);
         chunker.seek(currentState.position());
         bufferedUntil = currentState.position();
     }

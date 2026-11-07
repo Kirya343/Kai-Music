@@ -5,7 +5,7 @@ import java.lang.management.ManagementFactory;
 
 import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorkerManager;
-import org.kirya343.presence.services.PresenceService;
+import org.kirya343.presence.global.services.PresenceService;
 import org.springframework.stereotype.Component;
 
 import io.github.kirya343.terminal.api.command.DiagnosticCommand;
@@ -42,7 +42,7 @@ public class StatsCommand implements DiagnosticCommand {
 
                 builder.addRow(String.format("Memory usage: %.2f MB%n", getUsedMemory()));
 
-                builder.addRow("Online users: " + presenceService.countAll());
+                builder.addRow("Online users: " + presenceService.countOnline());
 
                 builder.addRow("Uptime: " + getUptime());
 

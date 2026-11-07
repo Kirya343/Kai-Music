@@ -45,7 +45,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
             r.owner_id AS ownerId,
             r.code,
-            COUNT(DISTINCT up.user_id) AS membersCount,
+            null,
             r.playlist_id AS playlistId
         FROM listening_room r
         JOIN users u ON u.id = r.owner_id
@@ -68,7 +68,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
             r.owner_id AS ownerId,
             r.code,
-            COUNT(DISTINCT up.user_id) AS membersCount,
+            null,
             r.playlist_id AS playlistId
         FROM listening_room r
         JOIN users u ON u.id = r.owner_id

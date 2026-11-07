@@ -2,7 +2,7 @@ import { useState } from "react";
 import { IRoomUpdate, roomService } from "@room";
 import styles from "./RoomPage.module.scss";
 import AudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/MobileAudioMiniPlayer";
-import { useData, useGlobal } from "@common";
+import { getRandomPastelColor, useData, useGlobal } from "@common";
 import { useWebSocket } from "@websocket";
 import KebabMenu from "@/components/ui/KebabMenu/KebabMenu";
 import { CheckBoxIcon, PlusIcon, ShuffleIcon } from "@/assets/icons";
@@ -56,6 +56,8 @@ const RoomPage = () => {
     if (!room) {
         return <Navigate to={"/app"}/>
     }
+
+    console.log(room)
     
     return (
         <>
@@ -91,7 +93,14 @@ const RoomPage = () => {
                         </div>
 
                         <div className={styles.members}>
-                            {room?.listeners} Listners
+                            {/* <div className={styles.avatarStack}>
+                                {room?.listeners?.map(listener => (
+                                    <span style={{ backgroundColor: getRandomPastelColor() }}>
+                                        {listener.name.charAt(0)}
+                                    </span>
+                                ))}
+                            </div> */}
+                            {room?.listeners?.length || 0} Listners
                         </div>
                     </div>
 

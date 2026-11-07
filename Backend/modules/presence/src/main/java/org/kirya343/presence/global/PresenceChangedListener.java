@@ -1,7 +1,7 @@
-package org.kirya343.presence;
+package org.kirya343.presence.global;
 
-import org.kirya343.presence.event.PresenceChangedEvent;
-import org.kirya343.presence.services.PresenceService;
+import org.kirya343.presence.global.event.PresenceChangedEvent;
+import org.kirya343.presence.global.services.PresenceService;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 

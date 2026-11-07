@@ -2,7 +2,7 @@ package org.kirya343.room.controller;
 
 import java.util.List;
 
-import org.kirya343.presence.services.PresenceService;
+import org.kirya343.presence.global.services.PresenceService;
 import org.kirya343.room.services.RoomCommandService;
 import org.kirya343.room.services.RoomQueryService;
 import org.kirya343.room.datasource.ListeningRoom;
@@ -77,7 +77,7 @@ public class RoomController {
 
         return new MainPageRequest(
             rooms,
-            presenceService.countAll(),
+            presenceService.countOnline(),
             roomsCount
         );
     }

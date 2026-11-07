@@ -75,7 +75,9 @@ public class RoomPlaybackContextStore {
 
         RoomPlaybackContext roomContext = rooms.get(roomId);
 
-        for (String user : roomContext.getListeners()) {
+        roomContext.setRoom(ShortRoomDTO.updateMembers(roomContext.getRoom(), roomContext.getPresence().getOnlineUsers()));
+
+        for (String user : roomContext.getPresence().getSubs()) {
             roomWebSocketService.broadcastRoomInfo(user, roomContext.getRoom());
         }
     }

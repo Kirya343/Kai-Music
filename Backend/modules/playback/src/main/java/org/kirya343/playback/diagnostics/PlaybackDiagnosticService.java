@@ -4,6 +4,7 @@ import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.playback.domain.model.RoomPlaybackContext;
 import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
 import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
+import org.kirya343.user.dto.ShortUserDTO;
 import org.springframework.stereotype.Service;
 
 import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
@@ -31,7 +32,12 @@ public class PlaybackDiagnosticService {
         return new DiagnosticTextBuilder()
             .setTitle("Room: " + roomId)
             .addRow("Status: ONLINE")
-            .addRow("Listeners: " + context.getListeners())
+            .addRow("Listeners: " + context.getPresence()
+                    .getOnlineUsers()
+                    .stream()
+                    .map(ShortUserDTO::name)
+                    .toList()
+            )
             .addRow( "Playing Audio: " + (audio != null ? audio.getName() : null));
     }
 

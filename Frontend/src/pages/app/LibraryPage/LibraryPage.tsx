@@ -7,27 +7,22 @@ import LibraryTrack from "@/components/ui/track/LibraryTrack";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData } from "@common";
 import { useRoomPlayback } from "@playback";
+import SelectableList from "@/components/ui/SelectableList/SelectableList";
 
 const LibraryPage = () => {
 
     const { audiosData, roomData } = useData();
+    const [selectMode, setSelectMode] = useState<boolean>(false);
 
     const {
         setSearchQuery,
         searchQuery, uploadAudios,
-        uploading, visibleAudios, filteredList,
-        visibleItems, setVisiblItems
+        uploading, filteredList,
     } = useLibrary();
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
     
     const { playbackState } = useRoomPlayback();
-
-    const playlistAudioIds = useMemo(() => {
-        return new Set(
-            roomData.playlist?.queue.map(item => item.audio.id)
-        );
-    }, [roomData.playlist?.queue]);
 
     const playingAudioId = useMemo(() => {
         return roomData.playlist?.queue.find(
@@ -70,24 +65,31 @@ const LibraryPage = () => {
                 </>
             )}
                 
-            <div className={styles.trackList}>
-                {visibleAudios.map((audio, idx) => (
-                    <LibraryTrack
-                        key={idx}
-                        audio={audio}
-                        trackNumber={idx + 1}
-                        importPlaylistId={roomData.playlist?.id}
-                        openEditModal={setAudioFileView}
-                        handleDelete={audiosData.deleteAudio}
-                        playing={playingAudioId === audio.id}
-                    />
-                ))}
-
-                {visibleItems < filteredList.length && (
-                    <button className={styles.loadMore} onClick={() => setVisiblItems(prev => prev + 50)}>Load more</button>
+            <SelectableList
+                className={styles.trackList}
+                data={Object.fromEntries(
+                    filteredList
+                        .slice()
+                        .sort((a, b) => a.id - b.id)
+                        .map((audio, idx) => [
+                            audio.id,
+                            <LibraryTrack
+                                key={idx}
+                                audio={audio}
+                                trackNumber={idx + 1}
+                                importPlaylistId={roomData.playlist?.id}
+                                openEditModal={setAudioFileView}
+                                handleDelete={audiosData.deleteAudio}
+                                playing={playingAudioId === audio.id}
+                            />
+                        ])
                 )}
-                
-            </div>
+                extraActions={[]}
+                selectMode={selectMode}
+                setSelectMode={setSelectMode}
+                trackedItem={playbackState?.entryId}
+                initialVisible={50}
+            />
 
             <input 
                 type="file"

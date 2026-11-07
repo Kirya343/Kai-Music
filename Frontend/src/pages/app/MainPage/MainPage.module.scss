@@ -173,34 +173,3 @@
         font-size: 0.8rem;
     }
 }
-
-.avatarStack {
-    display: flex;
-    align-items: center;
-
-    span {
-        display: grid;
-        place-items: center;
-        width: 26px;
-        height: 26px;
-        margin-left: -5px;
-        border: 2px solid #1a1a1d;
-        border-radius: 50%;
-        background: #b76e3a;
-        color: white;
-        font-size: 9px;
-        font-weight: 700;
-
-        &:first-child {
-            margin-left: 0;
-        }
-
-        &:nth-child(2) {
-            background: #765a9b;
-        }
-
-        &:nth-child(3) {
-            background: #527e83;
-        }
-    }
-}

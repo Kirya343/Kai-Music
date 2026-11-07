@@ -8,7 +8,7 @@ export function countPosition(position: number) {
     return `${Math.floor(position / 60)}:${Math.floor(position % 60).toString().padStart(2, '0')}`
 }
 
-export function getRandomPastelColor() {
-    const hue = Math.floor(Math.random() * 360);
-    return `hsl(${hue}, 65%, 85%)`;
+export function getRandomColor() {
+    const hue = 200 + Math.random() * 80;
+    return `hsl(${hue}, 85%, 60%)`;
 };

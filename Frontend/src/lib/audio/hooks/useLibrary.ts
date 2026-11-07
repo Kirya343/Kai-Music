@@ -27,8 +27,6 @@ export const useLibrary = () => {
 
     const { filteredList, searchQuery, setSearchQuery } = useSearch(audiosData.data);
 
-    const [visibleItems, setVisiblItems] = useState<number>(50);
-
     /** Uploads audios on server */
     const uploadAudios = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -96,9 +94,6 @@ export const useLibrary = () => {
     return { 
         setSearchQuery, searchQuery, 
         uploadAudios, uploading,
-        visibleAudios: filteredList.slice(0, visibleItems),
-        filteredList,
-        visibleItems,
-        setVisiblItems
+        filteredList
     };
 }

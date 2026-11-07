@@ -1,4 +1,4 @@
-import { Dispatch, HTMLAttributes, ReactNode, SetStateAction, useMemo, useState } from "react"
+import { Dispatch, HTMLAttributes, ReactNode, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom";
 import styles from "./SelectableList.module.scss"
 import clsx from "clsx";
@@ -6,9 +6,11 @@ import KebabMenu from "../KebabMenu/KebabMenu";
 
 interface SelectableListProps<T extends ItemKey> extends HTMLAttributes<HTMLDivElement> {
     data: Record<T, ReactNode>;
-    extraActions: ListAction<T>[],
-    selectMode: boolean,
-    setSelectMode: Dispatch<SetStateAction<boolean>>
+    extraActions: ListAction<T>[];
+    selectMode: boolean;
+    setSelectMode: Dispatch<SetStateAction<boolean>>;
+    trackedItem?: T;
+    initialVisible?: number | "all";
 }
 
 interface ListActionBase {
@@ -34,11 +36,14 @@ export default function SelectableList<T extends ItemKey>({
     extraActions, 
     selectMode,
     setSelectMode,
+    trackedItem,
+    initialVisible = 50,
     ...props
 }: SelectableListProps<T>) {
 
     const allItems = Object.keys(data) as T[];
 
+    // SELECT feature
     const [selectedItems, setSelectedItems] = useState<T[]>([]);
 
     const toggleItem = (id: T) => {
@@ -64,6 +69,42 @@ export default function SelectableList<T extends ItemKey>({
                 break;
         }
     };
+
+    //LIST OPTIMIZATION FEATURE
+
+    const [visibleCount, setVisiblCount] = useState<number>(() => 
+        initialVisible == "all" ? allItems.length : initialVisible
+    );
+
+    const visibleItems = allItems.slice(0, visibleCount)
+
+    //SCROLL TO NEEDED feature
+    const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+    const scrollToItem = () => {
+        itemRefs.current[String(trackedItem)]?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+    };
+
+    const [isTrackingVisible, setIsTrackingVisible] = useState(false);
+
+    useEffect(() => {
+        const element = itemRefs.current[String(trackedItem)];
+
+        if (!element) return;
+
+        const observer = new IntersectionObserver(([entry]) => {
+            setIsTrackingVisible(entry.isIntersecting);
+        });
+
+        observer.observe(element);
+
+        return () => observer.disconnect();
+    }, [trackedItem, visibleItems]);
+
+    // ACTIONS feature
 
     const actions = useMemo<ListAction<T>[]>(() => {
         let array: ListAction<T>[] = [
@@ -92,17 +133,24 @@ export default function SelectableList<T extends ItemKey>({
     const renderList = () => {
         return (
             <div className={clsx(styles.list, className, selectMode && styles.open)} {...props}>
-                {(Object.keys(data) as T[]).map(id => (
+                {visibleItems.map(id => (
                     <SelectableItem
                         key={id}
                         id={id}
                         onSelect={toggleItem}
                         selected={selectedItems.includes(id)}
                         selectMode={selectMode}
+                        refCallback={el => {
+                            itemRefs.current[String(id)] = el;
+                        }}
                     >
                         {data[id]}
                     </SelectableItem>
                 ))}
+
+                {visibleCount < allItems.length && (
+                    <button className={styles.loadMore} onClick={() => setVisiblCount(prev => prev + 50)}>Show more</button>
+                )}
             </div>
         )
     }
@@ -137,7 +185,18 @@ export default function SelectableList<T extends ItemKey>({
                 />
             </div>
         </div>, modalRoot
-    ) : renderList();
+    ) : (
+        <div className={styles.wrapper}>
+            {renderList()}
+
+            <button 
+                className={clsx(styles.trackingBtn, !trackedItem && isTrackingVisible && styles.active)} 
+                onClick={scrollToItem}
+            >
+                {"Playing ->"}
+            </button>
+        </div>
+    );
 }
 
 function SelectableItem<T extends ItemKey>({
@@ -145,24 +204,29 @@ function SelectableItem<T extends ItemKey>({
     children,
     onSelect,
     selectMode,
-    selected
+    selected,
+    refCallback
 }: {
     id: T;
     children: ReactNode;
     onSelect: (id: T) => void;
     selectMode: boolean;
     selected: boolean;
+    refCallback: (el: HTMLDivElement | null) => void;
 }) {
 
-    const handleClick = () => {
+    const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        event.stopPropagation();
+
         if (selectMode) {
             onSelect(id);
         }
-    }
+    };
 
     return (
         <div
-            className={styles.selectableItem}
+            ref={refCallback}
+            className={clsx(styles.selectableItem, selectMode && styles.selectMode)}
             onClick={selectMode ? handleClick : undefined}
         >
             {selectMode && (

@@ -4,7 +4,6 @@ import { roomService } from "../services";
 import { useWebSocket } from "@websocket";
 import { Playlist } from "@playlist";
 import { loggerFactory } from "@common";
-import { Client } from "@stomp/stompjs";
 
 const logger = loggerFactory.getLogger("Data.Room");
 

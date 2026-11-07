@@ -1,5 +1,6 @@
 import { Playlist } from "@playlist";
 import { IAudio } from "../audio";
+import { IShortUser } from "@user";
 
 export interface IListeningRoom extends RoomTemplate {
     audio: IAudio;
@@ -11,7 +12,7 @@ interface RoomTemplate {
     title: string;
     ownerId: number;
     code: string;
-    listeners: number;
+    listeners: IShortUser[];
 }
 
 export interface IShortRoom extends RoomTemplate {

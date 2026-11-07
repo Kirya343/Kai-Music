@@ -1,9 +1,9 @@
-package org.kirya343.presence.services;
+package org.kirya343.presence.global.services;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.presence.UserPresence;
+import org.kirya343.presence.global.UserPresence;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,11 @@ public class PresenceService {
         updatePresence(userSub, UserPresence.OFFLINE);
     }
 
-    public long countAll() {
-        return presences.size();
+    public long countOnline() {
+        return presences.values()
+            .stream()
+            .filter(p -> p == UserPresence.ONLINE)
+            .count();
     }
 
     public void updatePresence(String userSub, UserPresence presence) {

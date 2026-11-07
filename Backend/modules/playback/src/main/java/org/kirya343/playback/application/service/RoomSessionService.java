@@ -7,7 +7,9 @@ import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
 import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorkerManager;
+import org.kirya343.user.datasource.User;
 import org.kirya343.user.datasource.UserRepository;
+import org.kirya343.user.dto.ShortUserDTO;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -24,9 +26,9 @@ public class RoomSessionService {
     private final UserPlaybackRepository userPlaybackRepository;
     private final UserRepository userRepository;
     
-    public void initializeRoom(Long roomId, String userSub) {
+    public void initializeRoom(Long roomId, ShortUserDTO user) {
 
-        roomPlaybackContextStore.computeIfAbsent(roomId).getListeners().add(userSub);
+        roomPlaybackContextStore.computeIfAbsent(roomId).getPresence().userConnected(user);
 
         roomPlaybackContextStore.listenersUpdated(roomId);
     }
@@ -36,11 +38,11 @@ public class RoomSessionService {
 
         //TODO Убрать, перенеделать на простую модель
 
-        Long userId = userRepository.findBySub(userSub).orElseThrow().getId();
+        User user = userRepository.findBySub(userSub).orElseThrow();
 
-        userPlaybackRepository.save(new UserPlayback(userId, roomId, PlaybackTargetType.ROOM));
+        userPlaybackRepository.save(new UserPlayback(user.getId(), roomId, PlaybackTargetType.ROOM));
 
-        initializeRoom(roomId, userSub);
+        initializeRoom(roomId, ShortUserDTO.ofUser(user));
 
         UserAudioStreamWorker userWorker = userAudioStreamWorkerManager.getWorker(userSub);
 

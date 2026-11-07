@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IRoomUpdate, roomService } from "@room";
 import styles from "./RoomPage.module.scss";
 import AudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/MobileAudioMiniPlayer";
-import { useData, useGlobal } from "@common";
+import { getRandomColor, useData, useGlobal } from "@common";
 import { useWebSocket } from "@websocket";
 import KebabMenu from "@/components/ui/KebabMenu/KebabMenu";
 import { CheckBoxIcon, PlusIcon, ShuffleIcon } from "@/assets/icons";
@@ -14,6 +14,7 @@ import { useRoomPlayback } from "@playback";
 import { Navigate } from "react-router-dom";
 import { loggerFactory } from "@common";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
+import AvatarStack from "@/components/ui/AvatarStack/AvatarStack";
 
 const logger = loggerFactory.getLogger("Pages.Room");
 
@@ -53,9 +54,20 @@ const RoomPage = () => {
         }
     }
 
+    const itemRefs = useRef<Record<string | number, HTMLDivElement | null>>({});
+
+    const scrollToItem = (id: number) => {
+        itemRefs.current[id]?.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
+    };
+
     if (!room) {
         return <Navigate to={"/app"}/>
     }
+
+    console.log(room)
     
     return (
         <>
@@ -91,7 +103,8 @@ const RoomPage = () => {
                         </div>
 
                         <div className={styles.members}>
-                            {room?.listeners} Listners
+                            <AvatarStack users={room?.listeners} />
+                            {room?.listeners?.length || 0} Listners
                         </div>
                     </div>
 
@@ -126,18 +139,18 @@ const RoomPage = () => {
                         <SelectableList
                             className={styles.trackList}
                             data={Object.fromEntries(
-                                    (playlist?.queue ?? [])
-                                        .slice()
-                                        .sort((a, b) => a.position - b.position)
-                                        .map(qi => [
-                                            qi.id,
-                                            <RoomTrack
-                                                key={qi.id}
-                                                queueItem={qi}
-                                                playing={playbackState?.entryId === qi.id}
-                                            />
-                                        ])
-                                )}
+                                (playlist?.queue ?? [])
+                                    .slice()
+                                    .sort((a, b) => a.position - b.position)
+                                    .map(qi => [
+                                        qi.id,
+                                        <RoomTrack
+                                            key={qi.id}
+                                            queueItem={qi}
+                                            playing={playbackState?.entryId === qi.id}
+                                        />
+                                    ])
+                            )}
                             extraActions={[
                                 {
                                     title: "Remove from queue",
@@ -147,6 +160,8 @@ const RoomPage = () => {
                             ]}
                             selectMode={selectMode}
                             setSelectMode={setSelectMode}
+                            trackedItem={playbackState?.entryId}
+                            initialVisible={"all"}
                         />
 
                         <button 

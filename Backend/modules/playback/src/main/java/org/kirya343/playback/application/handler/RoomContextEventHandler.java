@@ -23,7 +23,7 @@ public class RoomContextEventHandler {
 
         RoomPlaybackContext roomContext = roomPlaybackContextStore.get(event.roomId());
 
-        for (String user : roomContext.getListeners()) {
+        for (String user : roomContext.getPresence().getSubs()) {
             roomWebSocketService.broadcastRoomInfo(user, roomContext.getRoom());
         }
     }

@@ -1,5 +1,22 @@
 @use "@/css/components/mixins/" as *;
 
+.wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.list {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
 .menu {
     position: fixed;
     top: 0;
@@ -12,6 +29,10 @@
     gap: 0.5rem;
     justify-content: center;
     align-items: center;
+
+    .list {
+        max-width: 800px;
+    }
 
     @include dirty-glass;
 }
@@ -30,11 +51,6 @@
 
         @include glass;
     }
-}
-
-.list {
-    width: 100%;
-    max-width: 800px;
 }
 
 .selectedTracksActions {
@@ -60,9 +76,49 @@
     align-items: center;
     gap: 0.75rem;
     min-width: 0;
+    cursor: pointer;
 
     > :last-child {
         flex: 1;
         min-width: 0;
     }
+
+    &.selectMode > * {
+        pointer-events: none;
+    }
+}
+
+.trackingBtn {
+    right: 10px;
+    bottom: 10px;
+    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 1rem;
+    border: 1px solid;
+    transform: translateY(50px);
+
+    @include dirty-glass(true);
+
+    position: absolute;
+    opacity: 0;
+
+    transition: 
+        transform 0.2s ease 0.1s,
+        opacity 0.3s ease;
+
+    &.active {
+        transform: translateY(0);
+        opacity: 1;
+        transition: 
+            transform 0.3s ease 0.1s,
+            opacity 0.1s ease 0.3s;
+    }
+}
+
+.loadMore {
+    border-radius: 8px;
+    border: 1px solid;
+    padding: 10px 16px;
+
+    @include glass(true);
 }

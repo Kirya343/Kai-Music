@@ -38,12 +38,12 @@ public class AudioUserEventHandler {
         UserAudioStreamWorker userWorker = userAudioStreamWorkerManager.getWorker(event.authData().sub());
 
         if (context != null) {
-            context.getListeners().remove(event.authData().sub());
+            context.getPresence().userDisconnected(event.authData().sub());
             roomPlaybackContextStore.listenersUpdated(room.getId());
 
             roomStreamWorkerManager.getWorker(room.getId()).removeUserWorker(userWorker);
 
-            if (context.getListeners().size() == 0) {
+            if (context.getPresence().getSubs().size() == 0) {
                 roomStreamWorkerManager.removeWorker(room.getId());
             }
         }

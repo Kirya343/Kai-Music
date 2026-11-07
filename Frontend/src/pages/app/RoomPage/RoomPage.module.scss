@@ -70,6 +70,9 @@
 .members {
     border-radius: 10px;
     padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 
     @include glass;
 }

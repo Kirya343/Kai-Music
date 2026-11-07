@@ -1,6 +1,6 @@
-package org.kirya343.presence;
+package org.kirya343.presence.global;
 
-import org.kirya343.presence.services.PresenceService;
+import org.kirya343.presence.global.services.PresenceService;
 import org.kirya343.user.dto.event.UserConnectedEvent;
 import org.kirya343.user.dto.event.UserDisconnectedEvent;
 import org.springframework.context.event.EventListener;

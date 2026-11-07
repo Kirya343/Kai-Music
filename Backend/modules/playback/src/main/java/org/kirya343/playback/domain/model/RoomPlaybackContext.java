@@ -1,9 +1,7 @@
 package org.kirya343.playback.domain.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.kirya343.audio.datasource.AudioFile;
+import org.kirya343.presence.room.RoomPresence;
 import org.kirya343.room.dto.ShortRoomDTO;
 
 import lombok.Getter;
@@ -17,17 +15,15 @@ public class RoomPlaybackContext {
         AudioFile currentAudio,
         ShortRoomDTO room
     ) {
-        this.listeners = new HashSet<>();
         this.currentAudio = currentAudio;
         this.room = room;
     }
-
-    @Setter
-    private Set<String> listeners;
 
     @Setter 
     private AudioFile currentAudio;
 
     @Setter
     private ShortRoomDTO room;
+
+    private final RoomPresence presence = new RoomPresence();
 }

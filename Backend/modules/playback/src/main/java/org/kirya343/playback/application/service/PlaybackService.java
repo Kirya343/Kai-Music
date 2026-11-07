@@ -26,7 +26,7 @@ public class PlaybackService {
         switch (targetType) {
             case ROOM:
                 
-                Set<String> listners = roomPlaybackContextStore.get(targetId).getListeners();
+                Set<String> listners = roomPlaybackContextStore.get(targetId).getPresence().getSubs();
 
                 for (String user : listners) {
                     playbackWebsocketService.sendPlaybackMode(user, mode);

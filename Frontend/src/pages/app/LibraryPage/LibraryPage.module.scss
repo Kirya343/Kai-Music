@@ -5,21 +5,12 @@
     flex-direction: column;
     gap: 0.5rem;
 
-    flex: 0 0 auto;
     min-height: 0;
     min-width: 0;
 
     @include mobile {
         width: 100%;
     }
-}
-
-.loadMore {
-    border-radius: 8px;
-    border: 1px solid;
-    padding: 10px 16px;
-
-    @include glass(true);
 }
 
 .track {

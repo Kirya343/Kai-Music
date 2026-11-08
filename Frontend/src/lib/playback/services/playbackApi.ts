@@ -30,3 +30,6 @@ export const updateTrackPosition = (roomId: number, state: PlaybackState) =>
 
 export const setPlaylistPlaybackMode = (targetId: number, targetType: PlaybackTargetType, mode: PlaybackMode) => 
     playbackApi.post<void>(`/${targetId}/mode`, {}, { params: { mode, targetType }})
+
+export const subscribe = (targetType: string, targetId: number) => playbackApi.post<void>(`/subscribe`, {}, { params: { targetType, targetId }})
+export const unsubscribe = () => playbackApi.post<void>(`/unsubscribe`)

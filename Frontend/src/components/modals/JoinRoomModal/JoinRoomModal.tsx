@@ -4,6 +4,7 @@ import styles from "./JoinRoomModal.module.scss"
 import Modal from "@/components/modals/Modal/Modal";
 import { useNavigate } from "react-router-dom";
 import { loggerFactory } from "@common";
+import { playbackService } from "@playback";
 
 const logger = loggerFactory.getLogger("Component.JoinRoomModal");
 
@@ -30,7 +31,7 @@ const JoinRoomModal = ({
      */
     const joinRoom = async () => {
         try {
-            await roomService.joinRoom(code);
+            await playbackService.joinRoom(code);
             navigate("/app/room");
         } catch (e) {
             logger.error(e)

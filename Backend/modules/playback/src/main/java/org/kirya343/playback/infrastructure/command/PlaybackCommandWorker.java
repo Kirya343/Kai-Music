@@ -1,17 +1,13 @@
 package org.kirya343.playback.infrastructure.command;
 
-import java.util.concurrent.ThreadPoolExecutor;
-
-import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.application.command.ChangeTrack;
-import org.kirya343.playback.application.command.RoomCommand;
+import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
-import org.kirya343.playback.application.event.RoomPlaybackEvent;
+import org.kirya343.playback.application.event.PlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
-import org.kirya343.playback.domain.model.RoomPlaybackContext;
-import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
-import org.kirya343.playback.infrastructure.streaming.RoomStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
+import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.security.core.dto.UserAuthData;
@@ -27,28 +23,17 @@ import lombok.extern.slf4j.Slf4j;
 public class PlaybackCommandWorker {
 
     private final ApplicationEventPublisher publisher;
-    private final RoomPlaybackContextStore rooms;
     private final QueueService queueService;
-    private final PlaybackExecutorRegistry executorRegistry;
-    private final RoomStreamWorkerManager roomStreamWorkerManager;
     private final QueueItemRepository queueItemRepository;
+    private final AudioStreamWorkerManager audioStreamWorkerManager;
 
-    public void submit(RoomCommand cmd) {
-
-        ThreadPoolExecutor executor = executorRegistry.get(cmd.roomId());
-
-        log.debug("Submit command {}", cmd.getClass());
-        
-        executor.submit(() -> handle(cmd));
-    }
-
-    private void handle(RoomCommand cmd) {
-        RoomPlaybackContext roomContext = rooms.computeIfAbsent(cmd.roomId());
+    public void handle(PlaybackCommand cmd) {
 
         UserAuthData authData = cmd.user();
-        Long roomId = roomContext.getRoom().id();
 
-        RoomStreamWorker streamWorker = roomStreamWorkerManager.getWorker(roomContext.getRoom().id());
+        PlaybackStreamWorker playbackWorker = audioStreamWorkerManager
+            .get(authData.sub())
+            .getSubscribedWorker();
 
         PlaybackStateDTO state = null;
 
@@ -65,13 +50,19 @@ public class PlaybackCommandWorker {
                     switch (c.changing()) {
                         case "prev":
 
-                            entry = queueService.prevTrack(roomId);
+                            entry = queueService.prevTrack(
+                                playbackWorker.getTargetId(),
+                                playbackWorker.getTargetType()
+                            );
 
                             break;
 
                         case "next":
 
-                            entry = queueService.nextTrack(roomId);
+                            entry = queueService.prevTrack(
+                                playbackWorker.getTargetId(),
+                                playbackWorker.getTargetType()
+                            );
                             
                             break;
                     
@@ -97,19 +88,19 @@ public class PlaybackCommandWorker {
                         false
                     );
 
-                    roomContext.setCurrentAudio(
-                        entry.getAudio()
-                    );
+
+                    playbackWorker.setCurrentAudio(entry.getAudio());
 
                 }
                 default -> throw new RuntimeException("Введена неверная команда");
             };
 
-            streamWorker.applyState(state);
+            playbackWorker.applyState(state);
 
             publisher.publishEvent(
-                new RoomPlaybackEvent(
-                    roomContext.getRoom().id(), 
+                new PlaybackEvent(
+                    playbackWorker.getTargetId(),
+                    playbackWorker.getTargetType(), 
                     state, 
                     authData
                 ));

@@ -1,10 +1,6 @@
 package org.kirya343.playback.application.handler;
 
-import org.kirya343.playback.domain.model.RoomPlaybackContext;
-import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
-import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
 import org.kirya343.user.dto.event.UserDisconnectedEvent;
@@ -19,9 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class AudioUserEventHandler {
 
     private final ListeningRoomRepository listeningRoomRepository;
-    private final RoomPlaybackContextStore roomPlaybackContextStore;
-    private final UserAudioStreamWorkerManager userAudioStreamWorkerManager;
-    private final RoomStreamWorkerManager roomStreamWorkerManager;
+    private final AudioStreamWorkerManager audioStreamWorkerManager;
 
     @Async
     @EventListener
@@ -33,21 +27,6 @@ public class AudioUserEventHandler {
 
         if (room == null) return;
 
-        RoomPlaybackContext context = roomPlaybackContextStore.get(room.getId());
-
-        UserAudioStreamWorker userWorker = userAudioStreamWorkerManager.getWorker(event.authData().sub());
-
-        if (context != null) {
-            context.getPresence().userDisconnected(event.authData().sub());
-            roomPlaybackContextStore.listenersUpdated(room.getId());
-
-            roomStreamWorkerManager.getWorker(room.getId()).removeUserWorker(userWorker);
-
-            if (context.getPresence().getSubs().size() == 0) {
-                roomStreamWorkerManager.removeWorker(room.getId());
-            }
-        }
-
-        userAudioStreamWorkerManager.removeWorker(event.authData().sub());
+        audioStreamWorkerManager.unregister(event.authData().sub());
     }
 }

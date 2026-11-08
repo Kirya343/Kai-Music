@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service 
 @Slf4j 
 @RequiredArgsConstructor 
-public class RoomCommandService {
+public class PlaybackCommandService {
 
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomWebSocketService roomWebSocketService;

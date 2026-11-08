@@ -3,8 +3,8 @@ package org.kirya343.diagnostics.commands;
 
 import java.lang.management.ManagementFactory;
 
-import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.UserAudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
 import org.kirya343.presence.global.services.PresenceService;
 import org.springframework.stereotype.Component;
 
@@ -21,8 +21,8 @@ import lombok.RequiredArgsConstructor;
 public class StatsCommand implements DiagnosticCommand {
 
     private final PresenceService presenceService;
-    private final RoomStreamWorkerManager roomsWorkers;
-    private final UserAudioStreamWorkerManager userWorkers;
+    private final PlaybackStreamWorkerManager playbackworkers;
+    private final AudioStreamWorkerManager audioWorkers;
 
     public String getName() {
         return "stats";
@@ -48,8 +48,8 @@ public class StatsCommand implements DiagnosticCommand {
 
                 DiagnosticTextBuilder streaming = new DiagnosticTextBuilder("Streaming");
 
-                streaming.addRow("Online room workers: " + roomsWorkers.countAll());
-                streaming.addRow("Online user workers: " + userWorkers.countAll());
+                streaming.addRow("Online playback workers: " + playbackworkers.countAll());
+                streaming.addRow("Online user workers: " + audioWorkers.countAll());
 
                 builder.addSection(streaming);
 

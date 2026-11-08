@@ -6,17 +6,14 @@ import org.kirya343.user.dto.ShortUserDTO;
 import java.util.List;
 
 import org.kirya343.audio.datasource.AudioFile;
-import org.kirya343.audio.dto.AudioDTO;
-import org.kirya343.playlist.dto.PlaylistDTO;
+
 
 public record RoomDTO(
     Long id,
     String title,
     Long ownerId,
     String code,
-    List<ShortUserDTO> listeners,
-    PlaylistDTO playlist,
-    AudioDTO audio
+    List<ShortUserDTO> listeners
 ) {
     public static RoomDTO ofRoom(ListeningRoom room, AudioFile audio) {
         return new RoomDTO(
@@ -24,9 +21,7 @@ public record RoomDTO(
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
             room.getOwner().getId(),
             room.getCode(),
-            null,
-            PlaylistDTO.ofPlaylist(room.getPlaylist()),
-            AudioDTO.ofAudioFile(audio)
+            null
         );
     }
 
@@ -36,9 +31,7 @@ public record RoomDTO(
             r.title(),
             r.ownerId(),
             r.code(),
-            null,
-            r.playlist(),
-            AudioDTO.ofAudioFile(audio)
+            null
         );
     }
 
@@ -49,8 +42,6 @@ public record RoomDTO(
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
             room.getOwner().getId(),
             room.getCode(),
-            null,
-            PlaylistDTO.ofPlaylist(room.getPlaylist()),
             null
         );
     }

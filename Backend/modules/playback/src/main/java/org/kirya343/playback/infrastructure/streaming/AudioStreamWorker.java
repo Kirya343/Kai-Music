@@ -9,8 +9,11 @@ import org.kirya343.audio.dto.AudioChunk;
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.audio.services.util.Fmp4Chunker;
+import org.kirya343.playback.application.command.PlaybackCommand;
+import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
+import org.kirya343.user.dto.ShortUserDTO;
 
 import io.github.kirya343.terminal.api.component.DiagnosticLoggable;
 import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
@@ -18,8 +21,11 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j 
-public class UserAudioStreamWorker
+public class AudioStreamWorker
     extends DiagnosticLoggable {
+
+    @Getter 
+    private PlaybackStreamWorker subscribedWorker;
 
     @Getter 
     private final String userSub;
@@ -39,7 +45,7 @@ public class UserAudioStreamWorker
     private final PlaybackWebsocketService playbackWebsocketService;
     private final AudioQueryService audioQueryService;
 
-    public UserAudioStreamWorker(
+    public AudioStreamWorker(
         String userSub,
         AudioQueryService audioQueryService,
         AudioStorageService audioStorageService,
@@ -51,6 +57,19 @@ public class UserAudioStreamWorker
         this.playbackWebsocketService = playbackWebsocketService;
 
         addLog("Created UserAudioStreamWorker for %s", userSub);
+    }
+
+    public void submit(PlaybackCommand cmd) {
+        subscribedWorker.submit(cmd);
+    }
+
+    public void subscribe(PlaybackStreamWorker worker, ShortUserDTO userDTO) {
+        if (subscribedWorker != null) {
+            subscribedWorker.unsubscribe(this);
+        }
+
+        subscribedWorker = worker;
+        worker.subscribe(this, userDTO);
     }
 
     public void applyState(PlaybackStateDTO state) {
@@ -204,6 +223,10 @@ public class UserAudioStreamWorker
             task.cancel(false);
             task = null;
         }
+    }
+
+    public void sendPlaybackMode(PlaybackMode mode) {
+        playbackWebsocketService.sendPlaybackMode(userSub, mode);
     }
 
     // Diadnostic voids

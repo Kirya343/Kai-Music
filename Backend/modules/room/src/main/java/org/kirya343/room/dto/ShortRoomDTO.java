@@ -10,8 +10,7 @@ public record ShortRoomDTO(
     String title,
     Long ownerId,
     String code,
-    List<ShortUserDTO> listeners,
-    Long playlistId
+    List<ShortUserDTO> listeners
 ) {
 
     public static ShortRoomDTO ofRoom(ListeningRoom room) {
@@ -20,8 +19,7 @@ public record ShortRoomDTO(
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room", 
             room.getOwner().getId(),
             room.getCode(),
-            null,
-            room.getPlaylist().getId()
+            null
         );
     }
 
@@ -31,8 +29,7 @@ public record ShortRoomDTO(
             room.title(), 
             room.ownerId(),
             room.code(),
-            listeners,
-            room.playlistId()
+            listeners
         );
     }
 }

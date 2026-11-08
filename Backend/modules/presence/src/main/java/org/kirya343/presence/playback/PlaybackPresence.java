@@ -1,4 +1,4 @@
-package org.kirya343.presence.room;
+package org.kirya343.presence.playback;
 
 import java.time.Instant;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.user.dto.ShortUserDTO;
 
-public class RoomPresence {
+public class PlaybackPresence {
     
     private final Map<String, UserRuntime> presences = new ConcurrentHashMap<>();
 

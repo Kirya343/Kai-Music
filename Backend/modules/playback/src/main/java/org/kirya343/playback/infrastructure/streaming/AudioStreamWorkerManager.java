@@ -18,34 +18,30 @@ import io.github.kirya343.terminal.result.TextResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j 
 @Component 
+@Slf4j 
 @RequiredArgsConstructor 
-public class UserAudioStreamWorkerManager 
+public class AudioStreamWorkerManager 
     implements DiagnosticComponent {
 
     private final AudioQueryService audioQueryService;
     private final PlaybackWebsocketService playbackWebsocketService;
     private final AudioStorageService audioStorageService;
 
-    private final Map<String, UserAudioStreamWorker> workers =
-            new ConcurrentHashMap<>();
+    private final Map<String, AudioStreamWorker> workers =
+        new ConcurrentHashMap<>();
 
-    public long countAll() {
-        return workers.size();
-    }
-
-    public UserAudioStreamWorker getWorker(String userSub) {
+    public AudioStreamWorker get(String userSub) {
 
         log.debug("Пытаемся получить воркер для пользователя {}", userSub);
 
-        UserAudioStreamWorker worker = workers.get(userSub);
+        AudioStreamWorker worker = workers.get(userSub);
 
         if (worker == null) {
 
             log.debug("Создаём новый воркер для пользователя {}", userSub);
 
-            worker = new UserAudioStreamWorker(
+            worker = new AudioStreamWorker(
                 userSub,
                 audioQueryService,
                 audioStorageService,
@@ -60,21 +56,26 @@ public class UserAudioStreamWorkerManager
         return worker;
     }
 
-    public void removeWorker(String userSub) {
+    public void register(AudioStreamWorker worker) {
+        workers.put(worker.getUserSub(), worker);
+    }
 
-        UserAudioStreamWorker worker = workers.remove(userSub);
+    public void unregister(String userSub) {
+        AudioStreamWorker worker = workers.remove(userSub);
 
         log.debug("Удаляем воркер {}", userSub);
-
-        log.debug("Воркеры стриминга пользователей {}", workers.keySet());
 
         if (worker != null) {
             worker.cancelTask();
         }
     }
 
+    public long countAll() {
+        return workers.size();
+    }
+
     public String getComponentId() {
-        return "user-workers";
+        return "audio-workers";
     }
 
     public List<DiagnosticCommand> getCommands() {
@@ -93,13 +94,13 @@ public class UserAudioStreamWorkerManager
 
                 if (args.length != 1) {
                     throw new IllegalArgumentException(
-                        "Usage: room <roomId>"
+                        "Usage: audio-workers <userSub>"
                     );
                 }
 
                 String userSub = args[0];
 
-                UserAudioStreamWorker worker = workers.get(userSub);
+                AudioStreamWorker worker = workers.get(userSub);
 
                 if (worker == null) {
                     return new TextResult(String.format("Worker of user %s is offline", userSub));
@@ -132,7 +133,7 @@ public class UserAudioStreamWorkerManager
 
                 String userSub = args[0];
 
-                UserAudioStreamWorker worker = workers.get(userSub);
+                AudioStreamWorker worker = workers.get(userSub);
 
                 if (worker == null) {
                     return new TextResult(String.format("Worker of user %s is offline", userSub));

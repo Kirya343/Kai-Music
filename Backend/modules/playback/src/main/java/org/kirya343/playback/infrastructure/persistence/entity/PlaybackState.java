@@ -6,7 +6,10 @@ import java.time.Instant;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
+import org.kirya343.playlist.datasource.model.Playlist;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,6 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -51,18 +55,25 @@ public class PlaybackState {
     @Enumerated(EnumType.STRING)
     private PlaybackMode playbackMode = PlaybackMode.NORMAL;
 
-    public PlaybackState(Long targetId, PlaybackTargetType targetType, Long entryId, Double position, boolean paused, String userName) {
-        this.targetId = targetId;
-        this.targetType = targetType;
-        this.entryId = entryId;
-        this.position = position;
-        this.paused = paused;
-        this.initiatorName = userName;
-    }
+    @ManyToOne(
+        cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+        optional = false
+    )
+    @JoinColumn(nullable = false)
+    private Playlist playlist = new Playlist(targetType + "-" + targetId + " state-playlist", null);
 
-    public PlaybackState(Long targetId, PlaybackTargetType targetType) {
+    public PlaybackState(Long targetId, PlaybackTargetType targetType, PlaybackStateDTO state) {
         this.targetId = targetId;
         this.targetType = targetType;
+
+        if (state != null) {
+            this.entryId = state.entryId();
+            this.position = state.position();
+            this.paused = state.pause();
+            this.initiatorName = state.user();
+        }
+
+        this.playlist = new Playlist(targetType + "-" + targetId + " state-playlist", null);
     }
 
     public double getCurrentPosition() {

@@ -1,4 +1,4 @@
-package org.kirya343.presence.room;
+package org.kirya343.presence.playback;
 
 import java.time.Instant;
 

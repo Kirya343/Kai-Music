@@ -6,13 +6,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
+import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.application.command.ChangeTrack;
-import org.kirya343.playback.application.command.RoomCommand;
+import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
 import org.kirya343.playback.application.service.PlaybackService;
 import org.kirya343.playback.domain.enums.PlaybackMode;
-import org.kirya343.playback.infrastructure.command.PlaybackCommandWorker;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
 import org.kirya343.security.core.dto.UserAuthData;
@@ -34,7 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class PlaybackController {
 
     private final PlaybackStateRepository playbackStateRepository;
-    private final PlaybackCommandWorker playbackCommandWorker;
+    private final AudioStreamWorkerManager audioStreamWorkerManager;
     private final PlaybackService playbackService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
@@ -53,7 +53,7 @@ public class PlaybackController {
         return PlaybackStateDTO.ofState(state);
     }
     
-    @PostMapping("/{roomId}/update-state")
+    @PostMapping("/update-state")
     @Authenticated
     public void updatePlaybackState(
         @RequestBody PlaybackStateDTO state,
@@ -65,9 +65,9 @@ public class PlaybackController {
             return;
         }
 
-        RoomCommand cmd = new UpdatePlayback(roomId, state, authData);
-        
-        playbackCommandWorker.submit(cmd);
+        PlaybackCommand cmd = new UpdatePlayback(state, authData);
+
+        audioStreamWorkerManager.get(authData.sub()).submit(cmd);
     }
 
     @PostMapping("/{roomId}/change-track")
@@ -82,9 +82,9 @@ public class PlaybackController {
             return;
         }
 
-        RoomCommand cmd = new ChangeTrack(roomId, changing, authData);
-        
-        playbackCommandWorker.submit(cmd);
+        PlaybackCommand cmd = new ChangeTrack(changing, authData);
+
+        audioStreamWorkerManager.get(authData.sub()).submit(cmd);
     }
 
     @PostMapping("/{targetId}/mode")

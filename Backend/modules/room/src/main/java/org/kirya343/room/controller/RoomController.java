@@ -3,7 +3,7 @@ package org.kirya343.room.controller;
 import java.util.List;
 
 import org.kirya343.presence.global.services.PresenceService;
-import org.kirya343.room.services.RoomCommandService;
+import org.kirya343.room.services.PlaybackCommandService;
 import org.kirya343.room.services.RoomQueryService;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
@@ -37,7 +37,7 @@ public class RoomController {
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomQueryService roomQueryService;
     private final PresenceService presenceService;
-    private final RoomCommandService roomCommandService;
+    private final PlaybackCommandService PlaybackCommandService;
 
     @GetMapping
     @Authenticated
@@ -48,7 +48,7 @@ public class RoomController {
     @PostMapping
     @Authenticated
     public void createRoom(@AuthUser UserAuthData authData) {
-        roomCommandService.createRoom(authData);
+        PlaybackCommandService.createRoom(authData);
     }
 
     @PostMapping("/join")
@@ -57,7 +57,7 @@ public class RoomController {
         @RequestParam String code,
         @AuthUser UserAuthData authData
     ) {
-        roomCommandService.joinRoom(code, authData);
+        PlaybackCommandService.joinRoom(code, authData);
     }
 
     @PostMapping("/leave")
@@ -65,7 +65,7 @@ public class RoomController {
     public void leaveRoom(
         @AuthUser UserAuthData authData
     ) {
-        roomCommandService.leaveRoom(authData);
+        PlaybackCommandService.leaveRoom(authData);
     }
 
     @GetMapping("/list/page")

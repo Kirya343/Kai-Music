@@ -2,10 +2,9 @@ package org.kirya343.playback.diagnostics.command;
 
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.playback.diagnostics.PlaybackDiagnosticService;
-import org.kirya343.playback.domain.model.RoomPlaybackContext;
-import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
-import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
-
+import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
 import org.springframework.stereotype.Component;
 
 import io.github.kirya343.terminal.api.command.DiagnosticCommand;
@@ -18,8 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class RoomCommand implements DiagnosticCommand {
 
-    private final RoomPlaybackContextStore roomPlaybackContextStore;
-    private final RoomStreamWorkerManager roomStreamWorkerManager;
+    private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     private final PlaybackDiagnosticService diagnosticService;
 
     @Override
@@ -58,22 +56,22 @@ public class RoomCommand implements DiagnosticCommand {
     }
 
     private String getRoomStreamerData(Long roomId) {
-        boolean isOnline = roomStreamWorkerManager.checkWorker(roomId);
+        boolean isOnline = playbackStreamWorkerManager.checkWorker(PlaybackTargetType.ROOM, roomId);
 
         DiagnosticTextBuilder builder = null;
 
         if (isOnline) {
 
-            RoomPlaybackContext context = roomPlaybackContextStore.get(roomId);
+            PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(PlaybackTargetType.ROOM, roomId);
 
-            AudioFile audio = context.getCurrentAudio();
+            AudioFile audio = playbackWorker.getCurrentAudio();
 
-            builder = diagnosticService.renderOnlineRoom(roomId);
+            builder = diagnosticService.renderOnlineRoom(PlaybackTargetType.ROOM, roomId);
 
             builder.addSection(diagnosticService.renderAudioData(audio));
-            builder.addSection(diagnosticService.renderStreamWorker(roomId));
+            builder.addSection(diagnosticService.renderStreamWorker(PlaybackTargetType.ROOM, roomId));
         } else {
-            builder = diagnosticService.renderOfflineRoom(roomId);
+            builder = diagnosticService.renderOfflineRoom(PlaybackTargetType.ROOM, roomId);
         }
 
         return builder.getContent();

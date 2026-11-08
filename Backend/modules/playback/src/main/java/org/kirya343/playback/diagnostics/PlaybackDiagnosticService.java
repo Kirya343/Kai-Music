@@ -1,10 +1,9 @@
 package org.kirya343.playback.diagnostics;
 
 import org.kirya343.audio.datasource.AudioFile;
-import org.kirya343.playback.domain.model.RoomPlaybackContext;
-import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
-import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
-import org.kirya343.user.dto.ShortUserDTO;
+import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
 import org.springframework.stereotype.Service;
 
 import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
@@ -14,30 +13,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class PlaybackDiagnosticService {
 
-    private final RoomPlaybackContextStore roomPlaybackContextStore;
-    private final RoomStreamWorkerManager roomStreamWorkerManager;
+    private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     
-    public DiagnosticTextBuilder renderOfflineRoom(Long roomId) {
+    public DiagnosticTextBuilder renderOfflineRoom(PlaybackTargetType type, Long id) {
         return new DiagnosticTextBuilder()
-            .setTitle("Room: " + roomId)
+            .setTitle(type + "-streamer: " + id)
             .addRow("Status: OFFLINE");
     }
 
-    public DiagnosticTextBuilder renderOnlineRoom(Long roomId) {
+    public DiagnosticTextBuilder renderOnlineRoom(PlaybackTargetType type, Long id) {
 
-        RoomPlaybackContext context = roomPlaybackContextStore.get(roomId);
+        PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(type, id);
 
-        AudioFile audio = context.getCurrentAudio();
+        AudioFile audio = playbackWorker.getCurrentAudio();
 
         return new DiagnosticTextBuilder()
-            .setTitle("Room: " + roomId)
+            .setTitle(type + "-streamer: " + id)
             .addRow("Status: ONLINE")
-            .addRow("Listeners: " + context.getPresence()
-                    .getOnlineUsers()
-                    .stream()
-                    .map(ShortUserDTO::name)
-                    .toList()
-            )
+            // .addRow("Listeners: " + playbackWorker.()
+            //         .getOnlineUsers()
+            //         .stream()
+            //         .map(ShortUserDTO::name)
+            //         .toList()
+            // )
             .addRow( "Playing Audio: " + (audio != null ? audio.getName() : null));
     }
 
@@ -52,9 +50,9 @@ public class PlaybackDiagnosticService {
             .addRow("Chunks: " + audio.getChunks());
     }
 
-    public DiagnosticTextBuilder renderStreamWorker(Long roomId) {
+    public DiagnosticTextBuilder renderStreamWorker(PlaybackTargetType type, Long id) {
 
-        DiagnosticTextBuilder builder = roomStreamWorkerManager.getWorker(roomId)
+        DiagnosticTextBuilder builder = playbackStreamWorkerManager.get(type, id)
             .getInfo();
 
         builder.setTitle("Stream worker:");

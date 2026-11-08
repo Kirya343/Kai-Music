@@ -2,15 +2,15 @@ package org.kirya343.playback.infrastructure.streaming;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.kirya343.playback.infrastructure.command.PlaybackCommandWorker;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
-import org.kirya343.playback.domain.model.RoomPlaybackContext;
-import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
@@ -25,64 +25,69 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j 
 @RequiredArgsConstructor
-public class RoomStreamWorkerManager implements DiagnosticComponent {
+public class PlaybackStreamWorkerManager implements DiagnosticComponent {
 
-    private final RoomPlaybackContextStore roomPlaybackContextStore;
     private final ApplicationEventPublisher eventPublisher;
     private final PlaybackStateRepository playbackStateRepository;
     private final QueueService queueService;
+    private final PlaybackCommandWorker playbackCommandWorker;
 
-    private final Map<Long, RoomStreamWorker> workers =
+    private final Map<PlaybackTargetType, Map<Long, PlaybackStreamWorker>> workers =
             new ConcurrentHashMap<>();
 
-    public boolean checkWorker(Long roomId) {
-        return workers.get(roomId) != null;
+    public boolean checkWorker(PlaybackTargetType type, Long id) {
+        return workers.get(type).get(id) != null;
     }
 
     public long countAll() {
         return workers.size();
     }
 
-    public RoomStreamWorker getWorker(Long roomId) {
+    public Set<Long> keySet(PlaybackTargetType type) {
+        return workers.get(type).keySet();
+    }
 
-        log.debug("Пытаемся получить воркер для комнаты {}", roomId);
+    public PlaybackStreamWorker get(PlaybackTargetType type, Long id) {
 
-        RoomStreamWorker worker = workers.get(roomId);
+        log.debug("Пытаемся получить {} воркер для {}", type, id);
+
+        PlaybackStreamWorker worker = workers.get(type).get(id);
 
         if (worker == null) {
 
-            log.debug("Создаём новый воркер для комнаты {}", roomId);
+            log.debug("Создаём новый {} воркер {}", type, id);
 
             PlaybackState state = playbackStateRepository
-                .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM)
+                .findByTargetIdAndTargetType(id, type)
                 .orElse(null);
 
-            RoomPlaybackContext context = roomPlaybackContextStore.computeIfAbsent(roomId);
-
             try {
-                worker = new RoomStreamWorker(
-                    roomId,
+                worker = new PlaybackStreamWorker(
+                    id,
+                    type,
                     eventPublisher, 
                     PlaybackStateDTO.ofState(state),
-                    context,
-                    queueService
+                    queueService,
+                    playbackCommandWorker
                 );
             } catch (Exception e) {
-                log.error("Ошибка создания воркера для комнаты {}", roomId, e);
+                log.error("Ошибка создания {} воркера {}", type, id, e);
                 throw e;
             }
 
-            log.debug("Кладём к остальным воркер для комнаты {}", roomId);
+            log.debug("Кладём к остальным {} воркер {}", type, id);
 
-            workers.putIfAbsent(roomId, worker);
+            workers
+                .computeIfAbsent(type, key -> new ConcurrentHashMap<>())
+                .putIfAbsent(id, worker);
         }
 
         return worker;
     }
 
-    public void removeWorker(Long roomId) {
+    public void removeWorker(PlaybackTargetType type, Long id) {
 
-        RoomStreamWorker worker = workers.remove(roomId);
+        PlaybackStreamWorker worker = workers.get(type).remove(id);
 
         if (worker != null) {
             worker.cancelTask();
@@ -92,7 +97,7 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
     // Diagnotsic
 
     public String getComponentId() {
-        return "room-workers";
+        return "stream-workers";
     }
 
     public List<DiagnosticCommand> getCommands() {
@@ -109,24 +114,26 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
             
             public StreamingResult execute(String[] args) {
 
-                if (args.length != 1) {
+                if (args.length != 2) {
                     throw new IllegalArgumentException(
-                        "Usage: room <roomId>"
+                        "Usage: stream-workers logs <type> <id>"
                     );
                 }
 
-                Long roomId;
+                PlaybackTargetType type;
+                Long id;
 
                 try {
-                    roomId = Long.parseLong(args[0]);
+                    type = PlaybackTargetType.valueOf(args[0]);
+                    id = Long.parseLong(args[1]);
                 } catch (NumberFormatException exception) {
                     throw new IllegalArgumentException(
-                        "Room ID must be a number: " + args[0]
+                        "Target ID must be a number: " + args[0]
                     );
                 }
 
                 return new StreamingResult(
-                    () -> getWorker(roomId).getLogs().getContent(),
+                    () -> get(type, id).getLogs().getContent(),
                     StreamMode.REPLACE
                 );
             }
@@ -144,24 +151,26 @@ public class RoomStreamWorkerManager implements DiagnosticComponent {
             
             public StreamingResult execute(String[] args) {
 
-                if (args.length != 1) {
+                if (args.length != 2) {
                     throw new IllegalArgumentException(
-                        "Usage: room <roomId>"
+                        "Usage: stream-workers room <type> <id>"
                     );
                 }
 
-                Long roomId;
+                PlaybackTargetType type;
+                Long id;
 
                 try {
-                    roomId = Long.parseLong(args[0]);
+                    type = PlaybackTargetType.valueOf(args[0]);
+                    id = Long.parseLong(args[1]);
                 } catch (NumberFormatException exception) {
                     throw new IllegalArgumentException(
-                        "Room ID must be a number: " + args[0]
+                        "Target ID must be a number: " + args[0]
                     );
                 }
 
                 return new StreamingResult(
-                    () -> getWorker(roomId).getInfo().getContent(),
+                    () -> get(type, id).getInfo().getContent(),
                     StreamMode.REPLACE
                 );
             }

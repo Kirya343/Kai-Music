@@ -11,11 +11,11 @@ import org.springframework.data.repository.query.Param;
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
 
     @Query("""
-        SELECT r.playlist
-        FROM ListeningRoom r
-        WHERE r.id = :roomId
+        SELECT ps.playlist
+        FROM PlaybackState ps
+        WHERE ps.id = :stateId
     """)
-    Optional<Playlist> findByRoomId(@Param("roomId") Long roomId);
+    Optional<Playlist> findByPlaybackStateId(@Param("stateId") Long stateId);
 
     @Query("""
         SELECT p

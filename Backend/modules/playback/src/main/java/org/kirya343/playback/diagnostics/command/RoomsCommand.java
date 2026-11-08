@@ -4,8 +4,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.kirya343.playback.diagnostics.PlaybackDiagnosticService;
-import org.kirya343.playback.infrastructure.cache.RoomPlaybackContextStore;
-import org.kirya343.playback.infrastructure.streaming.RoomStreamWorkerManager;
+import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
 
 import org.springframework.stereotype.Component;
 
@@ -20,8 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class RoomsCommand implements DiagnosticCommand {
 
     private final PlaybackDiagnosticService diagnosticService;
-    private final RoomPlaybackContextStore roomPlaybackContextStore;
-    private final RoomStreamWorkerManager roomStreamWorkerManager;
+    private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
 
     @Override
     public String getName() {
@@ -43,7 +42,7 @@ public class RoomsCommand implements DiagnosticCommand {
 
     private String getRoomsData() {
 
-        Set<Long> keys = roomPlaybackContextStore.getAll().keySet();
+        Set<Long> keys = playbackStreamWorkerManager.keySet(PlaybackTargetType.ROOM);
 
         if (keys.size() == 0) return "No rooms online";
 
@@ -53,14 +52,14 @@ public class RoomsCommand implements DiagnosticCommand {
     }
 
     private String renderRoomData(Long roomId) {
-        boolean isOnline = roomStreamWorkerManager.checkWorker(roomId);
+        boolean isOnline = playbackStreamWorkerManager.checkWorker(PlaybackTargetType.ROOM, roomId);
 
         DiagnosticTextBuilder builder = null;
 
         if (isOnline) {
-            builder = diagnosticService.renderOnlineRoom(roomId);
+            builder = diagnosticService.renderOnlineRoom(PlaybackTargetType.ROOM, roomId);
         } else {
-            builder = diagnosticService.renderOfflineRoom(roomId);
+            builder = diagnosticService.renderOfflineRoom(PlaybackTargetType.ROOM, roomId);
         }
 
         return builder.getContent();

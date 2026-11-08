@@ -1,7 +1,5 @@
 package org.kirya343.playback.application.service;
 
-import java.util.Optional;
-
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
@@ -24,25 +22,23 @@ public class QueueService {
     private final PlaybackStateRepository playbackStateRepository;
     private final PlaylistRepository playlistRepository;
 
-    public QueueItem nextTrack(Long roomId) {
+    public QueueItem nextTrack(Long id, PlaybackTargetType type) {
 
-        Playlist playlist = playlistRepository.findByRoomId(roomId).orElseThrow(
-            () -> new EntityNotFoundException("Playlist by room (%s) not found".formatted(roomId)));
-
-        Optional<PlaybackState> playbackState = playbackStateRepository
-            .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
+        PlaybackState playbackState = playbackStateRepository
+            .findByTargetIdAndTargetType(id, type)
+            .orElse(playbackStateRepository.save(new PlaybackState(id, type, null)));
 
         QueueItem queueItem = null;
+        Playlist playlist = playlistRepository.findByPlaybackStateId(playbackState.getId()).orElseThrow(
+            () -> new EntityNotFoundException("Playlist by playbackState (%s) not found".formatted(playbackState.getId())));
 
-        if (playbackState.isPresent()) {
+        if (playbackState.getEntryId() != null) {
 
-            PlaybackState existingState = playbackState.get();
-
-            Long prevEntryId = existingState.getEntryId();
+            Long prevEntryId = playbackState.getEntryId();
 
             log.debug("prevEntryId: {}, playlistId: {}", prevEntryId, playlist.getId());
 
-            queueItem = switch (existingState.getPlaybackMode()) {
+            queueItem = switch (playbackState.getPlaybackMode()) {
 
                 case NORMAL ->
                     queueItemRepository
@@ -75,7 +71,7 @@ public class QueueService {
                 
             };
 
-            log.debug("Режим проигрывания: {}", existingState.getPlaybackMode());
+            log.debug("Режим проигрывания: {}", playbackState.getPlaybackMode());
         } else {
             queueItem = queueItemRepository
                 .findFirstInPlaylist(playlist.getId())
@@ -91,19 +87,19 @@ public class QueueService {
         return queueItem;
     }
 
-    public QueueItem prevTrack(Long roomId) {
+    public QueueItem prevTrack(Long id, PlaybackTargetType type) {
 
-        Optional<PlaybackState> playbackState = playbackStateRepository
-            .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM);
+        PlaybackState playbackState = playbackStateRepository
+            .findByTargetIdAndTargetType(id, type)
+            .orElse(playbackStateRepository.save(new PlaybackState(id, type, null)));
 
         QueueItem queueItem = null;
-        Playlist playlist = playlistRepository.findByRoomId(roomId).orElseThrow(
-            () -> new EntityNotFoundException("Playlist by room (%s) not found".formatted(roomId)));
+        Playlist playlist = playlistRepository.findByPlaybackStateId(playbackState.getId()).orElseThrow(
+            () -> new EntityNotFoundException("Playlist by playbackState (%s) not found".formatted(playbackState.getId())));
 
-        if (playbackState.isPresent()) {
-            PlaybackState existingState = playbackState.get();
+        if (playbackState.getEntryId() != null) {
 
-            queueItem = queueItemRepository.findPrevTrack(playlist.getId(), existingState.getEntryId()).orElse(null);
+            queueItem = queueItemRepository.findPrevTrack(playlist.getId(), playbackState.getEntryId()).orElse(null);
         }
 
         if (queueItem == null) {

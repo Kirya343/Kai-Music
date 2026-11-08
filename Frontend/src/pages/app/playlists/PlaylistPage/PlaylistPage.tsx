@@ -26,8 +26,8 @@ const PlaylistPage = ({}: {}) => {
     const playlist = useMemo<Playlist | null>(() => {
         if (!playlistId) return null;
 
-        return playlistsData.data.find(p => p.id === playlistId) || null
-    }, [playlistsData.data])
+        return playlistsData.playlists.find(p => p.id === playlistId) || null
+    }, [playlistsData.playlists])
     
     const { filteredList, searchQuery, setSearchQuery } = useSearch(playlist?.queue || []);
 

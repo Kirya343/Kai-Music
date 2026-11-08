@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,12 @@ import lombok.Setter;
     name = "queue_items",
     indexes = {
         @Index(name = "idx_playlist_position", columnList = "playlist_id, position")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_playlist_audio",
+            columnNames = {"playlist_id", "audio_id"}
+        )
     }
 )
 @NoArgsConstructor

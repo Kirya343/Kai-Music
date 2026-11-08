@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Playlist, playlistService } from "@playlist";
 import { ShuffleIcon } from "@/assets/icons";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
+import Loader from "@/components/ui/Loader/Loader";
 
 /** Displays user library with importable tracks to playlist */
 const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playlist, onClose: () => void }) => {
@@ -12,7 +13,7 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
     const [selectMode, setSelectMode] = useState<boolean>(false);
 
     const { 
-        setSearchQuery, searchQuery, filteredList
+        setSearchQuery, searchQuery, audiosPage, loading
     } = useLibrary();
 
     const playlistAudioIds = useMemo(() => {
@@ -47,32 +48,34 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
                     />
                 </div>
 
-                {searchQuery.length != 0 && <span>Found {filteredList.length} audios</span>}
+                {searchQuery.length != 0 && <span>Found {audiosPage?.totalElements} audios</span>}
             </div>
 
-            <SelectableList
-                className={styles.trackList}
-                data={Object.fromEntries(
-                    filteredList
-                        .slice()
-                        .sort((a, b) => a.id - b.id)
-                        .map((audio, idx) => [
-                            audio.id,
-                            <ImportingTrack
-                                key={idx}
-                                audio={audio}
-                                trackNumber={idx + 1}
-                                isInPlaylist={playlistAudioIds.has(audio.id)}
-                                importPlaylistId={importPlaylist.id}
-                                className={styles.track}
-                            />
-                        ])
-                )}
-                extraActions={[]}
-                selectMode={selectMode}
-                setSelectMode={setSelectMode}
-                initialVisible={50}
-            />
+            <Loader loadingActive={!loading && !audiosPage?.content}>
+                <SelectableList
+                    className={styles.trackList}
+                    data={audiosPage ? Object.fromEntries(
+                        audiosPage?.content
+                            .slice()
+                            .sort((a, b) => a.id - b.id)
+                            .map((audio, idx) => [
+                                audio.id,
+                                <ImportingTrack
+                                    key={idx}
+                                    audio={audio}
+                                    trackNumber={idx + 1}
+                                    isInPlaylist={playlistAudioIds.has(audio.id)}
+                                    importPlaylistId={importPlaylist.id}
+                                    className={styles.track}
+                                />
+                            ])
+                    ) : {}}
+                    extraActions={[]}
+                    selectMode={selectMode}
+                    setSelectMode={setSelectMode}
+                    initialVisible={50}
+                />
+            </Loader>
         </div>
     )
 }

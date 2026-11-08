@@ -1,6 +1,7 @@
 import { AxiosProgressEvent } from "axios";
 import { createApi } from "@common";
 import { IAudio, IAudioUpdate } from "@audio";
+import { IPage } from "../common/types";
 
 
 const audioApi = createApi('/audio')
@@ -13,7 +14,7 @@ export const loadAudioInfo = (entryId: number) => audioApi.get<IAudio>(`/${entry
 /**
  * Retrieves all audio tracks available in the library.
  */
-export const loadLibrary = () => audioApi.get<IAudio[]>("/library")
+export const loadLibrary = (query?: string, page?: number, size?: number) => audioApi.get<IPage<IAudio>>("/library", { params: { page, size, query }})
 
 /**
  * Uploads an audio file.

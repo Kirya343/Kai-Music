@@ -91,6 +91,15 @@ public class PlaylistController {
         playlistCommandService.addQueueList(list, playlistId, authData);
     }
 
+    @PostMapping("/liked")
+    @Authenticated
+    public void setAudiosLiked(
+        @RequestBody List<QueueItemCreateDTO> list,
+        @AuthUser UserAuthData authData
+    ) {
+        playlistCommandService.setAudiosLiked(list, authData);
+    }
+
     @PostMapping("/{playlistId}/queue/rundom")
     @Authenticated
     public void addRundomTracks(
@@ -109,5 +118,14 @@ public class PlaylistController {
         @AuthUser UserAuthData authData
     ) {
         playlistCommandService.removeQueueList(list, playlistId, authData);
+    }
+
+    @DeleteMapping("/liked")
+    @Authenticated
+    public void unsetAudiosLiked(
+        @RequestBody List<Long> list,
+        @AuthUser UserAuthData authData
+    ) {
+        playlistCommandService.unsetAudiosLiked(list, authData);
     }
 }

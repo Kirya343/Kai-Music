@@ -21,7 +21,7 @@ const TrackImportPlaylists = ({
     
     const { playlistsData } = useData();
     
-    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.data);
+    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.playlists);
 
     return (
         <>

@@ -19,7 +19,9 @@ interface DataContextType {
  */
 interface IPlaylistsData {
     /** List of available playlists. */
-    data: Playlist[];
+    playlists: Playlist[];
+
+    liked: Playlist | null
 
     /** Synchronizes playlists with the server. */
     syncPlaylists: () => void;

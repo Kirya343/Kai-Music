@@ -37,14 +37,22 @@ const PlaylistCard = ({
 }) => {
 
     return (
-        <article className={styles.playlistCard} onClick={onClick}>
-            <div className={styles.body}>
+        <article className={styles.playlistCard}>
+            <div className={styles.body} onClick={onClick}>
                 <span className={styles.title}>{playlist.title}</span>
             </div>
 
             <div className={styles.actions}>
                 {actions?.map(act => (
-                    <button onClick={act.func} key={act.title}>{act.icon}</button>
+                    <button 
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            act.func();
+                        }} 
+                        key={act.title}
+                    >
+                        {act.icon}
+                    </button>
                 ))}
                 {extraActions && <KebabMenu actions={extraActions}/>}
             </div>

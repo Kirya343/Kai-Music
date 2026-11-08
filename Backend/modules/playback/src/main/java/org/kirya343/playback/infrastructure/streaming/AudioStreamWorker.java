@@ -65,16 +65,16 @@ public class AudioStreamWorker
     }
 
     public void subscribe(PlaybackStreamWorker worker, ShortUserDTO userDTO) {
-        if (subscribedWorker != null) {
-            subscribedWorker.unsubscribe(this);
-        }
+        unsubscribe();
 
         subscribedWorker = worker;
         worker.subscribe(this, userDTO);
     }
 
     public void unsubscribe() {
-        subscribedWorker.unsubscribe(this);
+        if (subscribedWorker != null) {
+            subscribedWorker.unsubscribe(this);
+        }
     }
 
     public void applyState(PlaybackStateDTO state) {

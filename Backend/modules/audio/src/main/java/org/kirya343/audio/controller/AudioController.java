@@ -9,6 +9,7 @@ import org.kirya343.audio.dto.AudioUpdateDTO;
 import org.kirya343.audio.services.AudioCommandService;
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioFileManager;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,8 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/audio")
 @RequiredArgsConstructor
@@ -36,10 +35,21 @@ public class AudioController {
     private final AudioCommandService audioCommandService;
     private final AudioQueryService audioQueryService;
 
+    // @GetMapping("/library")
+    // @Authenticated
+    // public List<AudioDTO> getUserLibrary(@AuthUser UserAuthData authData) {
+    //     return audioQueryService.getUserLibrary(authData.id());
+    // }
+    
     @GetMapping("/library")
     @Authenticated
-    public List<AudioDTO> getUserLibrary(@AuthUser UserAuthData authData) {
-        return audioQueryService.getUserLibrary(authData.id());
+    public Page<AudioDTO> getLibrary(
+        @RequestParam(required = false, defaultValue = "0") int page,
+        @RequestParam(required = false, defaultValue = "50") int size,
+        @RequestParam(required = false) String query,
+        @AuthUser UserAuthData authData
+    ) {
+        return audioQueryService.getLibrary(page, size, query);
     }
 
     @PostMapping("/recognize/{audioId}")

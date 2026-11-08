@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { CreatePlaylist, Playlist } from "../playlistTypes";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { CreatePlaylist, Playlist, PlaylistType } from "../playlistTypes";
 import { playlistService } from "../services";
 import { useWebSocket } from "@websocket";
 import { IQueueItem } from "@playback";
@@ -16,6 +16,10 @@ export const usePlaylistsData = () => {
 
         return saved ? JSON.parse(saved) : [];
     });
+
+    const liked = useMemo<Playlist | null>(() => {
+        return playlists.find(p => p.type === PlaylistType.LIKED) ?? null;
+    }, [playlists])
 
     const syncPlaylists = useCallback(async () => {
         try {
@@ -90,7 +94,11 @@ export const usePlaylistsData = () => {
         const unsubscribe = addOnConnectHandler((client) => {
 
             const playlistSub = client.subscribe(`/user/queue/playlists`, (message) => {
-                updatePlaylist(JSON.parse(message.body));
+
+                const playlist: Playlist = JSON.parse(message.body)
+                updatePlaylist(playlist);
+
+                logger.debug("Обновление плейлиста", playlist.id, playlist.queue.map(qi => qi.audio.id))
             });
 
             return () => {
@@ -102,7 +110,8 @@ export const usePlaylistsData = () => {
     }, [addOnConnectHandler]);
     
     return { 
-        data: playlists, 
+        playlists, 
+        liked,
         syncPlaylists,
         deletePlaylist,
         createPlaylist,

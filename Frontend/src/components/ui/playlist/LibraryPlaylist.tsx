@@ -23,6 +23,14 @@ const LibraryPlaylist = ({
 
     const navigate = useNavigate();
 
+    const actions = [
+        {
+            title: "Delete playlist",
+            func: deletePlaylist,
+            icon: <TrashIcon />
+        }
+    ]
+
     const extraActions: IKebabAction[] = [
         {
             title: "Delete playlist",
@@ -35,7 +43,13 @@ const LibraryPlaylist = ({
         }
     ]
 
-    return <PlaylistCard onClick={() => navigate(`/app/playlists/${playlist.id}`)} playlist={playlist} extraActions={extraActions}/>
+    return (
+        <PlaylistCard 
+            onClick={() => navigate(`/app/playlists/${playlist.id}`)} 
+            playlist={playlist} extraActions={extraActions}
+            actions={actions}
+        />
+    )
 }
 
 export default LibraryPlaylist;

@@ -8,6 +8,7 @@ import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLay
 import { useData } from "@common";
 import { usePlaybackContext } from "@playback";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
+import Loader from "@/components/ui/Loader/Loader";
 
 const LibraryPage = () => {
 
@@ -17,7 +18,7 @@ const LibraryPage = () => {
     const {
         setSearchQuery,
         searchQuery, uploadAudios,
-        uploading, filteredList,
+        uploading, audiosPage, loading
     } = useLibrary();
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
@@ -33,7 +34,7 @@ const LibraryPage = () => {
     return (
         <SearchableLayout
             title="Library"
-            search={{searchQuery, setSearchQuery, filteredList}}
+            search={{ searchQuery, setSearchQuery, filteredList: audiosPage?.content || [] }}
             extraActions={[
                 <label htmlFor="uploadAudio" key={"upload"} className={styles.upload}>
                     <CirclePlusIcon />
@@ -64,32 +65,34 @@ const LibraryPage = () => {
                     </div>
                 </>
             )}
-                
-            <SelectableList
-                className={styles.trackList}
-                data={Object.fromEntries(
-                    filteredList
-                        .slice()
-                        .sort((a, b) => a.id - b.id)
-                        .map((audio, idx) => [
-                            audio.id,
-                            <LibraryTrack
-                                key={idx}
-                                audio={audio}
-                                trackNumber={idx + 1}
-                                importPlaylistId={playbackPlaylist?.id}
-                                openEditModal={setAudioFileView}
-                                handleDelete={audiosData.deleteAudio}
-                                playing={playingAudioId === audio.id}
-                            />
-                        ])
-                )}
-                extraActions={[]}
-                selectMode={selectMode}
-                setSelectMode={setSelectMode}
-                trackedItem={playbackState?.entryId}
-                initialVisible={50}
-            />
+            
+            <Loader loadingActive={!loading && !audiosPage?.content}>
+                <SelectableList
+                    className={styles.trackList}
+                    data={audiosPage ? Object.fromEntries(
+                        audiosPage?.content
+                            .slice()
+                            .sort((a, b) => a.id - b.id)
+                            .map((audio, idx) => [
+                                audio.id,
+                                <LibraryTrack
+                                    key={idx}
+                                    audio={audio}
+                                    trackNumber={idx + 1}
+                                    importPlaylistId={playbackPlaylist?.id}
+                                    openEditModal={setAudioFileView}
+                                    handleDelete={audiosData.deleteAudio}
+                                    playing={playingAudioId === audio.id}
+                                />
+                            ])
+                    ) : {}}
+                    extraActions={[]}
+                    selectMode={selectMode}
+                    setSelectMode={setSelectMode}
+                    trackedItem={playbackState?.entryId}
+                    initialVisible={50}
+                />
+            </Loader>
 
             <input 
                 type="file"

@@ -11,7 +11,7 @@
     align-items: center;
     justify-content: space-between;
 
-    @include glass;
+    @include glass(true);
 
     .title {
         font-size: 1.4rem;
@@ -21,4 +21,9 @@
     .actions {
         display: flex;
     }
+}
+
+.body {
+    display: flex;
+    width: 100%;
 }

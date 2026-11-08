@@ -1,8 +1,9 @@
-import { PenIcon, PlusIcon, ShazamIcon, TrashIcon } from "@/assets/icons";
+import { HeartIcon, PenIcon, PlusIcon, ShazamIcon, TrashIcon } from "@/assets/icons";
 import { playlistService } from "@playlist"
 import { audioService, IAudio } from "@audio"
 import Track from "./Track/Track"
 import { HTMLAttributes } from "react";
+import { useData } from "@common";
 
 /**
  * Props for the LibraryTrack component
@@ -52,7 +53,7 @@ const LibraryTrack = ({
         {
             icon: <TrashIcon/>,
             title: "Delete from library",
-            func: () => handleDelete(audio)
+            func: () => handleDelete(audio),
         }
     ]
 

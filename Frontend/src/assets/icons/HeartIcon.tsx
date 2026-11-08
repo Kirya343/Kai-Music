@@ -1,16 +1,10 @@
 const HeartIcon = ({
-    filled, 
-    onClick
+    filled
 }: {
-    filled: boolean, 
-    onClick?: () => void
+    filled?: boolean
 }) => {
     return (
         <svg 
-            onClick={(e) => {
-                e.stopPropagation();
-                onClick?.();
-            }}
             xmlns="http://www.w3.org/2000/svg" 
             viewBox="0 0 640 640"
             fill="currentColor"
@@ -24,7 +18,7 @@ const HeartIcon = ({
                 }
                 fill="currentColor"
                 stroke="currentColor"
-                stroke-width="2"
+                strokeWidth="2"
             />
         </svg>
     )

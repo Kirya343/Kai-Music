@@ -10,8 +10,8 @@ export const usePlaylistPage = (playlistId: number) => {
     const playlist = useMemo<Playlist | null>(() => {
         if (!playlistId) return null;
 
-        return playlistsData.data.find(p => p.id === playlistId) || null
-    }, [playlistsData.data])
+        return playlistsData.playlists.find(p => p.id === playlistId) || null
+    }, [playlistsData.playlists])
 
     const queue = useMemo<IQueueItem[]>(() => {
         if (!playlist?.queue) return []

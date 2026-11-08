@@ -48,6 +48,7 @@ const KebabMenu = ({ actions, className }: KebabMenuProps) => {
                     type="button"
                     className={clsx(styles.button, className)}
                     aria-label="Actions"
+                    onClick={(event) => event.stopPropagation()}
                 >
                     <EllipsisVerticalIcon className={styles.icon} />
                 </button>
@@ -63,7 +64,10 @@ const KebabMenu = ({ actions, className }: KebabMenuProps) => {
                         <DropdownMenu.Item
                             key={action.title}
                             className={styles.item}
-                            onSelect={action.func}
+                            onSelect={(event) => {
+                                event.stopPropagation()
+                                action.func()
+                            }}
                         >
                             {action.icon && (
                                 <div className={styles.itemIcon}>

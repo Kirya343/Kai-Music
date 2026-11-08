@@ -1,11 +1,12 @@
 import { IAudio } from "@audio"
 import styles from "./Track.module.scss"
-import { MusicNoteIcon, PlayingAudioIcon } from "@/assets/icons"
-import { countPosition } from "@common"
-import { HTMLAttributes, ReactNode } from "react"
+import { HeartIcon, MusicNoteIcon, PlayingAudioIcon } from "@/assets/icons"
+import { countPosition, useData } from "@common"
+import { HTMLAttributes, ReactNode, useMemo } from "react"
 import clsx from "clsx"
 import { usePlaybackContext } from "@playback"
 import KebabMenu, { IKebabAction } from "@/components/ui/KebabMenu/KebabMenu"
+import { playlistService } from "@playlist"
 
 /** Defines an action button displayed on a track. */
 export interface ITrackAction {
@@ -100,6 +101,38 @@ const Track = ({
 
     const { playbackState } = usePlaybackContext();
 
+    const { playlistsData } = useData();
+    
+    const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === audio.id)
+
+    const toggleLike = async () => {
+
+        try {
+            if (isLiked) {
+                console.log("Unlike", audio.id)
+                await playlistService.removeLiked([audio.id]);
+            } else {
+                console.log("Like", audio.id)
+                await playlistService.addLiked([{ audioId: audio.id }]);
+            }
+        } finally {
+
+        }
+    };
+
+    const finalActions = useMemo<ITrackAction[]>(() => {
+        const array = actions ?? []
+        
+        array.push({
+            icon: <HeartIcon filled={isLiked} />,
+            title: "Like",
+            func: toggleLike
+        })
+
+        return array;
+    }, [isLiked, actions])
+    
+
     return (
         <div 
             {...divProps}
@@ -136,8 +169,17 @@ const Track = ({
             </div>
 
             <div className={styles.actions}>
-                {actions?.map(act => (
-                    <button onClick={act.func} key={act.title}>{act.icon}</button>
+                {finalActions.map(act => (
+                    <button 
+                        onClick={(event) => {
+                            console.log("BUTTON CLICK", audio.id);
+                            event.stopPropagation();
+                            act.func();
+                        }}
+                        key={act.title}
+                    >
+                        {act.icon}
+                    </button>
                 ))}
                 {extraActions && <KebabMenu actions={extraActions}/>}
             </div>

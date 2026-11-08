@@ -5,11 +5,17 @@ export interface Playlist {
     ownerId: number;
     title: string;
     queue: IQueueItem[];
-    type: string
+    type: PlaylistType;
 }
 
 
 export interface CreatePlaylist {
     title: string;
     audios?: IQueueItemCreate[];
+}
+
+export enum PlaylistType {
+    STANDART = "STANDART",
+    LIKED = "LIKED",
+    PLAYBACK_QUEUE = "PLAYBACK_QUEUE"
 }

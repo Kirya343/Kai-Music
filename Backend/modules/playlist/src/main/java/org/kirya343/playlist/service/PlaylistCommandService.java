@@ -12,7 +12,9 @@ import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.playlist.dto.PlaylistCreateDTO;
 import org.kirya343.playlist.dto.PlaylistDTO;
 import org.kirya343.playlist.dto.queue.QueueItemCreateDTO;
+import org.kirya343.playlist.enums.PlaylistType;
 import org.kirya343.user.datasource.User;
+import org.kirya343.user.datasource.UserRepository;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.security.services.UserAuthDataService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -34,7 +36,9 @@ public class PlaylistCommandService {
     private final UserAuthDataService userAuthDataService;
     private final PlaylistRepository playlistRepository;
     private final AudioFileRepository audioFileRepository;
+    private final UserRepository userRepository;
 
+    @Transactional 
     public PlaylistDTO createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
         User user = userAuthDataService.parse(authData);
 
@@ -64,6 +68,28 @@ public class PlaylistCommandService {
         if (list.size() > 0) {
             addQueueList(list, targetPlaylistId, authData);
         }
+    }
+
+    @Transactional
+    public void setAudiosLiked(List<QueueItemCreateDTO> list, UserAuthData authData) {
+        Playlist playlist = playlistRepository.findLikedPlaylistByOwnerId(authData.id())
+            .orElseGet(() -> 
+                playlistRepository.save(
+                    new Playlist(
+                        "Liked songs", 
+                        userRepository.getReferenceById(authData.id()), 
+                        PlaylistType.LIKED
+                    )));
+
+        addQueueList(list, playlist.getId(), authData);
+    }
+
+    @Transactional
+    public void unsetAudiosLiked(List<Long> list, UserAuthData authData) {
+        Playlist playlist = playlistRepository.findLikedPlaylistByOwnerId(authData.id())
+            .orElseThrow();
+
+        removeQueueList(list, playlist.getId(), authData);
     }
 
     @Transactional
@@ -146,9 +172,9 @@ public class PlaylistCommandService {
     @Transactional
     public void removeQueueList(List<Long> list, Long playlistId, UserAuthData authData) {
 
-        for (Long queueItemId : list) {
+        for (Long audioId : list) {
 
-            removeFromQueue(playlistId, queueItemId, authData);
+            removeFromQueue(playlistId, audioId, authData);
         }
 
         eventPublisher.publishEvent(
@@ -157,10 +183,13 @@ public class PlaylistCommandService {
     }
 
     @Transactional 
-    public void removeFromQueue(Long playlistId, Long queueItemId, UserAuthData authData) {
-        queueItemRepository.deleteByIdAndUserPlayback(queueItemId, authData.id());
+    public void removeFromQueue(Long playlistId, Long audioId, UserAuthData authData) {
+        int deleted = queueItemRepository.deleteByAudioIdAndPlaylistId(
+            audioId,
+            playlistId
+        );
 
-        log.debug("deleted");
+        log.debug("Deleted queue items from playlist {}: {}", playlistId, deleted);
 
         queueItemRepository.normalizePositions(playlistId);
 

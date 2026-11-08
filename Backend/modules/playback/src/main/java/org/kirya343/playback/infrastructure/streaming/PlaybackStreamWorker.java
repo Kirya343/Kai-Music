@@ -118,7 +118,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
                     try {
                         streamTick();
                     } catch (Exception e) {
-                        log.error("Ошибка обработки тика комнаты: {}", e);
+                        log.error("Ошибка обработки тика комнаты: ", e.getMessage());
                     }
                 },
                 0,
@@ -135,7 +135,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         /**
          * if current playback position is after than audio duration - cancel task and send Next command
          */
-        if (currentState.position() > currentAudio.getDuration()) {
+        if (currentAudio != null && currentState.position() > currentAudio.getDuration()) {
 
             addLog("Sending NEXT event: room=%s, becouse position(%s) is after audioDuration(%s)", 
                 targetId,

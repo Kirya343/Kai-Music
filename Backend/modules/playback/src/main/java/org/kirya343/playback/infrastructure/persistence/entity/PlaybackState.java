@@ -8,6 +8,7 @@ import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.Playlist;
+import org.kirya343.playlist.enums.PlaylistType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -19,6 +20,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +29,14 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
+@Table (
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "uk_playback_target",
+            columnNames = {"target_id", "target_type"}
+        )
+    }
+)
 @NoArgsConstructor
 public class PlaybackState {
     
@@ -60,7 +71,7 @@ public class PlaybackState {
         optional = false
     )
     @JoinColumn(nullable = false)
-    private Playlist playlist = new Playlist(targetType + "-" + targetId + " state-playlist", null);
+    private Playlist playlist = new Playlist(targetType + "-" + targetId + " state-playlist", PlaylistType.PLAYBACK_QUEUE);
 
     public PlaybackState(Long targetId, PlaybackTargetType targetType, PlaybackStateDTO state) {
         this.targetId = targetId;
@@ -73,7 +84,7 @@ public class PlaybackState {
             this.initiatorName = state.user();
         }
 
-        this.playlist = new Playlist(targetType + "-" + targetId + " state-playlist", null);
+        this.playlist = new Playlist(targetType + "-" + targetId + " state-playlist", PlaylistType.PLAYBACK_QUEUE);
     }
 
     public double getCurrentPosition() {

@@ -12,7 +12,7 @@ const PlaylistsPage = () => {
     const { playlistsData } = useData();
     const { playbackPlaylist } = usePlaybackContext();
     
-    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.data);
+    const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.playlists);
 
     const [isOpen, setOpen] = useState(false);
 

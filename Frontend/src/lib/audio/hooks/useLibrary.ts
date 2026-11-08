@@ -1,8 +1,8 @@
+import { IPage } from "@/lib/common/types";
 import { IAudio, audioService } from "@audio";
-import { useData, useSearch } from "@common";
-import { useVirtualizer } from "@tanstack/react-virtual";
+import { useSearch } from "@common";
 import { AxiosProgressEvent } from "axios";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 interface IUploadingAudio {
     file: File;
@@ -20,12 +20,27 @@ interface IUploadingAudio {
  */
 export const useLibrary = () => {
 
-    const { audiosData } = useData();
+    const [audiosPage, setAudiosPage] = useState<IPage<IAudio> | null>(null)
     
     /** List of current uploads */
+    const [loading, setLoading] = useState<boolean>(true)
     const [uploading, setUploading] = useState<IUploadingAudio[]>([]);
 
-    const { filteredList, searchQuery, setSearchQuery } = useSearch(audiosData.data);
+    const [searchQuery, setSearchQuery] = useState<string>("")
+
+    useEffect(() => {
+        async function loadLibrary(searchQuery: string) {
+            try {
+                const res = await audioService.loadLibrary(searchQuery);
+
+                setAudiosPage(res.data)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        loadLibrary(searchQuery);
+    }, [searchQuery])
 
     /** Uploads audios on server */
     const uploadAudios = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,6 +109,6 @@ export const useLibrary = () => {
     return { 
         setSearchQuery, searchQuery, 
         uploadAudios, uploading,
-        filteredList
+        audiosPage, loading
     };
 }

@@ -65,7 +65,7 @@ export const useMediaSource = () => {
                         return;
                     }
 
-                    updateBufferedRanges(streamId);
+                    updateBufferedRanges();
                 });
 
                 sourceBuffer.addEventListener('error', event => {

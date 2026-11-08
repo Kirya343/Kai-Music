@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import styles from "./RoomReturnModal.module.scss"
 import { useNavigate } from "react-router-dom";
-import { IShortRoom, roomService } from "@room";
+import { IListeningRoom, roomService } from "@room";
 import Modal from "../Modal/Modal";
 import { useData } from "@common";
 import { useWebSocket } from "@websocket";
+import { playbackService } from "@playback";
 
 /**
  * RoomReturnModal is component that helps to return to room that was before 
@@ -39,7 +40,7 @@ const RoomReturnModal = () => {
      */
     const leaveRoom = async () => {
         try {
-            await roomService.leaveRoom();
+            await playbackService.unsubscribe();
         } finally {
             
         }

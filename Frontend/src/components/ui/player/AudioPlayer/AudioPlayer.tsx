@@ -1,4 +1,4 @@
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 import { useEffect, useRef } from "react";
 import VolumeSlider from "../parts/VolumeSlider/VolumeSlider";
 import styles from "./AudioPlayer.module.scss";
@@ -20,7 +20,7 @@ const AudioPlayer = () => {
         fullPlayerOpen, playingAudio,
         setFullPlayerOpen,
         playbackState
-    } = useRoomPlayback();
+    } = usePlaybackContext();
 
     // displays only if playbackState is loaded
     return playbackState && playingAudio ? (

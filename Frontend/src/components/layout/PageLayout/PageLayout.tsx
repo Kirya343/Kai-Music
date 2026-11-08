@@ -1,6 +1,6 @@
 import MobileAudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/MobileAudioMiniPlayer";
 import styles from "./PageLayout.module.scss";
-import { useRoomPlayback } from "@playback";
+import { useData } from "@common";
 
 interface PageLayoutProps {
     header?: React.ReactNode;
@@ -15,7 +15,7 @@ interface PageLayoutProps {
  */
 const PageLayout = ({ header, children }: PageLayoutProps) => {
 
-    const { roomLoaded } = useRoomPlayback();
+    const { roomData } = useData();
 
     return (
         <div className={styles.layout}>
@@ -24,7 +24,7 @@ const PageLayout = ({ header, children }: PageLayoutProps) => {
             <div className={styles.page}>
                 {children}
 
-                {roomLoaded && <MobileAudioMiniPlayer />}
+                {roomData.room?.id && <MobileAudioMiniPlayer />}
             </div>
         </div>
     );

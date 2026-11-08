@@ -1,4 +1,4 @@
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 import { useEffect, useRef } from "react";
 
 import styles from "./MobileAudioMiniPlayer.module.scss"
@@ -20,9 +20,7 @@ const MobileAudioMiniPlayer = () => {
     const { 
         playbackState, playingAudio, 
         setFullPlayerOpen, togglePlay 
-    } = useRoomPlayback();
-
-    const playTrack = playbackService.usePlayTrack();
+    } = usePlaybackContext();
 
     const duration = playingAudio?.duration || 0
 
@@ -56,7 +54,7 @@ const MobileAudioMiniPlayer = () => {
 
                 <button 
                     aria-label="Play Next Track"
-                    onClick={() => playTrack("next")}
+                    onClick={() => playbackService.playTrack("next")}
                 >
                     <RightIcon />
                 </button>

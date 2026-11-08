@@ -61,9 +61,6 @@ interface IRoomData {
     /** Room data. */
     room: IListeningRoom | null;
 
-    /** Room playlist. */
-    playlist: Playlist | null;
-
     /** Shows is data already synced or not */
     synced: boolean;
 

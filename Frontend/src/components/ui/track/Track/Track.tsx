@@ -4,7 +4,7 @@ import { MusicNoteIcon, PlayingAudioIcon } from "@/assets/icons"
 import { countPosition } from "@common"
 import { HTMLAttributes, ReactNode } from "react"
 import clsx from "clsx"
-import { useRoomPlayback } from "@playback"
+import { usePlaybackContext } from "@playback"
 import KebabMenu, { IKebabAction } from "@/components/ui/KebabMenu/KebabMenu"
 
 /** Defines an action button displayed on a track. */
@@ -98,7 +98,7 @@ const Track = ({
     ...divProps
 }: TrackProps) => {
 
-    const { playbackState } = useRoomPlayback();
+    const { playbackState } = usePlaybackContext();
 
     return (
         <div 

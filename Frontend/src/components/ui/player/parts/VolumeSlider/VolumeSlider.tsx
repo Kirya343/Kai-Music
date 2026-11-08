@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./VolumeSlider.module.scss"
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 import { useGlobal } from "@common";
 
 /**
@@ -10,7 +10,7 @@ import { useGlobal } from "@common";
  */
 export default function VolumeSlider({ visible = true }: { visible?: boolean }) {
 
-    const { audioRef } = useRoomPlayback();
+    const { audioRef } = usePlaybackContext();
     const { isMobile } = useGlobal();
 
     // on init gets state from localstorage

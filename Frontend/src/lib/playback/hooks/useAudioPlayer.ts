@@ -1,12 +1,10 @@
 import { useMediaSource } from "./useMediaSource";
-import { usePlayback } from "./usePlayback";
+import { usePlaybackController } from "./usePlaybackController";
 
-export const useAudioPlayer = (roomId: number | null) => {
+export const useAudioPlayer = () => {
     const mediaResource = useMediaSource();
 
-    const playback = usePlayback({
-        roomId,
-
+    const playbackController = usePlaybackController({
         audio: mediaResource.audio,
         createMediaSource: mediaResource.createMediaSource,
         cleanupMediaSource: mediaResource.cleanupMediaSource,
@@ -17,6 +15,6 @@ export const useAudioPlayer = (roomId: number | null) => {
 
     return {
         ...mediaResource,
-        ...playback
+        ...playbackController
     };
 };

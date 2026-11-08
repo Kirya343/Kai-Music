@@ -4,23 +4,21 @@ import { PlaybackState, PlaybackMode } from "../playbackTypes";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
 import { loggerFactory } from "@common";
+import { Playlist } from "@playlist";
+import { Client } from "@stomp/stompjs";
 
 const logger = loggerFactory.getLogger("Audio.Playback");
 
 interface usePlaybackProps {
-    roomId: number | null;
-
     audio: HTMLAudioElement | null,
     createMediaSource: (entryId: string) => HTMLAudioElement | null,
     cleanupMediaSource: () => void,
     currentStreamIdRef: RefObject<string | null>
 
-    setBufferUpdateHandler: (callback: (streamId: string) => void) => void
+    setBufferUpdateHandler: (callback: () => void) => void
 }
 
-export const usePlayback = ({
-    roomId,
-
+export const usePlaybackController = ({
     audio, 
     createMediaSource, 
     cleanupMediaSource, 
@@ -29,8 +27,14 @@ export const usePlayback = ({
     setBufferUpdateHandler
 }: usePlaybackProps) => {
 
+    const [playlist, setPlaylist] = useState<Playlist | null>(() => {
+        const saved = localStorage.getItem("playback.playlist");
+
+        return saved ? JSON.parse(saved) : null;
+    });
+
     const { started } = useGlobal();
-    const { addOnConnectHandler } = useWebSocket();
+    const { addOnConnectHandler, client } = useWebSocket();
 
     const unsyncedStateRef = useRef<PlaybackState | null>(null);
     const debounceTimeoutRef = useRef<number | null>(null);
@@ -80,7 +84,7 @@ export const usePlayback = ({
     // Play / Pause кнопка
     const togglePlay = useCallback(async () => {
 
-        if (!playbackState || !roomId) return;
+        if (!playbackState) return;
 
         const newPaused = !playbackState?.pause
 
@@ -88,12 +92,12 @@ export const usePlayback = ({
             pausePlayback()
         }
 
-        await playbackService.updateTrackPosition(roomId, {...playbackState, pause: newPaused});
-    }, [playbackState, roomId]);
+        await playbackService.updateTrackPosition({...playbackState, pause: newPaused});
+    }, [playbackState]);
 
     const seek = useCallback((position: number) => {
 
-        if (!playbackState?.entryId || !roomId) return;
+        if (!playbackState?.entryId) return;
 
         pendingSeekRef.current = true;
 
@@ -113,12 +117,12 @@ export const usePlayback = ({
             // ставим новый таймаут на 300 мс
             debounceTimeoutRef.current = setTimeout(async () => {
                 if (playbackState) {
-                    await playbackService.updateTrackPosition(roomId, newState);
+                    await playbackService.updateTrackPosition(newState);
                 }
                 debounceTimeoutRef.current = null;
             }, 100);
         }
-    }, [playbackState, pausePlayback, roomId]);
+    }, [playbackState, pausePlayback]);
 
     /**
      * Starts playing audio if last playbackState isn't paused and 
@@ -235,15 +239,30 @@ export const usePlayback = ({
         initMediaSource(streamId);
     }, [cleanupMediaSource, initMediaSource]);
 
+    const reconnect = useCallback((stompClient: Client) => {
+
+        let c: Client | null = stompClient || client
+
+        if (!c) return;
+
+        logger.debug("переподключаемся к комнате")
+
+        c?.publish({
+            destination: "/app/playback.reconnect",
+            body: ""
+        });
+    }, [client])
+
+
     useEffect(() => {
         const unsubscribe = addOnConnectHandler((client) => {
 
-            const playbackSub = client.subscribe(`/user/queue/playback`, (message) => {
+            const playbackSub = client.subscribe(`/user/queue/playback.state`, (message) => {
                 const state: PlaybackState = JSON.parse(message.body);
 
                 const streamId = message.headers["stream-id"];
 
-                logger.debug("Пришло обновление playback: ", state, streamId)
+                logger.debug("Пришло обновление playback.state: ", state, streamId)
 
                 if (currentStreamIdRef.current !== streamId) {
                     startNewStream(streamId);
@@ -256,15 +275,28 @@ export const usePlayback = ({
                 playIfBufferedRef.current();
             });
 
-            const playbackModeSub = client.subscribe(`/user/queue/playback-mode`, (message) => {
+            const playbackModeSub = client.subscribe(`/user/queue/playback.mode`, (message) => {
                 const mode = JSON.parse(message.body);
+
+                logger.debug("Пришло обновление playback.mode: ", mode)
 
                 setPlaybackMode(mode);
             });
 
-            logger.debug("Подписались на /user/queue/playback")
+            const playbackPlaylistSub = client.subscribe(`/user/queue/playback.playlist`, (message) => {
+                const playlist = JSON.parse(message.body);
+
+                logger.debug("Пришло обновление playback.playlist: ", playlist)
+
+                setPlaylist(playlist);
+            });
+
+            logger.debug("Подписались на /user/queue/playback .mode, .playlist, .state")
+
+            reconnect(client);
 
             return () => {
+                playbackPlaylistSub.unsubscribe();
                 playbackModeSub.unsubscribe();
                 playbackSub.unsubscribe();
             }
@@ -278,6 +310,7 @@ export const usePlayback = ({
         resumePlayback,
         playbackState,
         playbackMode,
+        playbackPlaylist: playlist,
         togglePlay,
         seek
     }

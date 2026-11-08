@@ -15,7 +15,7 @@ public record PlaylistDTO(
 
         return new PlaylistDTO(
             playlist.getId(),
-            playlist.getOwner().getId(),
+            playlist.getOwner() != null ? playlist.getOwner().getId() : null,
             playlist.getTitle(),
             QueueItemDTO.ofList(playlist.getQueue())
         );

@@ -13,6 +13,7 @@ import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
+import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.user.dto.ShortUserDTO;
 
 import io.github.kirya343.terminal.api.component.DiagnosticLoggable;
@@ -231,6 +232,10 @@ public class AudioStreamWorker
 
     public void sendPlaybackMode(PlaybackMode mode) {
         playbackWebsocketService.sendPlaybackMode(userSub, mode);
+    }
+
+    public void sendPlaylist(Playlist playlist) {
+        playbackWebsocketService.sendPlaybackPlaylist(userSub, playlist);
     }
 
     // Diadnostic voids

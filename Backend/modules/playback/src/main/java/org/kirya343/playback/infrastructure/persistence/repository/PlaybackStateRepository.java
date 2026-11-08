@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.domain.enums.PlaybackMode;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +13,19 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface PlaybackStateRepository extends JpaRepository<PlaybackState, Long> {
-    Optional<PlaybackState> findByTargetIdAndTargetType(Long targetId, PlaybackTargetType targetType);
+    Optional<PlaybackState> findByTargetIdAndTargetType(
+        Long targetId,
+        PlaybackTargetType targetType
+    );
+
+    @EntityGraph(attributePaths = {"playlist", "playlist.queue", "playlist.queue.audio"})
+    Optional<PlaybackState> findWithPlaylistByTargetIdAndTargetType(
+        Long targetId,
+        PlaybackTargetType targetType
+    );
+
+    @EntityGraph(attributePaths = {"playlist", "playlist.queue", "playlist.queue.audio"})
+    Optional<PlaybackState> findByPlaylistId(Long playlistId);
 
     @Transactional 
     @Modifying 

@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import { CirclePlusIcon } from "@/assets/icons";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 
 const PlaylistPage = ({}: {}) => {
 
@@ -19,9 +19,9 @@ const PlaylistPage = ({}: {}) => {
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
-    const { playbackState } = useRoomPlayback();
+    const { playbackState, playbackPlaylist } = usePlaybackContext();
 
-    const { playlistsData, roomData } = useData();
+    const { playlistsData } = useData();
         
     const playlist = useMemo<Playlist | null>(() => {
         if (!playlistId) return null;
@@ -32,10 +32,10 @@ const PlaylistPage = ({}: {}) => {
     const { filteredList, searchQuery, setSearchQuery } = useSearch(playlist?.queue || []);
 
     const playingAudioId = useMemo(() => {
-        return roomData.playlist?.queue.find(
+        return playbackPlaylist?.queue.find(
             item => item.id === playbackState?.entryId
         )?.audio.id;
-    }, [roomData.playlist?.queue, playbackState?.entryId]);
+    }, [playbackPlaylist?.queue, playbackState?.entryId]);
 
     if (!playlist) return null;
 

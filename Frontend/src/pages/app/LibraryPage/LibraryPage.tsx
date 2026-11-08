@@ -6,12 +6,12 @@ import { CirclePlusIcon, CheckmarkIcon, CrossIcon } from "@/assets/icons";
 import LibraryTrack from "@/components/ui/track/LibraryTrack";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData } from "@common";
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 
 const LibraryPage = () => {
 
-    const { audiosData, roomData } = useData();
+    const { audiosData } = useData();
     const [selectMode, setSelectMode] = useState<boolean>(false);
 
     const {
@@ -22,13 +22,13 @@ const LibraryPage = () => {
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
     
-    const { playbackState } = useRoomPlayback();
+    const { playbackState, playbackPlaylist } = usePlaybackContext();
 
     const playingAudioId = useMemo(() => {
-        return roomData.playlist?.queue.find(
+        return playbackPlaylist?.queue.find(
             item => item.id === playbackState?.entryId
         )?.audio.id;
-    }, [roomData.playlist?.queue, playbackState?.entryId]);
+    }, [playbackPlaylist?.queue, playbackState?.entryId]);
 
     return (
         <SearchableLayout
@@ -77,7 +77,7 @@ const LibraryPage = () => {
                                 key={idx}
                                 audio={audio}
                                 trackNumber={idx + 1}
-                                importPlaylistId={roomData.playlist?.id}
+                                importPlaylistId={playbackPlaylist?.id}
                                 openEditModal={setAudioFileView}
                                 handleDelete={audiosData.deleteAudio}
                                 playing={playingAudioId === audio.id}

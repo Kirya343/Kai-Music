@@ -1,4 +1,4 @@
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 import styles from "./TrackPositionTracker.module.scss"
 import { countPosition } from "@common";
 
@@ -10,7 +10,7 @@ const TrackPositionTracker = () => {
         bufferedRanges,
         playingAudio,
         playbackState
-    } = useRoomPlayback();
+    } = usePlaybackContext();
 
     // variables to control the scrolling title
     const duration = playingAudio?.duration || 0
@@ -19,7 +19,7 @@ const TrackPositionTracker = () => {
         <div className={styles.tracker}>
             <div className={styles.progress}>
                 <div className={styles.buffered}>
-                    {bufferedRanges.get(playbackState.entryId)?.map((range, index) => (
+                    {bufferedRanges?.map((range, index) => (
                         <div
                             key={index}
                             className={styles.bufferedRange}

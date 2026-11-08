@@ -2,12 +2,12 @@
 src/
 └── playback/
     ├── hooks/
-    │   └── useRoomPlayback.ts
+    │   └── usePlaybackContext.ts
     └── ...
 
 tests/
 ├── unit/
-│   ├── useRoomPlayback.test.ts
+│   ├── usePlaybackContext.test.ts
 │   ├── useAudioStream.test.ts
 │   └── audioBuffer.test.ts
 └── e2e/

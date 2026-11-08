@@ -31,7 +31,7 @@ const JoinRoomModal = ({
      */
     const joinRoom = async () => {
         try {
-            await playbackService.joinRoom(code);
+            await roomService.joinRoom(code);
             navigate("/app/room");
         } catch (e) {
             logger.error(e)

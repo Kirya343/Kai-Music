@@ -1,4 +1,4 @@
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 import { useEffect, useRef } from "react";
 
 import styles from "./DesktopAudioPlayer.module.scss"
@@ -19,7 +19,7 @@ const DesktopAudioPlayer = () => {
 
     const { isMobile } = useGlobal();
 
-    const { playbackState, playingAudio } = useRoomPlayback();
+    const { playbackState, playingAudio } = usePlaybackContext();
 
     return playingAudio && playbackState && !isMobile && (
         <div 

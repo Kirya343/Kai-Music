@@ -21,11 +21,4 @@ public class PlaylistWebSocketService {
             playlist
         );
     }
-
-    public void broadcastRoomPlaylist(PlaylistDTO playlist) {
-        messagingTemplate.convertAndSend(
-            "/topic/playlist/" + playlist.id(), 
-            playlist
-        );
-    }
 }

@@ -10,7 +10,7 @@ import Loader from "@/components/ui/Loader/Loader";
 import { playlistService } from "@playlist";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
 import RoomTrack from "@/components/ui/track/RoomTrack";
-import { useRoomPlayback } from "@playback";
+import { usePlaybackContext } from "@playback";
 import { Navigate } from "react-router-dom";
 import { loggerFactory } from "@common";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
@@ -20,8 +20,8 @@ const logger = loggerFactory.getLogger("Pages.Room");
 
 const RoomPage = () => {
     const [selectMode, setSelectMode] = useState<boolean>(false);
-    const { playbackState } = useRoomPlayback();
-    const { room, playlist } = useData().roomData;
+    const { playbackState, playbackPlaylist } = usePlaybackContext();
+    const { room } = useData().roomData;
 
     const { started } = useGlobal();
     const { error } = useWebSocket();
@@ -31,10 +31,10 @@ const RoomPage = () => {
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
     const deleteFromRoom = async (id: number) => {
-        if (!playlist?.id) return;
+        if (!playbackPlaylist?.id) return;
 
         try {
-            await playlistService.removeFromQueue(playlist?.id, [id])
+            await playlistService.removeFromQueue(playbackPlaylist?.id, [id])
         } finally {
 
         }
@@ -42,6 +42,7 @@ const RoomPage = () => {
 
     const saveRoom = async () => {
         if (!room) return;
+
         const roomUpdate: IRoomUpdate = {
             title: newRoomName
         }
@@ -54,20 +55,9 @@ const RoomPage = () => {
         }
     }
 
-    const itemRefs = useRef<Record<string | number, HTMLDivElement | null>>({});
-
-    const scrollToItem = (id: number) => {
-        itemRefs.current[id]?.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest"
-        });
-    };
-
     if (!room) {
         return <Navigate to={"/app"}/>
     }
-
-    console.log(room)
     
     return (
         <>
@@ -129,7 +119,7 @@ const RoomPage = () => {
                                         icon: <ShuffleIcon />,
                                         title: "Add rundom",
                                         func: async () => {
-                                            if (playlist) await playlistService.addRandomTracks(playlist.id, 30)
+                                            if (playbackPlaylist) await playlistService.addRandomTracks(playbackPlaylist.id, 30)
                                         }
                                     }
                                 ]}
@@ -139,7 +129,7 @@ const RoomPage = () => {
                         <SelectableList
                             className={styles.trackList}
                             data={Object.fromEntries(
-                                (playlist?.queue ?? [])
+                                (playbackPlaylist?.queue ?? [])
                                     .slice()
                                     .sort((a, b) => a.position - b.position)
                                     .map(qi => [
@@ -176,7 +166,7 @@ const RoomPage = () => {
                 {started && <AudioMiniPlayer />}
             </div>
 
-            {playlist && <TrackImportModal importPlaylist={playlist} isOpen={importOpen} onClose={() => setImportOpen(false)} />}
+            {playbackPlaylist && <TrackImportModal importPlaylist={playbackPlaylist} isOpen={importOpen} onClose={() => setImportOpen(false)} />}
         </>
     )
 }

@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import org.kirya343.audio.dto.AudioChunk;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
+import org.kirya343.playlist.datasource.model.Playlist;
+import org.kirya343.playlist.dto.PlaylistDTO;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class PlaybackWebsocketService {
 
         messagingTemplate.convertAndSendToUser(
             userSub,
-            "/queue/playback",
+            "/queue/playback.state",
             state,
             headers
         );
@@ -67,8 +69,19 @@ public class PlaybackWebsocketService {
     public void sendPlaybackMode(String userSub, PlaybackMode mode) {
         messagingTemplate.convertAndSendToUser(
             userSub, 
-            "/queue/playback-mode", 
+            "/queue/playback.mode", 
             mode
+        );
+    }
+
+    public void sendPlaybackPlaylist(String userSub, Playlist playlist) {
+
+        if (playlist == null) return;
+
+        messagingTemplate.convertAndSendToUser(
+            userSub,
+            "/queue/playback.playlist",
+            PlaylistDTO.ofPlaylist(playlist)
         );
     }
 }

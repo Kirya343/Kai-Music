@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IListeningRoom, IShortRoom } from "../roomTypes";
+import { IListeningRoom } from "../roomTypes";
 import { roomService } from "../services";
 import { useWebSocket } from "@websocket";
-import { Playlist } from "@playlist";
 import { loggerFactory } from "@common";
 
 const logger = loggerFactory.getLogger("Data.Room");
@@ -21,12 +20,6 @@ export function useRoomData() {
         return saved ? JSON.parse(saved) : null;
     });
 
-    const [playlist, setPlaylist] = useState<Playlist | null>(() => {
-        const saved = localStorage.getItem("roomPlaylist");
-
-        return saved ? JSON.parse(saved) : null;
-    });
-
     /**
      * synchronizes list of audios with the server  
      */
@@ -37,10 +30,6 @@ export function useRoomData() {
             setRoom(res.data)
 
             logger.debug("roomService.loadCurrentRoom:", res.data)
-
-            if (res.data.playlist) {
-                setPlaylist(res.data.playlist)
-            }
 
             setSynced(true)
         } finally {
@@ -75,23 +64,11 @@ export function useRoomData() {
         const unsubscribe = addOnConnectHandler((client) => {
 
             const roomSub = client.subscribe(`/user/queue/room`, (message) => {
-                const shortRoom: IShortRoom = JSON.parse(message.body);
+                const room: IListeningRoom = JSON.parse(message.body);
                 
-                // Mapping from Short to full listing room
-                setRoom(prev => {
-                    if (!prev?.playlist) return null;
+                setRoom(room);
 
-                    return {
-                        ...prev,
-                        ...shortRoom,
-                        playlist: {
-                            ...prev.playlist,
-                            id: shortRoom.playlistId
-                        }
-                    };
-                });
-
-                currentRoomIdRef.current = shortRoom.id
+                currentRoomIdRef.current = room.id
             });
 
             return () => {
@@ -102,31 +79,8 @@ export function useRoomData() {
         return unsubscribe;
     }, [addOnConnectHandler]);
 
-    useEffect(() => {
-
-        if (!room?.playlist?.id) return; 
-
-        const unsubscribe = addOnConnectHandler((client) => {
-
-            const playlistSub = client.subscribe(`/topic/playlist/${room?.playlist?.id}`, (message) => {
-                logger.debug(`пришло обновление плейлиста на ${room?.playlist?.id}`)
-
-                setPlaylist(JSON.parse(message.body));
-            });
-
-            logger.debug(`подписались на /topic/playlist/${room?.playlist?.id}`)
-
-            return () => {
-                playlistSub.unsubscribe();
-            }
-        });
-
-        return unsubscribe;
-    }, [room?.playlist?.id, addOnConnectHandler])
-
     return {
         room,
-        playlist,
         synced,
         syncRoom
     }

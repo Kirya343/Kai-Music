@@ -25,16 +25,6 @@ public record RoomDTO(
         );
     }
 
-    public static RoomDTO byContext(RoomDTO r, AudioFile audio, Integer listeners) {
-        return new RoomDTO(
-            r.id(),
-            r.title(),
-            r.ownerId(),
-            r.code(),
-            null
-        );
-    }
-
     public static RoomDTO ofRoom(ListeningRoom room) {
 
         return new RoomDTO(
@@ -43,6 +33,16 @@ public record RoomDTO(
             room.getOwner().getId(),
             room.getCode(),
             null
+        );
+    }
+
+    public static RoomDTO updateMembers(RoomDTO room, List<ShortUserDTO> listeners) {
+        return new RoomDTO(
+            room.id(), 
+            room.title(), 
+            room.ownerId(),
+            room.code(),
+            listeners
         );
     }
 }

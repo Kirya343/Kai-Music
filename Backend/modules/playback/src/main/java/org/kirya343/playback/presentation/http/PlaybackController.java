@@ -41,15 +41,16 @@ public class PlaybackController {
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
     
-    @GetMapping("/{roomId}/playback-state")
+    @GetMapping("/playback-state")
     @Authenticated
     public PlaybackStateDTO getPlaybackState(
-        @PathVariable Long roomId,
+        @PathVariable Long targetId,
+        @RequestParam PlaybackTargetType targetType,
         @AuthUser UserAuthData authData
     ) {
 
         PlaybackState state = playbackStateRepository
-            .findByTargetIdAndTargetType(roomId, PlaybackTargetType.ROOM)
+            .findByTargetIdAndTargetType(targetId, targetType)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return PlaybackStateDTO.ofState(state);
@@ -59,7 +60,6 @@ public class PlaybackController {
     @Authenticated
     public void updatePlaybackState(
         @RequestBody PlaybackStateDTO state,
-        @PathVariable Long roomId,
         @AuthUser UserAuthData authData
     ) {
 
@@ -76,7 +76,6 @@ public class PlaybackController {
     @Authenticated
     public void changeTrack(
         @RequestParam String changing,
-        @PathVariable Long roomId,
         @AuthUser UserAuthData authData
     ) {
 

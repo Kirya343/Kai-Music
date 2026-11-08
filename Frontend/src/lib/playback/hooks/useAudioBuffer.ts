@@ -13,14 +13,14 @@ interface useAudioBufferProps {
 export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioBufferProps) {
 
     const sourceBufferRef = useRef<SourceBuffer | null>(null);
-    const [bufferedRanges, setBufferedRanges] = useState<Map<string, TimeRange[]>>(new Map());
-    const onBufferUpdateRef = useRef<((streamId: string) => void) | null>(null);
+    const [bufferedRanges, setBufferedRanges] = useState<TimeRange[]>([]);
+    const onBufferUpdateRef = useRef<(() => void) | null>(null);
     const queueRef = useRef<AudioChunk[]>([]);
 
     const { addOnConnectHandler } = useWebSocket();
 
     const setBufferUpdateHandler = useCallback(
-        (callback: (streamId: string) => void) => {
+        (callback: () => void) => {
             onBufferUpdateRef.current = callback;
         }, []);
 
@@ -29,7 +29,7 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
      * 
      * @param entryId - ID of the current entry
      */
-    const updateBufferedRanges = useCallback((streamId: string) => {
+    const updateBufferedRanges = useCallback(() => {
         const sourceBuffer = sourceBufferRef.current;
 
         if (!sourceBuffer) {
@@ -45,16 +45,9 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
             });
         }
 
-        setBufferedRanges(prev => {
-            const updated = new Map(prev);
-            updated.set(streamId, ranges);
-            
-            logger.debug("buffer", updated)
+        setBufferedRanges(ranges);
 
-            return updated;
-        });
-
-        onBufferUpdateRef.current?.(streamId)
+        onBufferUpdateRef.current?.()
     }, []);
 
     /**
@@ -82,6 +75,8 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
         }
 
         sourceBuffer.appendBuffer(buffer);
+
+        updateBufferedRanges();
 
         return true;
     }, []);

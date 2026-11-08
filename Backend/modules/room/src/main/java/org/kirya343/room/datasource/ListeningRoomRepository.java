@@ -3,7 +3,7 @@ package org.kirya343.room.datasource;
 import java.util.List;
 import java.util.Optional;
 
-import org.kirya343.room.dto.ShortRoomDTO;
+import org.kirya343.room.dto.RoomDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -53,7 +53,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             r.owner_id,
             r.code
         """, nativeQuery = true)
-    List<ShortRoomDTO> findAllShortDTOs();
+    List<RoomDTO> findAllShortDTOs();
 
     @Query(value = """
         SELECT
@@ -75,7 +75,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             r.owner_id,
             r.code
         """, nativeQuery = true)
-    Optional<ShortRoomDTO> findShortRoomById(
+    Optional<RoomDTO> findShortRoomById(
         @Param("roomId") Long roomId
     );
 }

@@ -1,5 +1,5 @@
 import styles from "./MainPage.module.scss";
-import { IShortRoom, roomService } from "@room";
+import { IListeningRoom, roomService } from "@room";
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { 
@@ -18,7 +18,7 @@ const MainPage = () => {
 
     const { roomData } = useData()
 
-    const [rooms, setRooms] = useState<IShortRoom[] | null>(null);
+    const [rooms, setRooms] = useState<IListeningRoom[] | null>(null);
     const [isOpen, setOpen] = useState<boolean>(false);
     const [stat, setStat] = useState<{activeListners: number, activeRooms: number} | null>(null);
     const navigate = useNavigate()

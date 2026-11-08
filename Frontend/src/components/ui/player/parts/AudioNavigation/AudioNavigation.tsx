@@ -1,23 +1,21 @@
-import { playbackService, useRoomPlayback } from "@playback";
+import { playbackService, usePlaybackContext } from "@playback";
 import { PlaybackModeToggle } from "../PlaybackModeToggle"
 import styles from "./AudioNavigation.module.scss"
 import { LeftIcon, PauseIcon, PlayIcon, PlusIcon, RightIcon } from "@/assets/icons";
 
 const AudioNavigation = () => {
 
-    const playTrack = playbackService.usePlayTrack();
-
     const {  
         togglePlay,
         playbackState
-    } = useRoomPlayback();
+    } = usePlaybackContext();
 
     return playbackState && (
         <div className={styles.navigation}>
             <PlaybackModeToggle />
             <button 
                 aria-label="Play Prev Track"
-                onClick={() => playTrack("prev")}
+                onClick={() => playbackService.playTrack("prev")}
             >
                 <LeftIcon />
             </button>
@@ -29,7 +27,7 @@ const AudioNavigation = () => {
             </button>
             <button 
                 aria-label="Play Next Track"
-                onClick={() => playTrack("next")}>
+                onClick={() => playbackService.playTrack("next")}>
                 <RightIcon />
             </button>
             <button><PlusIcon/></button>

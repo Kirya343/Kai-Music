@@ -72,9 +72,13 @@ export default function SelectableList<T extends ItemKey>({
 
     //LIST OPTIMIZATION FEATURE
 
-    const [visibleCount, setVisiblCount] = useState<number>(() => 
+    const [visibleCount, setVisibleCount] = useState<number>(() => 
         initialVisible == "all" ? allItems.length : initialVisible
     );
+
+    useEffect(() => {
+        setVisibleCount(allItems.length)
+    }, [allItems])
 
     const visibleItems = allItems.slice(0, visibleCount)
 
@@ -131,6 +135,7 @@ export default function SelectableList<T extends ItemKey>({
     }, [extraActions])
 
     const renderList = () => {
+
         return (
             <div className={clsx(styles.list, className, selectMode && styles.open)} {...props}>
                 {visibleItems.map(id => (
@@ -149,7 +154,7 @@ export default function SelectableList<T extends ItemKey>({
                 ))}
 
                 {visibleCount < allItems.length && (
-                    <button className={styles.loadMore} onClick={() => setVisiblCount(prev => prev + 50)}>Show more</button>
+                    <button className={styles.loadMore} onClick={() => setVisibleCount(prev => prev + 50)}>Show more</button>
                 )}
             </div>
         )

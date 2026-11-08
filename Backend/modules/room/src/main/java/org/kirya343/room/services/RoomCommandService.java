@@ -5,6 +5,7 @@ import org.kirya343.user.datasource.User;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.room.datasource.ListeningRoomRepository;
 import org.kirya343.common.event.room.RoomDeletedEvent;
+import org.kirya343.common.event.room.RoomDisconnectedEvent;
 import org.kirya343.room.dto.PlaybackSubscribeEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -44,5 +45,17 @@ public class RoomCommandService {
         eventPublisher.publishEvent(new RoomDeletedEvent(room.getId()));
 
         listeningRoomRepository.delete(room);
+    }
+
+    public void joinRoom(String code, UserAuthData authData) {
+        ListeningRoom prevRoom = listeningRoomRepository.findRoomByUserId(authData.id()).orElse(null);
+
+        if (prevRoom != null) {
+            eventPublisher.publishEvent(new RoomDisconnectedEvent(authData.sub(), prevRoom.getId()));
+        }
+
+        ListeningRoom newRoom = listeningRoomRepository.findByCode(code).orElseThrow();
+
+        eventPublisher.publishEvent(new PlaybackSubscribeEvent(authData, "ROOM", newRoom.getId()));
     }
 }

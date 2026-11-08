@@ -3,36 +3,37 @@ import { IAudio, TimeRange } from "@audio";
 import { countPosition, useData } from "@common";
 import { PlaybackState, PlaybackMode, playbackService } from "@playback";
 import { useAudioPlayer } from "./hooks";
+import { Playlist } from "@playlist";
 
 interface RoomPlaybackContextType {
     playingAudio: IAudio | null;
 
     playbackState: PlaybackState | null;
     playbackMode: PlaybackMode;
-    roomLoaded: boolean;
+    playbackPlaylist: Playlist | null;
+
     fullPlayerOpen: boolean;
     setFullPlayerOpen: Dispatch<SetStateAction<boolean>>;
     updateMessage: string;
     audioRef: React.RefObject<HTMLAudioElement | null>;
     togglePlay: () => void;
-    bufferedRanges: Map<number, TimeRange[] | []>;
+    bufferedRanges: TimeRange[];
     pausePlayback: () => void;
     seek: (position: number) => void;
 }
 
 const RoomPlaybackContext = createContext<RoomPlaybackContextType | null>(null);
 
-export const useRoomPlayback = () => {
+export const usePlaybackContext = () => {
     const ctx = useContext(RoomPlaybackContext);
     if (!ctx) {
-        throw new Error("useRoomPlayback must be used inside AuthProvider");
+        throw new Error("usePlaybackContext must be used inside AuthProvider");
     }
     return ctx;
 }
 
 export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 
-    const { roomData } = useData();
     const prevPlaybackStateRef = useRef<PlaybackState | null>(null);
 
     const { 
@@ -41,21 +42,18 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
 
         playbackState, 
         playbackMode,
+        playbackPlaylist,
         seek,
         togglePlay
-    } = useAudioPlayer(roomData.room?.id || null);
+    } = useAudioPlayer();
 
     const playingAudio = useMemo<IAudio | null>(() => {
-        const queueItem = roomData.playlist?.queue.find(qi => qi.id === playbackState?.entryId)
+        const queueItem = playbackPlaylist?.queue.find(qi => qi.id === playbackState?.entryId)
 
         if (!queueItem?.audio) return null;
 
         return queueItem.audio;
-    }, [roomData.playlist, playbackState])
-
-    const roomLoaded: boolean = !!roomData.room;
-
-    const prevRoomRef = useRef<number | null>(null);
+    }, [playbackPlaylist, playbackState])
 
     // info
     const updateMessage = useMemo<string>(() => {
@@ -85,23 +83,8 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     const [fullPlayerOpen, setFullPlayerOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!roomData.room) return;
 
-        if (
-            prevRoomRef.current !== null &&
-            prevRoomRef.current !== roomData.room.id
-        ) {
-            pausePlayback();
-        }
-
-        prevRoomRef.current = roomData.room.id;
-    }, [roomData.room?.id]);
-
-    useEffect(() => {
-
-        const roomId = roomData.room?.id;
-
-        if (!("mediaSession" in navigator) || !playbackState || !playingAudio || !roomId) {
+        if (!("mediaSession" in navigator) || !playbackState || !playingAudio) {
             return;
         }
 
@@ -127,11 +110,11 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         });
 
         navigator.mediaSession.setActionHandler("nexttrack", async () => {
-            await playbackService.playTrack(roomId, "next");
+            await playbackService.playTrack("next");
         });
 
         navigator.mediaSession.setActionHandler("previoustrack", async () => {
-            await playbackService.playTrack(roomId, "prev");
+            await playbackService.playTrack("prev");
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
@@ -166,7 +149,6 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     }, [
         playingAudio,
         playbackState,
-        roomData.room?.id,
         seek
     ]);
     
@@ -176,8 +158,8 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
 
             playbackState,
             playbackMode,
+            playbackPlaylist,
 
-            roomLoaded, 
             fullPlayerOpen, 
             setFullPlayerOpen,
             updateMessage,

@@ -1,6 +1,6 @@
 package org.kirya343.room.services;
 
-import org.kirya343.room.dto.ShortRoomDTO;
+import org.kirya343.room.dto.RoomDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class RoomWebSocketService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    public void broadcastRoomInfo(String userSub, ShortRoomDTO dto) {
+    public void broadcastRoomInfo(String userSub, RoomDTO dto) {
         
         if (dto == null) return;
 

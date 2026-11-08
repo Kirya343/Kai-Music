@@ -12,6 +12,7 @@ import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
 import org.kirya343.playback.application.service.PlaybackService;
+import org.kirya343.playback.application.service.PlaybackSessionService;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
@@ -35,6 +36,7 @@ public class PlaybackController {
 
     private final PlaybackStateRepository playbackStateRepository;
     private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final PlaybackSessionService playbackSessionService;
     private final PlaybackService playbackService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
@@ -61,7 +63,7 @@ public class PlaybackController {
         @AuthUser UserAuthData authData
     ) {
 
-        if (shouldIgnore(authData.id(), roomId, "updatePlayback")) {
+        if (shouldIgnore(authData.id(), "updatePlayback")) {
             return;
         }
 
@@ -70,7 +72,7 @@ public class PlaybackController {
         audioStreamWorkerManager.get(authData.sub()).submit(cmd);
     }
 
-    @PostMapping("/{roomId}/change-track")
+    @PostMapping("/change-track")
     @Authenticated
     public void changeTrack(
         @RequestParam String changing,
@@ -78,13 +80,31 @@ public class PlaybackController {
         @AuthUser UserAuthData authData
     ) {
 
-        if (shouldIgnore(authData.id(), roomId, "changeTrack")) {
+        if (shouldIgnore(authData.id(), "changeTrack")) {
             return;
         }
 
         PlaybackCommand cmd = new ChangeTrack(changing, authData);
 
         audioStreamWorkerManager.get(authData.sub()).submit(cmd);
+    }
+
+    @PostMapping("/subscribe")
+    @Authenticated
+    public void subscribe(
+        @RequestParam PlaybackTargetType targetType,
+        @RequestParam Long targetId,
+        @AuthUser UserAuthData authData
+    ) {
+        playbackSessionService.subscribe(authData, targetType, targetId);
+    }
+
+    @PostMapping("/unsubscribe")
+    @Authenticated
+    public void unsubscribe(
+        @AuthUser UserAuthData authData
+    ) {
+        playbackSessionService.unsubscribe(authData);
     }
 
     @PostMapping("/{targetId}/mode")
@@ -98,10 +118,10 @@ public class PlaybackController {
         playbackService.updatePlaybackMode(targetId, targetType, mode, authData);
     }
 
-    private boolean shouldIgnore(Long userId, Long roomId, String action) {
+    private boolean shouldIgnore(Long userId, String action) {
         long now = System.currentTimeMillis();
 
-        String key = userId + ":" + roomId + ":" + action;
+        String key = userId + ":" + action;
 
         Long last = lastUpdate.get(key);
 

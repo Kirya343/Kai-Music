@@ -7,6 +7,10 @@ import org.kirya343.playback.infrastructure.streaming.AudioStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
+import org.kirya343.room.datasource.ListeningRoom;
+import org.kirya343.room.datasource.ListeningRoomRepository;
+import org.kirya343.room.dto.ShortRoomDTO;
+import org.kirya343.room.services.RoomWebSocketService;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.user.datasource.User;
 import org.kirya343.user.datasource.UserRepository;
@@ -25,6 +29,8 @@ public class PlaybackSessionService {
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     private final UserPlaybackRepository userPlaybackRepository;
     private final UserRepository userRepository;
+    private final RoomWebSocketService roomWebSocketService;
+    private final ListeningRoomRepository listeningRoomRepository;
 
     public void subscribe(UserAuthData authData, PlaybackTargetType targetType, Long targetId) {
 
@@ -39,7 +45,22 @@ public class PlaybackSessionService {
 
         userWorker.subscribe(playbackWorker, ShortUserDTO.ofUser(user));
 
+        switch (targetType) {
+            case ROOM:
+                
+                ListeningRoom room = listeningRoomRepository.findById(targetId).orElseThrow();
+                roomWebSocketService.broadcastRoomInfo(authData.sub(), ShortRoomDTO.ofRoom(room));
+                break;
+        
+            default:
+                break;
+        }
+
         userPlaybackRepository.save(new UserPlayback(authData.id(), targetId, targetType));
+    }
+
+    public void unsubscribe(UserAuthData authData) {
+        audioStreamWorkerManager.unregister(authData.sub());
     }
 
     public void restoreSession(UserAuthData authData) {

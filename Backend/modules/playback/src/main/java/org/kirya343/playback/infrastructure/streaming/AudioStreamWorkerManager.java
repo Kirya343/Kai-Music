@@ -66,6 +66,7 @@ public class AudioStreamWorkerManager
         log.debug("Удаляем воркер {}", userSub);
 
         if (worker != null) {
+            worker.unsubscribe();
             worker.cancelTask();
         }
     }

@@ -72,6 +72,10 @@ public class AudioStreamWorker
         worker.subscribe(this, userDTO);
     }
 
+    public void unsubscribe() {
+        subscribedWorker.unsubscribe(this);
+    }
+
     public void applyState(PlaybackStateDTO state) {
 
         addLog("applyState state=%s", state == null);

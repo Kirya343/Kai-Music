@@ -158,7 +158,7 @@ public class PlaylistCommandService {
 
     @Transactional 
     public void removeFromQueue(Long playlistId, Long queueItemId, UserAuthData authData) {
-        queueItemRepository.deleteByIdAndUserRoom(queueItemId, authData.id());
+        queueItemRepository.deleteByIdAndUserPlayback(queueItemId, authData.id());
 
         log.debug("deleted");
 

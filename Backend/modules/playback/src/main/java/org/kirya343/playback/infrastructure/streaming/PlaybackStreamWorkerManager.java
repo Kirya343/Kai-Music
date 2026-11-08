@@ -44,14 +44,15 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
     }
 
     public Set<Long> keySet(PlaybackTargetType type) {
-        return workers.get(type).keySet();
+        return workers.computeIfAbsent(type, key -> new ConcurrentHashMap<>()).keySet();
     }
 
     public PlaybackStreamWorker get(PlaybackTargetType type, Long id) {
 
         log.debug("Пытаемся получить {} воркер для {}", type, id);
 
-        PlaybackStreamWorker worker = workers.get(type).get(id);
+        PlaybackStreamWorker worker = workers
+            .computeIfAbsent(type, key -> new ConcurrentHashMap<>()).get(id);
 
         if (worker == null) {
 
@@ -87,7 +88,8 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
 
     public void removeWorker(PlaybackTargetType type, Long id) {
 
-        PlaybackStreamWorker worker = workers.get(type).remove(id);
+        PlaybackStreamWorker worker = workers
+            .computeIfAbsent(type, key -> new ConcurrentHashMap<>()).remove(id);
 
         if (worker != null) {
             worker.cancelTask();

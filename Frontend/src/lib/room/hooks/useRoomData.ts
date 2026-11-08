@@ -49,13 +49,13 @@ export function useRoomData() {
     }, [])
 
     const reconnectToRoom = useCallback(() => {
-        if (!client || !room?.id) return;
+        if (!client) return;
 
-        logger.debug("переподключаемся к комнате", room?.id)
+        logger.debug("переподключаемся к комнате")
 
         client.publish({
-            destination: "/app/room/reconnect",
-            body: JSON.stringify({ roomId: room?.id })
+            destination: "/app/playback.reconnect",
+            body: ""
         });
     }, [client])
 

@@ -14,17 +14,12 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         SELECT DISTINCT r
         FROM ListeningRoom r
         LEFT JOIN FETCH r.owner
-        LEFT JOIN FETCH r.playlist p
-        LEFT JOIN FETCH p.queue q
-        LEFT JOIN FETCH q.audio
         JOIN UserPlayback up ON up.targetId = r.id
         WHERE up.userId = :userId
             AND up.targetType =
                 org.kirya343.playback.domain.enums.PlaybackTargetType.ROOM
         """)
     Optional<ListeningRoom> findRoomByUserId(@Param("userId") Long userId);
-    
-    Optional<ListeningRoom> findByPlaylistId(Long playlistId);
 
     @Query("""
         SELECT r FROM ListeningRoom r
@@ -45,8 +40,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
             r.owner_id AS ownerId,
             r.code,
-            null,
-            r.playlist_id AS playlistId
+            null
         FROM listening_room r
         JOIN users u ON u.id = r.owner_id
         LEFT JOIN user_playbacks up
@@ -57,8 +51,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             r.title,
             u.name,
             r.owner_id,
-            r.code,
-            r.playlist_id
+            r.code
         """, nativeQuery = true)
     List<ShortRoomDTO> findAllShortDTOs();
 
@@ -68,8 +61,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
             r.owner_id AS ownerId,
             r.code,
-            null,
-            r.playlist_id AS playlistId
+            null
         FROM listening_room r
         JOIN users u ON u.id = r.owner_id
         LEFT JOIN user_playbacks up
@@ -81,8 +73,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             r.title,
             u.name,
             r.owner_id,
-            r.code,
-            r.playlist_id
+            r.code
         """, nativeQuery = true)
     Optional<ShortRoomDTO> findShortRoomById(
         @Param("roomId") Long roomId

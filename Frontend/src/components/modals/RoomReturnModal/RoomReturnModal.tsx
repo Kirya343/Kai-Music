@@ -29,8 +29,8 @@ const RoomReturnModal = () => {
         setOpen(false)
         
         client.publish({
-            destination: "/app/room/reconnect",
-            body: JSON.stringify({ roomId: room?.id })
+            destination: "/app/playback.reconnect",
+            body: ""
         });
     }
 

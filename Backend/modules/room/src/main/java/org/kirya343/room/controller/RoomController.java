@@ -3,7 +3,7 @@ package org.kirya343.room.controller;
 import java.util.List;
 
 import org.kirya343.presence.global.services.PresenceService;
-import org.kirya343.room.services.PlaybackCommandService;
+import org.kirya343.room.services.RoomCommandService;
 import org.kirya343.room.services.RoomQueryService;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -37,7 +36,7 @@ public class RoomController {
     private final ListeningRoomRepository listeningRoomRepository;
     private final RoomQueryService roomQueryService;
     private final PresenceService presenceService;
-    private final PlaybackCommandService PlaybackCommandService;
+    private final RoomCommandService roomCommandService;
 
     @GetMapping
     @Authenticated
@@ -48,24 +47,7 @@ public class RoomController {
     @PostMapping
     @Authenticated
     public void createRoom(@AuthUser UserAuthData authData) {
-        PlaybackCommandService.createRoom(authData);
-    }
-
-    @PostMapping("/join")
-    @Authenticated
-    public void joinRoom(
-        @RequestParam String code,
-        @AuthUser UserAuthData authData
-    ) {
-        PlaybackCommandService.joinRoom(code, authData);
-    }
-
-    @PostMapping("/leave")
-    @Authenticated
-    public void leaveRoom(
-        @AuthUser UserAuthData authData
-    ) {
-        PlaybackCommandService.leaveRoom(authData);
+        roomCommandService.createRoom(authData);
     }
 
     @GetMapping("/list/page")

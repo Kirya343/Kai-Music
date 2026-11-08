@@ -22,9 +22,9 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
         FROM Playlist p
         WHERE p.owner.id = :userId
         AND NOT EXISTS (
-            SELECT r
-            FROM ListeningRoom r
-            WHERE r.playlist = p
+            SELECT ps
+            FROM PlaybackState ps
+            WHERE ps.playlist = p
         )
     """)
     List<Playlist> findUserPlaylists(@Param("userId") Long userId);

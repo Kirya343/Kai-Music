@@ -22,8 +22,4 @@ public class RoomQueryService {
 
         return RoomDTO.ofRoom(room);
     }
-
-    public ListeningRoom findByPlaylistId(Long playlistId) {
-        return listeningRoomRepository.findByPlaylistId(playlistId).orElse(null);
-    }
 }

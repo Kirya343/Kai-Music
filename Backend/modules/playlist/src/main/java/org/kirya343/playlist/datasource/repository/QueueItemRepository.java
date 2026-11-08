@@ -22,16 +22,16 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
                 SELECT 1
                 FROM UserPlayback up
                 WHERE up.userId = :userId
-                    AND up.targetId = (
-                        SELECT r.id
-                        FROM ListeningRoom r
-                        WHERE r.playlist.id = q.playlist.id
+                    AND EXISTS (
+                        SELECT 1
+                        FROM PlaybackState ps
+                        WHERE ps.targetId = up.targetId
+                            AND ps.targetType = up.targetType
+                            AND ps.playlist.id = q.playlist.id
                     )
-                    AND up.targetType =
-                        org.kirya343.playback.domain.enums.PlaybackTargetType.ROOM
             )
         """)
-    int deleteByIdAndUserRoom(
+    int deleteByIdAndUserPlayback(
         @Param("id") Long id,
         @Param("userId") Long userId
     );

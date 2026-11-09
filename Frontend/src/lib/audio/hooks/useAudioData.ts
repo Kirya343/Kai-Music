@@ -14,11 +14,7 @@ export const useAudioData = () => {
 
     const { addOnConnectHandler } = useWebSocket();
 
-    const [audios, setAudios] = useState<IAudio[]>(() => {
-        const saved = localStorage.getItem("audios");
-
-        return saved ? JSON.parse(saved) : [];
-    });
+    const [audios, setAudios] = useState<IAudio[]>([]);
 
     /**
      * synchronizes list of audios with the server  
@@ -26,7 +22,7 @@ export const useAudioData = () => {
     const syncAudios = useCallback(async () => {
         try {
             const res = await audioService.loadLibrary();
-            setAudios(res.data)
+            
         } finally {
             
         }
@@ -52,6 +48,9 @@ export const useAudioData = () => {
      */
     const updateAudio = useCallback((audio: IAudio) => {
         setAudios(prev => {
+            
+            if (!prev) return [audio];
+
             const exists = prev.some(a => a.id === audio.id);
 
             if (exists) {

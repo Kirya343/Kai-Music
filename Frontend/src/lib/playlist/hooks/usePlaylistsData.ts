@@ -32,6 +32,8 @@ export const usePlaylistsData = () => {
 
     const updatePlaylist = useCallback((playlist: Playlist) => {
         setPlaylists(prev => {
+            if (!prev) return [playlist];
+            
             const exists = prev.some(pl => pl.id === playlist.id);
 
             if (exists) {

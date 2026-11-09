@@ -4,14 +4,17 @@ import java.io.IOException;
 
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.datasource.AudioFileRepository;
-import org.kirya343.audio.dto.AudioDTO;
 import org.kirya343.audio.dto.AudioUpdateDTO;
+import org.kirya343.audio.event.AudioDeletedEvent;
+import org.kirya343.audio.event.AudioUpdatedEvent;
 import org.kirya343.audio.services.recognition.AcrCloudRecognitionService;
 import org.kirya343.audio.services.recognition.AcrCloudResponse;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.audio.services.util.M4aBuilder;
 import org.kirya343.security.core.dto.UserAuthData;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -27,9 +30,9 @@ public class AudioCommandService {
     private final AudioStorageService audioStorageService;
     private final AudioFileRepository audioFileRepository;
     private final AcrCloudRecognitionService recognitionService;
-    private final AudioWebsocketService audioWebsocketService;
     private final ObjectMapper objectMapper;
     private final M4aBuilder m4aBuilder;
+    private final ApplicationEventPublisher eventPublisher;
     
     public void recognize(
             Long audioId,
@@ -93,6 +96,7 @@ public class AudioCommandService {
 
     }
 
+    @Transactional
     public void updateAudio(
         Long audioId,
         AudioUpdateDTO dto,
@@ -109,9 +113,10 @@ public class AudioCommandService {
 
         audioFileRepository.save(audio);
 
-        audioWebsocketService.broadcastAudio(authData.sub(), AudioDTO.ofAudioFile(audio));
+        eventPublisher.publishEvent(new AudioUpdatedEvent(audioId));
     }
 
+    @Transactional 
     public void deleteAudio(Long audioId) {
         AudioFile audio = audioFileRepository.findById(audioId).orElseThrow(
             () -> new EntityNotFoundException("Трека не существует"));
@@ -124,5 +129,7 @@ public class AudioCommandService {
         }
 
         audioFileRepository.save(audio);
+
+        eventPublisher.publishEvent(new AudioDeletedEvent(audioId));
     }
 }

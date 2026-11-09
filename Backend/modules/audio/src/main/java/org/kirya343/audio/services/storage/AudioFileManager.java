@@ -3,7 +3,6 @@ package org.kirya343.audio.services.storage;
 import java.io.File;
 import java.util.List;
 
-import org.kirya343.audio.services.AudioWebsocketService;
 import org.kirya343.audio.services.util.AudioConverter;
 import org.kirya343.audio.services.util.Fmp4Parser;
 import org.kirya343.audio.datasource.AudioFile;
@@ -11,8 +10,9 @@ import org.kirya343.audio.datasource.AudioFileRepository;
 import org.kirya343.user.datasource.User;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.audio.dto.AudioChunk;
-import org.kirya343.audio.dto.AudioDTO;
 import org.kirya343.audio.dto.AudioMetadataDTO;
+import org.kirya343.audio.event.AudioUpdatedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +27,7 @@ public class AudioFileManager {
 
     private final AudioFileRepository audioFileRepository;
     private final AudioStorageService audioStorageService;
-    private final AudioWebsocketService audioWebsocketService;
+    private final ApplicationEventPublisher eventPublisher;
     private final EntityManager entityManager;
 
     public void uploadAudio(MultipartFile uploadedFile, UserAuthData authData) {
@@ -94,9 +94,9 @@ public class AudioFileManager {
             
             log.debug("Сохранили файл в бд");
 
-            AudioFile saved = audioFileRepository.save(audio);
+            audioFileRepository.save(audio);
 
-            audioWebsocketService.broadcastAudio(authData.sub(), AudioDTO.ofAudioFile(saved));
+            eventPublisher.publishEvent(new AudioUpdatedEvent(audio.getId()));
 
         } catch (Exception e) {
             throw new RuntimeException("Ошибка загрузки аудио", e);

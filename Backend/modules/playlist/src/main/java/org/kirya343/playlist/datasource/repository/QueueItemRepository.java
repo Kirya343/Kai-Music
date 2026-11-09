@@ -1,5 +1,6 @@
 package org.kirya343.playlist.datasource.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.kirya343.playlist.datasource.model.QueueItem;
@@ -56,6 +57,8 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         WHERE q.id = :entryId
         """)
     Optional<QueueItem> findByIdWithAudio(@Param("entryId") Long entryId);
+
+    List<QueueItem> findByAudioId(Long audioId);
 
     @Query("""
         SELECT q FROM QueueItem q

@@ -26,7 +26,7 @@ public class QueueService {
 
         PlaybackState playbackState = playbackStateRepository
             .findByTargetIdAndTargetType(id, type)
-            .orElse(playbackStateRepository.save(new PlaybackState(id, type, null)));
+            .orElseThrow();
 
         QueueItem queueItem = null;
         Playlist playlist = playlistRepository.findByPlaybackStateId(playbackState.getId()).orElseThrow(
@@ -91,7 +91,7 @@ public class QueueService {
 
         PlaybackState playbackState = playbackStateRepository
             .findByTargetIdAndTargetType(id, type)
-            .orElse(playbackStateRepository.save(new PlaybackState(id, type, null)));
+            .orElseThrow();
 
         QueueItem queueItem = null;
         Playlist playlist = playlistRepository.findByPlaybackStateId(playbackState.getId()).orElseThrow(

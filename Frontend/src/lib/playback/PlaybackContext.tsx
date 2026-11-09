@@ -17,6 +17,7 @@ interface RoomPlaybackContextType {
     updateMessage: string;
     audioRef: React.RefObject<HTMLAudioElement | null>;
     togglePlay: () => void;
+    changeTrack: (changing: "prev" | "next" | number) => void;
     bufferedRanges: TimeRange[];
     pausePlayback: () => void;
     seek: (position: number) => void;
@@ -44,7 +45,8 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         playbackMode,
         playbackPlaylist,
         seek,
-        togglePlay
+        togglePlay,
+        changeTrack
     } = useAudioPlayer();
 
     const playingAudio = useMemo<IAudio | null>(() => {
@@ -110,11 +112,11 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         });
 
         navigator.mediaSession.setActionHandler("nexttrack", async () => {
-            await playbackService.changeTrack("next");
+            changeTrack("next");
         });
 
         navigator.mediaSession.setActionHandler("previoustrack", async () => {
-            await playbackService.changeTrack("prev");
+            changeTrack("prev");
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
@@ -165,6 +167,7 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
             updateMessage,
             audioRef, 
             togglePlay,
+            changeTrack,
             bufferedRanges,
             pausePlayback,
             seek

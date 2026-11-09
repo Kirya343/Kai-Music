@@ -1,9 +1,7 @@
 import { usePlaybackContext } from "@playback";
-import { useEffect, useRef } from "react";
 
 import styles from "./MobileAudioMiniPlayer.module.scss"
 import { RightIcon, PlayIcon, PauseIcon } from "@/assets/icons";
-import { playbackService } from "@playback";
 import { useGlobal } from "@common";
 import ScrollableTitle from "../../ScrollableTitle/ScrollableTitle";
 
@@ -19,7 +17,8 @@ const MobileAudioMiniPlayer = () => {
 
     const { 
         playbackState, playingAudio, 
-        setFullPlayerOpen, togglePlay 
+        setFullPlayerOpen, togglePlay,
+        changeTrack
     } = usePlaybackContext();
 
     const duration = playingAudio?.duration || 0
@@ -54,7 +53,7 @@ const MobileAudioMiniPlayer = () => {
 
                 <button 
                     aria-label="Play Next Track"
-                    onClick={() => playbackService.changeTrack("next")}
+                    onClick={() => changeTrack("next")}
                 >
                     <RightIcon />
                 </button>

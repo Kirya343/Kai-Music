@@ -1,7 +1,7 @@
 import { playlistService } from "@playlist";
 import Track, { ITrackAction } from "./Track/Track";
 import { TrashIcon } from "@/assets/icons";
-import { playbackService, IQueueItem, usePlaybackContext } from "@playback";
+import { IQueueItem, usePlaybackContext } from "@playback";
 import { HTMLAttributes } from "react";
 
 /** Props for the RoomTrack component */
@@ -24,7 +24,8 @@ const RoomTrack = ({
     const { 
         playbackState,
         togglePlay,
-        playbackPlaylist
+        playbackPlaylist,
+        changeTrack
     } = usePlaybackContext();
 
     const handleTrackClick = async (qiId: number) => {
@@ -32,7 +33,7 @@ const RoomTrack = ({
         if (playbackState?.entryId === qiId) {
             togglePlay()
         } else {
-            await playbackService.changeTrack(qiId)
+            changeTrack(qiId)
         }
     }
 

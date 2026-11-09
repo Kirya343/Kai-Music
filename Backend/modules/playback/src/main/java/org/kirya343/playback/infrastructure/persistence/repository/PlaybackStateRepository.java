@@ -18,10 +18,18 @@ public interface PlaybackStateRepository extends JpaRepository<PlaybackState, Lo
         PlaybackTargetType targetType
     );
 
-    @EntityGraph(attributePaths = {"playlist", "playlist.queue", "playlist.queue.audio"})
+    @Query("""
+        SELECT DISTINCT ps
+        FROM PlaybackState ps
+        LEFT JOIN FETCH ps.playlist p
+        LEFT JOIN FETCH p.queue q
+        LEFT JOIN FETCH q.audio
+        WHERE ps.targetId = :targetId
+        AND ps.targetType = :targetType
+        """)
     Optional<PlaybackState> findWithPlaylistByTargetIdAndTargetType(
-        Long targetId,
-        PlaybackTargetType targetType
+        @Param("targetId") Long targetId,
+        @Param("targetType") PlaybackTargetType targetType
     );
 
     @EntityGraph(attributePaths = {"playlist", "playlist.queue", "playlist.queue.audio"})

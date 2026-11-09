@@ -1,12 +1,15 @@
 package org.kirya343.playlist.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.kirya343.audio.datasource.AudioFileRepository;
 import org.kirya343.common.event.playback.QueueChangedEvent;
 import org.kirya343.playlist.datasource.model.Playlist;
-import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.playlist.dto.PlaylistCreateDTO;
@@ -17,10 +20,15 @@ import org.kirya343.user.datasource.UserRepository;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.security.services.UserAuthDataService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +44,7 @@ public class PlaylistCommandService {
     private final PlaylistRepository playlistRepository;
     private final AudioFileRepository audioFileRepository;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     @Transactional 
     public Playlist createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
@@ -55,18 +64,12 @@ public class PlaylistCommandService {
     }
 
     @Transactional
-    public void importPlaylist(Long targetPlaylistId, Long playlistId, UserAuthData authData) {
-        Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
+    public void importPlaylist(Long targetPlaylistId, Long sourcePlaylistId, UserAuthData authData) {
+        int copied = playlistRepository.copyPlaylistItems(sourcePlaylistId, targetPlaylistId);
 
-        List<QueueItemCreateDTO> list = new ArrayList<>();
+        log.debug("Скопировано {} аудио в плейлист {}", copied, targetPlaylistId);
 
-        for (QueueItem qi : playlist.getQueue()) {
-            list.add(new QueueItemCreateDTO(qi.getAudio().getId(), qi.getPosition()));
-        }
-
-        if (list.size() > 0) {
-            addQueueList(list, targetPlaylistId, authData);
-        }
+        eventPublisher.publishEvent(new QueueChangedEvent(targetPlaylistId));
     }
 
     @Transactional
@@ -93,9 +96,7 @@ public class PlaylistCommandService {
 
     @Transactional
     public void addQueueList(List<QueueItemCreateDTO> list, Long playlistId, UserAuthData authData) {
-        for (QueueItemCreateDTO dto : list) {
-            addToQueue(playlistId, authData.id(), dto);
-        }
+        addToQueue(playlistId, authData.id(), list);
 
         eventPublisher.publishEvent(
             new QueueChangedEvent(playlistId)
@@ -107,9 +108,10 @@ public class PlaylistCommandService {
 
         log.debug("Adding {} rundom tracks to playlist {}", amount, playlistId);
 
+        Pageable pageable = PageRequest.of(0, amount);
+
         try {
-            List<Long> audioIds = audioFileRepository
-                .findRandomIds(playlistId, amount);
+            Slice<Long> audioIds = audioFileRepository.findRandomIds(playlistId, pageable);
 
             log.debug("selected {} tracks from user {}", audioIds, authData.name());
 
@@ -117,9 +119,7 @@ public class PlaylistCommandService {
                 .map(audioId -> new QueueItemCreateDTO(audioId, null))
                 .toList();
 
-            for (QueueItemCreateDTO dto : list) {
-                addToQueue(playlistId, authData.id(), dto);
-            }
+            addToQueue(playlistId, authData.id(), list);
 
             log.debug("Added to queue");
 
@@ -135,60 +135,103 @@ public class PlaylistCommandService {
     public void addToQueue(
         Long playlistId,
         Long addedById,
-        QueueItemCreateDTO dto
+        List<QueueItemCreateDTO> dtoList
     ) {
+        Map<Long, QueueItemCreateDTO> uniqueItems = new LinkedHashMap<>();
+
+        for (QueueItemCreateDTO item : dtoList) {
+            uniqueItems.putIfAbsent(item.audioId(), item);
+        }
+
+        dtoList = new ArrayList<>(uniqueItems.values());
+
+        List<Long> unpositioned = dtoList.stream()
+            .filter(qi -> qi.position() == null)
+            .map(QueueItemCreateDTO::audioId)
+            .toList();
+
+        List<QueueItemCreateDTO> positioned = dtoList.stream()
+            .filter(qi -> qi.position() != null)
+            .toList();
+
         try {
-            if (dto.position() == null) {
-                queueItemRepository.insertQueueItemAtEnd(
-                    playlistId,
-                    dto.audioId(),
-                    addedById
-                );
-
-                return;
-            }
-
+            // 1. Получаем исходную максимальную позицию
             int maxPosition = queueItemRepository.getMaxPosition(playlistId);
 
-            if (dto.position() < 0 || dto.position() > maxPosition + 1) {
-                throw new IllegalArgumentException(
-                    "Position must be between 0 and " + (maxPosition + 1)
+            // 2. Нормализуем позиции новых элементов
+            List<QueueItemCreateDTO> normalizedPositioned = new ArrayList<>();
+            Set<Long> usedPositions = new HashSet<>();
+
+            for (QueueItemCreateDTO item : positioned) {
+                Long position = item.position();
+
+                if (position < 0 || position > maxPosition + 1) {
+                    throw new IllegalArgumentException(
+                        "Position must be between 0 and " + (maxPosition + 1)
+                    );
+                }
+
+                while (!usedPositions.add(position)) {
+                    position++;
+                }
+
+                normalizedPositioned.add(
+                    new QueueItemCreateDTO(item.audioId(), position)
                 );
             }
 
-            queueItemRepository.shiftQueueItems(
-                playlistId,
-                dto.position()
+            // 3. Сдвигаем существующие элементы
+            String positionsJson = objectMapper.writeValueAsString(
+                normalizedPositioned.stream()
+                    .map(QueueItemCreateDTO::position)
+                    .sorted()
+                    .toList()
             );
 
-            queueItemRepository.insertQueueItem(
-                playlistId,
-                dto.audioId(),
-                dto.position(),
-                addedById
+            if (!normalizedPositioned.isEmpty()) {
+                queueItemRepository.shiftQueueItems(
+                    playlistId,
+                    positionsJson
+                );
+
+                // 4. Добавляем элементы на указанные позиции
+                String positionedJson = objectMapper.writeValueAsString(
+                    normalizedPositioned
+                );
+
+                queueItemRepository.insertQueueItems(
+                    playlistId,
+                    positionedJson,
+                    addedById
+                );
+            }
+
+            // 5. Добавляем элементы без позиции в конец
+            if (!unpositioned.isEmpty()) {
+                String unpositionedJson = objectMapper.writeValueAsString(
+                    unpositioned
+                );
+
+                queueItemRepository.insertQueueItemsAtEnd(
+                    playlistId,
+                    unpositionedJson,
+                    addedById
+                );
+            }
+
+            eventPublisher.publishEvent(
+                new QueueChangedEvent(playlistId)
             );
         } catch (Exception e) {
-            log.error("Ошибка добавления аудио в плейлист: {}", e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
     @Transactional
     public void removeQueueList(List<Long> list, Long playlistId, UserAuthData authData) {
 
-        for (Long audioId : list) {
-
-            removeFromQueue(playlistId, audioId, authData);
-        }
-
-        eventPublisher.publishEvent(
-            new QueueChangedEvent(playlistId)
-        );
-    }
-
-    @Transactional 
-    public void removeFromQueue(Long playlistId, Long audioId, UserAuthData authData) {
-        int deleted = queueItemRepository.deleteByAudioIdAndPlaylistId(
-            audioId,
+        int deleted = queueItemRepository.deleteAllByAudioIdsAndPlaylistId(
+            list,
             playlistId
         );
 
@@ -197,5 +240,9 @@ public class PlaylistCommandService {
         queueItemRepository.normalizePositions(playlistId);
 
         log.debug("shifted");
+
+        eventPublisher.publishEvent(
+            new QueueChangedEvent(playlistId)
+        );
     }
 }

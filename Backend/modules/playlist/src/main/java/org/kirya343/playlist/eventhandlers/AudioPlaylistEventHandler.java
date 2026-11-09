@@ -81,7 +81,7 @@ public class AudioPlaylistEventHandler {
         playlistCommandService.addToQueue(
             playlist.getId(), 
             event.userId(), 
-            new QueueItemCreateDTO(event.audioId(), null)
+            List.of(new QueueItemCreateDTO(event.audioId(), null))
         );
     }
 }

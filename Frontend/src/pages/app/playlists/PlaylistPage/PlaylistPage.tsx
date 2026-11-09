@@ -56,20 +56,6 @@ const PlaylistPage = ({}: {}) => {
                 </button>
             ]}
         >
-            <div className={styles.trackList}>
-                {filteredList.map((qi, idx) => (
-                    <PlaylistTrack
-                        key={idx}
-                        queueItem={qi}
-                        trackNumber={idx + 1}
-                        isInPlaylist={false}
-                        currentPlaylistId={playlist.id}
-                        openEditModal={setAudioFileView}
-                        handleRemove={playlistsData.removeAudio}
-                        playing={playingAudioId === qi.audio.id}
-                    />
-                ))}
-            </div>
 
             <SelectableList
                 className={styles.trackList}
@@ -119,6 +105,7 @@ const PlaylistPage = ({}: {}) => {
             />
 
             {playlist && <TrackImportModal importPlaylist={playlist} isOpen={importOpen} onClose={() => setImportOpen(false)} />}
+
         </SearchableLayout>
     )
 }

@@ -41,7 +41,7 @@ export default function SelectableList<T extends ItemKey>({
     ...props
 }: SelectableListProps<T>) {
 
-    const allItems = Object.keys(data) as T[];
+    const allItems = useMemo(() => Object.keys(data) as T[], [data]);
 
     // SELECT feature
     const [selectedItems, setSelectedItems] = useState<T[]>([]);
@@ -77,7 +77,7 @@ export default function SelectableList<T extends ItemKey>({
     );
 
     useEffect(() => {
-        setVisibleCount(allItems.length)
+        setVisibleCount(initialVisible == "all" ? allItems.length : initialVisible)
     }, [allItems])
 
     const visibleItems = allItems.slice(0, visibleCount)

@@ -45,7 +45,7 @@ const PlaylistPage = ({}: {}) => {
             title={playlist?.title || ""}
             search={{searchQuery, setSearchQuery, filteredList}}
             extraActions={[
-                <button className={styles.upload} onClick={() => setImportOpen(true)}>
+                <button className={styles.upload} key='upload' onClick={() => setImportOpen(true)}>
                     <CirclePlusIcon />
                     <span>Add tracks</span>
                 </button>

@@ -71,7 +71,7 @@ public class PlaylistCommandService {
 
     @Transactional
     public void setAudiosLiked(List<QueueItemCreateDTO> list, UserAuthData authData) {
-        Playlist playlist = playlistRepository.findLikedPlaylistByOwnerId(authData.id())
+        Playlist playlist = playlistRepository.findPlaylistByTypeByOwnerId(authData.id(), PlaylistType.LIKED)
             .orElseGet(() -> 
                 playlistRepository.save(
                     new Playlist(
@@ -85,7 +85,7 @@ public class PlaylistCommandService {
 
     @Transactional
     public void unsetAudiosLiked(List<Long> list, UserAuthData authData) {
-        Playlist playlist = playlistRepository.findLikedPlaylistByOwnerId(authData.id())
+        Playlist playlist = playlistRepository.findPlaylistByTypeByOwnerId(authData.id(), PlaylistType.LIKED)
             .orElseThrow();
 
         removeQueueList(list, playlist.getId(), authData);

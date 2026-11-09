@@ -21,7 +21,7 @@ const PlaylistsPage = () => {
             title="Playlists"
             search={{searchQuery, setSearchQuery, filteredList}}
             extraActions={[
-                <button className={styles.upload} onClick={() => setOpen(true)}>
+                <button className={styles.upload} key='upload' onClick={() => setOpen(true)}>
                     <CirclePlusIcon />
                     <span>Create new</span>
                 </button>

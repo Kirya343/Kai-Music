@@ -11,7 +11,7 @@ import org.kirya343.user.datasource.User;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.audio.dto.AudioChunk;
 import org.kirya343.audio.dto.AudioMetadataDTO;
-import org.kirya343.audio.event.AudioUpdatedEvent;
+import org.kirya343.audio.event.AudioUploadedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,7 +96,7 @@ public class AudioFileManager {
 
             audioFileRepository.save(audio);
 
-            eventPublisher.publishEvent(new AudioUpdatedEvent(audio.getId()));
+            eventPublisher.publishEvent(new AudioUploadedEvent(authData.id(), audio.getId()));
 
         } catch (Exception e) {
             throw new RuntimeException("Ошибка загрузки аудио", e);

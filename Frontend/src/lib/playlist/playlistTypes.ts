@@ -17,5 +17,6 @@ export interface CreatePlaylist {
 export enum PlaylistType {
     STANDART = "STANDART",
     LIKED = "LIKED",
+    UPLOADED = "UPLOADED",
     PLAYBACK_QUEUE = "PLAYBACK_QUEUE"
 }

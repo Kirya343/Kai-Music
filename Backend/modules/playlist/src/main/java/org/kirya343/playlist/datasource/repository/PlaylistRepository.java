@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.kirya343.playlist.datasource.model.Playlist;
+import org.kirya343.playlist.enums.PlaylistType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,10 +24,11 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
         SELECT p
         FROM Playlist p
         WHERE p.owner.id = :userId
-        AND p.type = org.kirya343.playlist.enums.PlaylistType.LIKED
+        AND p.type = :type
         """)
-    Optional<Playlist> findLikedPlaylistByOwnerId(
-        @Param("userId") Long userId
+    Optional<Playlist> findPlaylistByTypeByOwnerId(
+        @Param("userId") Long userId,
+        @Param("type") PlaylistType type
     );
 
     @Query("""

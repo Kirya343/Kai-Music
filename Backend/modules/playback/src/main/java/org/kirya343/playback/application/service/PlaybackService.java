@@ -2,7 +2,9 @@ package org.kirya343.playback.application.service;
 
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
+import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
+import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
@@ -15,7 +17,6 @@ import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,15 +33,17 @@ public class PlaybackService {
     private final PlaylistCommandService playlistCommandService;
     private final QueueItemRepository queueItemRepository;
     private final PlaylistRepository playlistRepository;
+    private final UserPlaybackRepository userPlaybackRepository;
     
-    public void updatePlaybackMode(Long id, PlaybackTargetType type, PlaybackMode mode, UserAuthData authData) {
-        playbackStateRepository.updatePlaybackMode(id, type, mode);
+    public void updatePlaybackMode(PlaybackMode mode, UserAuthData authData) {
+        UserPlayback userPlayback = userPlaybackRepository.findById(authData.id()).orElseThrow();
 
-        playbackStreamWorkerManager.get(type, id)
+        playbackStateRepository.updatePlaybackMode(userPlayback.getTargetId(), userPlayback.getTargetType(), mode);
+
+        playbackStreamWorkerManager.get(userPlayback.getTargetType(), userPlayback.getTargetId())
             .broadcast(userWorker -> userWorker.sendPlaybackMode(mode));
     }
-
-    @Transactional 
+ 
     public void playTrack(PlaybackTargetType targetType, Long audioId, Long playlistId, UserAuthData authData) {
 
         Long targetId = authData.id();
@@ -58,6 +61,8 @@ public class PlaybackService {
                 new PlaybackState(resolvedtargetId, targetType, null)
             ));
 
+        playbackSessionService.subscribe(authData, targetType, targetId);
+
         try {
             Playlist playlist = playbackState.getPlaylist();
 
@@ -71,19 +76,9 @@ public class PlaybackService {
                 playlistCommandService.importPlaylist(playbackState.getPlaylist().getId(), playlistId, authData);
             }
 
-            playlistRepository.flush();
         } catch (Exception e) {
             log.error("Ошибка добавления аудио в плейлист: {}", e.getMessage());
         }
-
-        Playlist updatedPlaylist = playlistRepository.findById(playbackState.getPlaylist().getId()).orElseThrow();
-
-        log.debug(
-            "Отправляем плейлист пользователю {}: {}", 
-            updatedPlaylist.getId(), 
-            updatedPlaylist.getQueue().stream().map(qi -> qi.getAudio().getId()).toList());
-
-        playbackSessionService.subscribe(authData, targetType, targetId);
 
         QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(playbackState.getPlaylist().getId(), audioId).orElse(null);
 

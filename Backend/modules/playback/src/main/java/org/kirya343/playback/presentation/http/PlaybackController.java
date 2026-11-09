@@ -106,15 +106,13 @@ public class PlaybackController {
         playbackSessionService.unsubscribe(authData);
     }
 
-    @PostMapping("/{targetId}/mode")
+    @PostMapping("/mode")
     @Authenticated
     public void updatePlaybackMode(
-        @PathVariable Long targetId,
-        @RequestParam PlaybackTargetType targetType,
         @RequestParam PlaybackMode mode,
         @AuthUser UserAuthData authData
     ) {
-        playbackService.updatePlaybackMode(targetId, targetType, mode, authData);
+        playbackService.updatePlaybackMode(mode, authData);
     }
 
     @PostMapping("/play")

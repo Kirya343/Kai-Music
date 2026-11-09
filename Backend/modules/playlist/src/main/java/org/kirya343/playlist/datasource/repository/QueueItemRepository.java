@@ -11,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
 
-    @Modifying(flushAutomatically = true)
+    @Modifying(
+        clearAutomatically = true,
+        flushAutomatically = true
+    )
     @Query("""
         DELETE FROM QueueItem q
         WHERE q.id = :id
@@ -33,7 +36,10 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         @Param("userId") Long userId
     );
 
-    @Modifying(flushAutomatically = true)
+    @Modifying(
+        clearAutomatically = true,
+        flushAutomatically = true
+    )
     @Query("""
         DELETE FROM QueueItem q
         WHERE q.audio.id = :audioId
@@ -154,7 +160,10 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         @Param("position") Long position
     );
 
-    @Modifying(flushAutomatically = true)
+    @Modifying(
+        clearAutomatically = true,
+        flushAutomatically = true
+    )
     @Transactional
     @Query(value = """
         INSERT INTO queue_items (
@@ -179,7 +188,10 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         @Param("addedById") Long addedById
     );
 
-    @Modifying(flushAutomatically = true)
+    @Modifying(
+        clearAutomatically = true,
+        flushAutomatically = true
+    )
     @Transactional
     @Query(value = """
         INSERT INTO queue_items (
@@ -204,7 +216,10 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         @Param("addedById") Long addedById
     );
 
-    @Modifying(flushAutomatically = true)
+    @Modifying(
+        clearAutomatically = true,
+        flushAutomatically = true
+    )
     @Query(value = """
         UPDATE queue_items q
         JOIN (

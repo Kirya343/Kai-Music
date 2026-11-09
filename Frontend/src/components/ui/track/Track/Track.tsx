@@ -4,7 +4,7 @@ import { HeartIcon, MusicNoteIcon, PlayingAudioIcon } from "@/assets/icons"
 import { countPosition, useData } from "@common"
 import { HTMLAttributes, ReactNode, useMemo } from "react"
 import clsx from "clsx"
-import { usePlaybackContext } from "@playback"
+import { playbackService, usePlaybackContext } from "@playback"
 import KebabMenu, { IKebabAction } from "@/components/ui/KebabMenu/KebabMenu"
 import { playlistService } from "@playlist"
 
@@ -72,6 +72,8 @@ interface TrackProps extends HTMLAttributes<HTMLDivElement> {
 
     /** Apply the playing style and display the playback indicator. */
     playing?: boolean;
+
+    currentPlaylistId?: number | null,
 }
 
 /**
@@ -95,6 +97,8 @@ const Track = ({
 
     playing = false,
     className,
+
+    currentPlaylistId,
 
     ...divProps
 }: TrackProps) => {
@@ -145,7 +149,10 @@ const Track = ({
         >
             <div className={styles.body} onClick={onClick}>
 
-                <div className={styles.audioCover}>
+                <div 
+                    className={styles.audioCover} 
+                    onClick={() => currentPlaylistId !== null && playbackService.playTrack("USER", audio.id, currentPlaylistId)}
+                >
                     <MusicNoteIcon/>
                 </div>
 

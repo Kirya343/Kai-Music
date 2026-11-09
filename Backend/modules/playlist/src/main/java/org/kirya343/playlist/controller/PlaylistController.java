@@ -11,6 +11,7 @@ import org.kirya343.playlist.service.PlaylistCommandService;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
 import org.kirya343.security.core.dto.UserAuthData;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,11 +56,15 @@ public class PlaylistController {
 
     @PostMapping
     @Authenticated
+    @Transactional 
     public PlaylistDTO createPlaylist(
         @RequestBody PlaylistCreateDTO dto,
         @AuthUser UserAuthData authData
     ) {
-        return playlistCommandService.createPlaylist(dto, authData);
+
+        Playlist playlist = playlistCommandService.createPlaylist(dto, authData);
+
+        return PlaylistDTO.ofPlaylistShort(playlist);
     }
 
     @PostMapping("/{targetPlaylistId}/import")

@@ -87,6 +87,7 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
     const resetBuffer = useCallback(() => {
         logger.info("Очищаем буфер")
         sourceBufferRef.current = null;
+        setBufferedRanges([])
     }, []);
 
     const processQueue = useCallback((streamId: string) => {

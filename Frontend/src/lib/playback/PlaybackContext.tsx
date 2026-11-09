@@ -110,11 +110,11 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         });
 
         navigator.mediaSession.setActionHandler("nexttrack", async () => {
-            await playbackService.playTrack("next");
+            await playbackService.changeTrack("next");
         });
 
         navigator.mediaSession.setActionHandler("previoustrack", async () => {
-            await playbackService.playTrack("prev");
+            await playbackService.changeTrack("prev");
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {

@@ -9,6 +9,7 @@ import { CirclePlusIcon } from "@/assets/icons";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
 import { usePlaybackContext } from "@playback";
+import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
 
 const PlaylistPage = ({}: {}) => {
 
@@ -46,7 +47,7 @@ const PlaylistPage = ({}: {}) => {
             extraActions={[
                 <button className={styles.upload} onClick={() => setImportOpen(true)}>
                     <CirclePlusIcon />
-                    <span>Create new</span>
+                    <span>Add tracks</span>
                 </button>
             ]}
         >
@@ -69,6 +70,8 @@ const PlaylistPage = ({}: {}) => {
                 audioFile={audioFileView} 
                 onClose={() => setAudioFileView(null)} 
             />
+
+            {playlist && <TrackImportModal importPlaylist={playlist} isOpen={importOpen} onClose={() => setImportOpen(false)} />}
         </SearchableLayout>
     )
 }

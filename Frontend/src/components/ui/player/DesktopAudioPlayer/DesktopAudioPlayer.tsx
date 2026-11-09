@@ -1,8 +1,6 @@
 import { usePlaybackContext } from "@playback";
-import { useEffect, useRef } from "react";
 
 import styles from "./DesktopAudioPlayer.module.scss"
-import { playbackService } from "@playback";
 import { useGlobal } from "@common";
 import AudioNavigation from "../parts/AudioNavigation/AudioNavigation";
 import TrackPositionTracker from "../parts/TrackPositionTracker/TrackPositionTracker";

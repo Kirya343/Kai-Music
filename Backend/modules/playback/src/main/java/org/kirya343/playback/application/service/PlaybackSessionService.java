@@ -69,6 +69,11 @@ public class PlaybackSessionService {
         PlaybackState state = playbackStateRepository
             .findWithPlaylistByTargetIdAndTargetType(resolvedTargetId, targetType)
             .orElseGet(() -> playbackStateRepository.save(new PlaybackState(resolvedTargetId, targetType, null)));
+        
+        log.debug(
+            "Отправляем плейлист пользователю {}: {}", 
+            state.getPlaylist().getId(), 
+            state.getPlaylist().getQueue().stream().map(qi -> qi.getAudio().getId()).toList());
 
         userWorker.sendPlaylist(state.getPlaylist());
     }

@@ -54,7 +54,7 @@ const MobileAudioMiniPlayer = () => {
 
                 <button 
                     aria-label="Play Next Track"
-                    onClick={() => playbackService.playTrack("next")}
+                    onClick={() => playbackService.changeTrack("next")}
                 >
                     <RightIcon />
                 </button>

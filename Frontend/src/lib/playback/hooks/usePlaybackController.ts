@@ -38,7 +38,7 @@ export const usePlaybackController = ({
 
     const unsyncedStateRef = useRef<PlaybackState | null>(null);
     const debounceTimeoutRef = useRef<number | null>(null);
-    const pendingSeekRef = useRef(false);
+    const awaitingStateRef = useRef(false);
 
     // audio state
     const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
@@ -99,7 +99,7 @@ export const usePlaybackController = ({
 
         if (!playbackState?.entryId) return;
 
-        pendingSeekRef.current = true;
+        awaitingStateRef.current = true;
 
         try {
             pausePlayback();
@@ -131,11 +131,11 @@ export const usePlaybackController = ({
     const playIfBuffered = useCallback(() => {
         logger.debug("попытка начать воспроизведение", started)
 
-        if (!started || pendingSeekRef.current) return;
+        if (!started || awaitingStateRef.current) return;
 
         const state = unsyncedStateRef.current;
 
-        logger.debug("audio", audio, "state", state)
+        //logger.debug("audio", audio, "state", state)
 
         if (!audio || !state) return;
 
@@ -268,7 +268,7 @@ export const usePlaybackController = ({
                     startNewStream(streamId);
                 }
 
-                pendingSeekRef.current = false;
+                awaitingStateRef.current = false;
 
                 setPlaybackState(state);
                 unsyncedStateRef.current = state;

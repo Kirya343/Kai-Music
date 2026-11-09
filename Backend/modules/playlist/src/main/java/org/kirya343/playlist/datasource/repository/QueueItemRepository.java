@@ -63,6 +63,16 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     );
 
     @Query("""
+        SELECT q FROM QueueItem q
+        WHERE q.playlist.id = :playlistId
+        AND q.audio.id = :audioId
+        """)
+    Optional<QueueItem> findByPlaylistIdAndAudioId(
+        @Param("playlistId") Long playlistId, 
+        @Param("audioId") Long audioId
+    );
+
+    @Query("""
         SELECT COALESCE(MAX(q.position), -1)
         FROM QueueItem q
         WHERE q.playlist.id = :playlistId

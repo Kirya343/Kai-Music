@@ -87,6 +87,7 @@ const PlaylistTrack = ({
             actions={actions}
             extraActions={extraActions}
             playing={playing}
+            currentPlaylistId={currentPlaylistId}
             {...divProps}
         />
     )

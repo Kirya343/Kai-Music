@@ -17,6 +17,7 @@ export const useMediaSource = () => {
     const { 
         sourceBufferRef, 
         updateBufferedRanges, 
+        setBufferedRanges,
         setBufferUpdateHandler,
         bufferedRanges, 
         appendChunks,
@@ -123,6 +124,7 @@ export const useMediaSource = () => {
         cleanupMediaSource,
         currentStreamIdRef,
 
+        setBufferedRanges,
         setBufferUpdateHandler,
         bufferedRanges, 
         appendChunks,

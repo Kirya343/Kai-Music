@@ -10,7 +10,6 @@ import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.playlist.dto.PlaylistCreateDTO;
-import org.kirya343.playlist.dto.PlaylistDTO;
 import org.kirya343.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.playlist.enums.PlaylistType;
 import org.kirya343.user.datasource.User;
@@ -39,7 +38,7 @@ public class PlaylistCommandService {
     private final UserRepository userRepository;
 
     @Transactional 
-    public PlaylistDTO createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
+    public Playlist createPlaylist(PlaylistCreateDTO dto, UserAuthData authData) {
         User user = userAuthDataService.parse(authData);
 
         if (user == null) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
@@ -48,11 +47,11 @@ public class PlaylistCommandService {
 
         Playlist saved = playlistRepository.save(playlist);
 
-        if (dto.audios() != null && dto.audios().size() > 0) {
+        if (dto != null && dto.audios() != null && dto.audios().size() > 0) {
             addQueueList(dto.audios(), saved.getId(), authData);
         }
 
-        return PlaylistDTO.ofPlaylistShort(saved);
+        return saved;
     }
 
     @Transactional

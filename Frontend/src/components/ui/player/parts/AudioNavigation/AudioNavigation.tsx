@@ -15,7 +15,7 @@ const AudioNavigation = () => {
             <PlaybackModeToggle />
             <button 
                 aria-label="Play Prev Track"
-                onClick={() => playbackService.playTrack("prev")}
+                onClick={() => playbackService.changeTrack("prev")}
             >
                 <LeftIcon />
             </button>
@@ -27,7 +27,7 @@ const AudioNavigation = () => {
             </button>
             <button 
                 aria-label="Play Next Track"
-                onClick={() => playbackService.playTrack("next")}>
+                onClick={() => playbackService.changeTrack("next")}>
                 <RightIcon />
             </button>
             <button><PlusIcon/></button>

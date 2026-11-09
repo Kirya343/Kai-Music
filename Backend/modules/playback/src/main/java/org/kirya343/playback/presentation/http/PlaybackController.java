@@ -117,6 +117,17 @@ public class PlaybackController {
         playbackService.updatePlaybackMode(targetId, targetType, mode, authData);
     }
 
+    @PostMapping("/play")
+    @Authenticated
+    public void updatePlaybackMode(
+        @RequestParam PlaybackTargetType targetType,
+        @RequestParam Long audioId,
+        @RequestParam(required = false) Long playlistId,
+        @AuthUser UserAuthData authData
+    ) {
+        playbackService.playTrack(targetType, audioId, playlistId, authData);
+    }
+
     private boolean shouldIgnore(Long userId, String action) {
         long now = System.currentTimeMillis();
 

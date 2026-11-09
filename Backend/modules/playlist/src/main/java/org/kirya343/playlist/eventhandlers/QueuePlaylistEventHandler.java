@@ -27,6 +27,8 @@ public class QueuePlaylistEventHandler {
 
         Playlist playlist = playlistRepository.findById(event.playlistId()).orElseThrow();
 
-        playlistWebSocketService.broadcastPlaylist(playlist.getOwner().getSub(), PlaylistDTO.ofPlaylist(playlist));
+        if (playlist.getOwner() != null) {
+            playlistWebSocketService.broadcastPlaylist(playlist.getOwner().getSub(), PlaylistDTO.ofPlaylist(playlist));
+        }
     }
 }

@@ -65,6 +65,8 @@ public class AudioStreamWorker
     }
 
     public void subscribe(PlaybackStreamWorker worker, ShortUserDTO userDTO) {
+        if (subscribedWorker == worker) return;
+        
         unsubscribe();
 
         subscribedWorker = worker;

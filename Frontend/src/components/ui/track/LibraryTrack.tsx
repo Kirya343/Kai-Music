@@ -2,8 +2,9 @@ import { HeartIcon, PenIcon, PlusIcon, ShazamIcon, TrashIcon } from "@/assets/ic
 import { playlistService } from "@playlist"
 import { audioService, IAudio } from "@audio"
 import Track from "./Track/Track"
-import { HTMLAttributes } from "react";
+import { HTMLAttributes, useMemo } from "react";
 import { useData } from "@common";
+import { IKebabAction } from "../KebabMenu/KebabMenu";
 
 /**
  * Props for the LibraryTrack component
@@ -39,33 +40,33 @@ const LibraryTrack = ({
     ...divProps
 }: LibraryTrackProps) => {
 
-    const extraActions = [
-        {
-            icon: <ShazamIcon/>,
-            title: "Autofill info with Shazam",
-            func: async () => await audioService.recognizeAudio(audio.id)
-        },
-        {
-            icon: <PenIcon/>,
-            title: "Edit audio info",
-            func: () => openEditModal(audio)
-        },
-        {
-            icon: <TrashIcon/>,
-            title: "Delete from library",
-            func: () => handleDelete(audio),
-        }
-    ]
-
-    if (importPlaylistId) {
-        const action = {
-            icon: <PlusIcon/>,
-            title: "Add to Room",
-            func: async () => await playlistService.addToQueue(importPlaylistId, [{audioId: audio.id}])
-        }
-
-        extraActions.push(action)
-    }
+    const extraActions = useMemo<IKebabAction[]>(() => {
+        return [
+            {
+                icon: <ShazamIcon/>,
+                title: "Autofill info with Shazam",
+                func: async () => await audioService.recognizeAudio(audio.id)
+            },
+            {
+                icon: <PenIcon/>,
+                title: "Edit audio info",
+                func: () => openEditModal(audio)
+            },
+            {
+                icon: <TrashIcon/>,
+                title: "Delete from library",
+                func: () => handleDelete(audio),
+            },
+            ...(importPlaylistId ? [{
+                icon: <PlusIcon />,
+                title: "Add to Room",
+                func: async () => await playlistService.addToQueue(
+                    importPlaylistId,
+                    [{ audioId: audio.id }]
+                )
+            }] : [])
+        ]
+    }, [audio, importPlaylistId])
 
     return (
         <Track

@@ -10,6 +10,7 @@ import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLay
 import { useData, useSearch } from "@common";
 import { usePlaybackContext } from "@playback";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
+import SelectableList from "@/components/ui/SelectableList/SelectableList";
 
 const PlaylistPage = ({}: {}) => {
 
@@ -18,6 +19,7 @@ const PlaylistPage = ({}: {}) => {
     const playlistId = Number(id)
     
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
+    const [selectMode, setSelectMode] = useState<boolean>(false);
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
     const { playbackState, playbackPlaylist } = usePlaybackContext();
@@ -65,6 +67,33 @@ const PlaylistPage = ({}: {}) => {
                     />
                 ))}
             </div>
+
+            <SelectableList
+                className={styles.trackList}
+                data={Object.fromEntries(
+                    filteredList
+                        .slice()
+                        .sort((a, b) => a.id - b.id)
+                        .map((qi, idx) => [
+                            qi.id,
+                            <PlaylistTrack
+                                key={idx}
+                                queueItem={qi}
+                                trackNumber={idx + 1}
+                                isInPlaylist={false}
+                                currentPlaylistId={playlist.id}
+                                openEditModal={setAudioFileView}
+                                handleRemove={playlistsData.removeAudio}
+                                playing={playingAudioId === qi.audio.id}
+                            />
+                        ])
+                )}
+                extraActions={[]}
+                selectMode={selectMode}
+                setSelectMode={setSelectMode}
+                trackedItem={playbackState?.entryId}
+                initialVisible={50}
+            />
 
             <AudioFileModal
                 audioFile={audioFileView} 

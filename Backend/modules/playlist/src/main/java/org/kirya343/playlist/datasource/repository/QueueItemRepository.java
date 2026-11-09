@@ -184,6 +184,12 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
             CURRENT_TIMESTAMP
         FROM queue_items
         WHERE playlist_id = :playlistId
+        HAVING NOT EXISTS (
+            SELECT 1
+            FROM queue_items qi
+            WHERE qi.playlist_id = :playlistId
+            AND qi.audio_id = :audioId
+        )
         """, nativeQuery = true)
     int insertQueueItemAtEnd(
         @Param("playlistId") Long playlistId,
@@ -204,12 +210,17 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
             added_by_id,
             created_at
         )
-        VALUES (
+        SELECT
             :playlistId,
             :audioId,
             :position,
             :addedById,
             CURRENT_TIMESTAMP
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM queue_items qi
+            WHERE qi.playlist_id = :playlistId
+            AND qi.audio_id = :audioId
         )
         """, nativeQuery = true)
     int insertQueueItem(

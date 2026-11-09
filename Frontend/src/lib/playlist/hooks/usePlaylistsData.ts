@@ -82,7 +82,7 @@ export const usePlaylistsData = () => {
     const removeAudio = async (playlistId: number, queueItem: IQueueItem) => {
         if (!playlistId) return;
         try {
-            await playlistService.removeFromQueue(playlistId, [queueItem.id])
+            await playlistService.removeFromQueue(playlistId, [queueItem.audio.id])
         } catch (e) {
             logger.error(e)
         }

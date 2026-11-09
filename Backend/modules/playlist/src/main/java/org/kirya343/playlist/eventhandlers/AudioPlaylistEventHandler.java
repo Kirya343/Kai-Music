@@ -40,6 +40,8 @@ public class AudioPlaylistEventHandler {
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleDeleted(AudioDeletedEvent event) {
 
+        log.debug("deleting entries by audio {}", event.audioId());
+
         List<QueueItem> entries = queueItemRepository.findByAudioId(event.audioId());
 
         Set<Long> playlistsIds = entries.stream()

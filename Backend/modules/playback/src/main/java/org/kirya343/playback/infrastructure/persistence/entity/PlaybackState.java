@@ -47,7 +47,7 @@ public class PlaybackState {
     @Column(nullable = false)
     private Double position = 0.0;
 
-    @JoinColumn(name = "audio_id")
+    @Column(name = "audio_id")
     private Long entryId;
 
     @Column(nullable = false)

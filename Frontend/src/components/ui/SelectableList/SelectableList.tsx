@@ -25,7 +25,7 @@ type ListAction<T> =
     })
     | (ListActionBase & {
         influence: "all" | "selected";
-        func: (id: T) => void;
+        func: (ids: T[]) => void;
     });
 
 type ItemKey = number | string
@@ -61,11 +61,11 @@ export default function SelectableList<T extends ItemKey>({
                 break;
 
             case "all":
-                allItems.forEach(i => action.func(i));
+                action.func(allItems)
                 break;
 
             case "selected":
-                selectedItems.forEach(i => action.func(i));
+                action.func(selectedItems)
                 break;
         }
     };
@@ -114,12 +114,19 @@ export default function SelectableList<T extends ItemKey>({
         let array: ListAction<T>[] = [
             {
                 title: "Clean selected",
-                func: (id: ItemKey) => setSelectedItems(prev => prev.filter(i => i === id)),
+                func: (ids: ItemKey[]) => setSelectedItems(prev => prev.filter(i => ids.includes(i))),
                 influence: "selected"
             },
             {
                 title: "Select all",
-                func: (id: T) => setSelectedItems(prev => !prev?.includes(id) ? ([...prev, id]) : prev),
+                func: (ids: T[]) => setSelectedItems(prev => {
+                    const current = prev ?? [];
+                    const hasAll = ids.every(id => current.includes(id));
+
+                    return hasAll
+                        ? current.filter(id => !ids.includes(id))
+                        : [...new Set([...current, ...ids])];
+                }),
                 influence: "all"
             },
             {

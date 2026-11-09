@@ -1,11 +1,11 @@
 import styles from "./PlaylistPage.module.scss"
 import { useMemo, useState } from "react";
-import { Playlist } from "@playlist";
+import { Playlist, playlistService } from "@playlist";
 import { IAudio } from "@audio";
 import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
 import PlaylistTrack from "@/components/ui/track/PlaylistTrack";
 import { useParams } from "react-router-dom";
-import { CirclePlusIcon } from "@/assets/icons";
+import { CheckBoxIcon, CirclePlusIcon, PenIcon, TrashIcon } from "@/assets/icons";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
 import { usePlaybackContext } from "@playback";
@@ -47,6 +47,9 @@ const PlaylistPage = ({}: {}) => {
             title={playlist?.title || ""}
             search={{searchQuery, setSearchQuery, filteredList}}
             extraActions={[
+                <button className={styles.upload} key='select' onClick={() => setSelectMode(true)}>
+                    <CheckBoxIcon />
+                </button>,
                 <button className={styles.upload} key='upload' onClick={() => setImportOpen(true)}>
                     <CirclePlusIcon />
                     <span>Add tracks</span>
@@ -88,7 +91,22 @@ const PlaylistPage = ({}: {}) => {
                             />
                         ])
                 )}
-                extraActions={[]}
+                extraActions={[
+                    {
+                        icon: <TrashIcon />,
+                        title: "Remove from playlist",
+                        func: (ids) => {
+                            const audioIds = filteredList
+                                .filter(qi => ids.some(id => Number(qi.id) === Number(id)))
+                                .map(qi => qi.audio.id);
+
+                            if (audioIds.length === 0) return;
+
+                            playlistService.removeFromQueue(playlist.id, audioIds);
+                        },
+                        influence: "selected"
+                    }
+                ]}
                 selectMode={selectMode}
                 setSelectMode={setSelectMode}
                 trackedItem={playbackState?.entryId}

@@ -10,6 +10,7 @@ import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
+import org.kirya343.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.playlist.service.PlaylistCommandService;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.services.RoomCommandService;
@@ -69,6 +70,8 @@ public class PlaybackService {
             playlist.getQueue().clear();
 
             playlistRepository.saveAndFlush(playlist);
+
+            playlistCommandService.addToQueue(playbackState.getPlaylist().getId(), authData.id(), new QueueItemCreateDTO(audioId, null));
 
             if (playlistId == null) {
                 playlistCommandService.addRundomTracks(30, playbackState.getPlaylist().getId(), authData);

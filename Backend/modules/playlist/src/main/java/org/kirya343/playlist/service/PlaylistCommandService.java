@@ -109,7 +109,7 @@ public class PlaylistCommandService {
 
         try {
             List<Long> audioIds = audioFileRepository
-                .findRandomIdsByOwnerId(authData.id(), amount);
+                .findRandomIds(playlistId, amount);
 
             log.debug("selected {} tracks from user {}", audioIds, authData.name());
 
@@ -137,35 +137,39 @@ public class PlaylistCommandService {
         Long addedById,
         QueueItemCreateDTO dto
     ) {
-        if (dto.position() == null) {
-            queueItemRepository.insertQueueItemAtEnd(
+        try {
+            if (dto.position() == null) {
+                queueItemRepository.insertQueueItemAtEnd(
+                    playlistId,
+                    dto.audioId(),
+                    addedById
+                );
+
+                return;
+            }
+
+            int maxPosition = queueItemRepository.getMaxPosition(playlistId);
+
+            if (dto.position() < 0 || dto.position() > maxPosition + 1) {
+                throw new IllegalArgumentException(
+                    "Position must be between 0 and " + (maxPosition + 1)
+                );
+            }
+
+            queueItemRepository.shiftQueueItems(
+                playlistId,
+                dto.position()
+            );
+
+            queueItemRepository.insertQueueItem(
                 playlistId,
                 dto.audioId(),
+                dto.position(),
                 addedById
             );
-
-            return;
+        } catch (Exception e) {
+            log.error("Ошибка добавления аудио в плейлист: {}", e.getMessage());
         }
-
-        int maxPosition = queueItemRepository.getMaxPosition(playlistId);
-
-        if (dto.position() < 0 || dto.position() > maxPosition + 1) {
-            throw new IllegalArgumentException(
-                "Position must be between 0 and " + (maxPosition + 1)
-            );
-        }
-
-        queueItemRepository.shiftQueueItems(
-            playlistId,
-            dto.position()
-        );
-
-        queueItemRepository.insertQueueItem(
-            playlistId,
-            dto.audioId(),
-            dto.position(),
-            addedById
-        );
     }
 
     @Transactional

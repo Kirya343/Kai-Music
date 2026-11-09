@@ -64,23 +64,18 @@ public class PlaybackService {
 
         playbackSessionService.subscribe(authData, targetType, targetId);
 
-        try {
-            Playlist playlist = playbackState.getPlaylist();
+        Playlist playlist = playbackState.getPlaylist();
 
-            playlist.getQueue().clear();
+        playlist.getQueue().clear();
 
-            playlistRepository.saveAndFlush(playlist);
+        playlistRepository.saveAndFlush(playlist);
 
-            playlistCommandService.addToQueue(playbackState.getPlaylist().getId(), authData.id(), new QueueItemCreateDTO(audioId, null));
+        playlistCommandService.addToQueue(playbackState.getPlaylist().getId(), authData.id(), new QueueItemCreateDTO(audioId, null));
 
-            if (playlistId == null) {
-                playlistCommandService.addRundomTracks(30, playbackState.getPlaylist().getId(), authData);
-            } else {
-                playlistCommandService.importPlaylist(playbackState.getPlaylist().getId(), playlistId, authData);
-            }
-
-        } catch (Exception e) {
-            log.error("Ошибка добавления аудио в плейлист: {}", e.getMessage());
+        if (playlistId == null) {
+            playlistCommandService.addRundomTracks(30, playbackState.getPlaylist().getId(), authData);
+        } else {
+            playlistCommandService.importPlaylist(playbackState.getPlaylist().getId(), playlistId, authData);
         }
 
         QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(playbackState.getPlaylist().getId(), audioId).orElse(null);

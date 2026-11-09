@@ -70,6 +70,8 @@ public class PlaybackCommandWorker {
 
                             try {
 
+                                log.debug("Getting QueueEntry by {}", c.changing());
+
                                 Long entryId = Long.parseLong(c.changing());
 
                                 entry = queueItemRepository.findByIdWithAudio(entryId).orElseThrow();

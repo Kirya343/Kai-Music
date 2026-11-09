@@ -25,14 +25,38 @@ public interface AudioFileRepository extends
     List<AudioFile> findByOwnerId(Long ownerId);
 
     @Query(value = """
-        SELECT id
-        FROM audio_file
-        WHERE owner_id = :ownerId
+        SELECT af.id
+        FROM audio_file af
+        WHERE af.owner_id = :ownerId
+        AND NOT EXISTS (
+            SELECT 1
+            FROM queue_items qi
+            WHERE qi.audio_id = af.id
+            AND qi.playlist_id = :playlistId
+        )
         ORDER BY RAND()
         LIMIT :amount
         """, nativeQuery = true)
     List<Long> findRandomIdsByOwnerId(
         @Param("ownerId") Long ownerId,
+        @Param("playlistId") Long playlistId,
+        @Param("amount") int amount
+    );
+
+    @Query(value = """
+        SELECT af.id
+        FROM audio_file af
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM queue_items qi
+            WHERE qi.audio_id = af.id
+            AND qi.playlist_id = :playlistId
+        )
+        ORDER BY RAND()
+        LIMIT :amount
+        """, nativeQuery = true)
+    List<Long> findRandomIds(
+        @Param("playlistId") Long playlistId,
         @Param("amount") int amount
     );
 }

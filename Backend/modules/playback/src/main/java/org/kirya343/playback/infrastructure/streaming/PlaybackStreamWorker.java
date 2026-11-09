@@ -14,7 +14,6 @@ import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
-import org.kirya343.playback.infrastructure.command.PlaybackCommandWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.presence.playback.PlaybackPresence;
@@ -39,7 +38,6 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
     private final ScheduledExecutorService scheduler;
 
     private final ApplicationEventPublisher eventPublisher;
-    private final PlaybackCommandWorker commandWorker;
 
     private final QueueService queueService;
 
@@ -63,15 +61,13 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         PlaybackTargetType targetType,
         ApplicationEventPublisher eventPublisher,
         PlaybackStateDTO currentState,
-        QueueService queueService,
-        PlaybackCommandWorker commandWorker
+        QueueService queueService
     ) {
 
         this.targetId = targetId;
         this.targetType = targetType;
         this.eventPublisher = eventPublisher;
         this.queueService = queueService;
-        this.commandWorker = commandWorker;
 
         this.scheduler =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -92,8 +88,8 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         }
     }
 
-    public void submit(PlaybackCommand command) {
-        scheduler.submit(() -> commandWorker.handle(command));
+    public void submit(PlaybackCommand cmd) {
+        eventPublisher.publishEvent(cmd);
     }
 
     public void broadcast(Consumer<AudioStreamWorker> action) {
@@ -143,17 +139,24 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
                 currentAudio.getDuration()
             );
 
+            cancelTask();
+
             try {
                 QueueItem entry = queueService.nextTrack(targetId, targetType);
 
                 addLog("Found next track: %s", entry.getId());
 
-                submit(new ChangeTrack(entry.getId().toString(), UserAuthData.server()));
+                submit(new ChangeTrack(
+                    entry.getId().toString(), 
+                    UserAuthData.server(),
+                    targetId,
+                    targetType
+                ));
             } catch (Exception e) {
 
                 addLog("Exception while auto-switching track  %s", e);
 
-                eventPublisher.publishEvent(
+                submit(
                     new UpdatePlayback(
                         new PlaybackStateDTO(
                             UserAuthData.server().name(), 
@@ -161,11 +164,11 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
                             Double.valueOf(currentAudio.getDuration()), 
                             true
                         ), 
-                        UserAuthData.server()
+                        UserAuthData.server(),
+                        targetId,
+                        targetType
                     ));
             }
-
-            cancelTask();
             
             return;
         }

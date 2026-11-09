@@ -67,7 +67,7 @@ public class PlaybackController {
             return;
         }
 
-        PlaybackCommand cmd = new UpdatePlayback(state, authData);
+        PlaybackCommand cmd = new UpdatePlayback(state, authData, null, null);
 
         audioStreamWorkerManager.get(authData.sub()).submit(cmd);
     }
@@ -83,7 +83,7 @@ public class PlaybackController {
             return;
         }
 
-        PlaybackCommand cmd = new ChangeTrack(changing, authData);
+        PlaybackCommand cmd = new ChangeTrack(changing, authData, null, null);
 
         audioStreamWorkerManager.get(authData.sub()).submit(cmd);
     }

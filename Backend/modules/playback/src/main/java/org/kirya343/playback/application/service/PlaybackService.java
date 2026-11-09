@@ -81,6 +81,6 @@ public class PlaybackService {
 
         QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(queuePlaylistId, audioId).orElse(null);
 
-        playbackStreamWorkerManager.get(targetType, targetId).submit(new ChangeTrack(qi.getId().toString(), authData));
+        playbackStreamWorkerManager.get(targetType, targetId).submit(new ChangeTrack(qi.getId().toString(), authData, null, null));
     }
 }

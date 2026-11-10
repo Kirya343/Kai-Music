@@ -1,12 +1,15 @@
 package org.kirya343.playback.application.service;
 
+import java.util.List;
+
+import org.kirya343.playback.application.command.ChangeTrack;
+import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
-import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
@@ -14,10 +17,9 @@ import org.kirya343.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.playlist.service.PlaylistCommandService;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.services.RoomCommandService;
-import org.kirya343.playback.application.command.ChangeTrack;
-import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,7 @@ public class PlaybackService {
             .broadcast(userWorker -> userWorker.sendPlaybackMode(mode));
     }
  
+    @Transactional 
     public void playTrack(PlaybackTargetType targetType, Long audioId, Long playlistId, UserAuthData authData) {
 
         Long targetId = authData.id();
@@ -64,22 +67,20 @@ public class PlaybackService {
 
         playbackSessionService.subscribe(authData, targetType, targetId);
 
-        Playlist playlist = playbackState.getPlaylist();
+        Long queuePlaylistId = playbackState.getPlaylist().getId();
 
-        playlist.getQueue().clear();
+        playlistRepository.deleteAllByPlaylistId(queuePlaylistId);
 
-        playlistRepository.saveAndFlush(playlist);
-
-        playlistCommandService.addToQueue(playbackState.getPlaylist().getId(), authData.id(), new QueueItemCreateDTO(audioId, null));
+        playlistCommandService.addToQueue(queuePlaylistId, authData.id(), List.of(new QueueItemCreateDTO(audioId, null)));
 
         if (playlistId == null) {
-            playlistCommandService.addRundomTracks(30, playbackState.getPlaylist().getId(), authData);
+            playlistCommandService.addRundomTracks(30, queuePlaylistId, authData);
         } else {
-            playlistCommandService.importPlaylist(playbackState.getPlaylist().getId(), playlistId, authData);
+            playlistCommandService.importPlaylist(queuePlaylistId, playlistId, authData);
         }
 
-        QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(playbackState.getPlaylist().getId(), audioId).orElse(null);
+        QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(queuePlaylistId, audioId).orElse(null);
 
-        playbackStreamWorkerManager.get(targetType, targetId).submit(new ChangeTrack(qi.getId().toString(), authData));
+        playbackStreamWorkerManager.get(targetType, targetId).submit(new ChangeTrack(qi.getId().toString(), authData, null, null));
     }
 }

@@ -27,11 +27,15 @@ public class QueuePlaybackEventHandler {
     @Transactional (propagation = Propagation.REQUIRES_NEW)
     public void handleQueueChanged(QueueChangedEvent event) {
 
+        log.debug("handle queue changed: ", event.playlistId());
+
         Optional<PlaybackState> playbackState = playbackStateRepository.findByPlaylistId(event.playlistId());
 
         if (playbackState.isPresent()) {
 
             PlaybackState existing = playbackState.get();
+
+            log.debug("send playlist: ", event.playlistId());
 
             playbackStreamWorkerManager.get(existing.getTargetType(), existing.getTargetId())
                 .broadcast(userWorker -> userWorker.sendPlaylist(existing.getPlaylist()));

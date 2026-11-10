@@ -76,6 +76,7 @@ public class PlaybackSessionService {
             state.getPlaylist().getQueue().stream().map(qi -> qi.getAudio().getId()).toList());
 
         userWorker.sendPlaylist(state.getPlaylist());
+        userWorker.sendPlaybackMode(state.getPlaybackMode());
     }
 
     public void unsubscribe(UserAuthData authData) {

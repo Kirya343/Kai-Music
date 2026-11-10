@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.playback.infrastructure.command.PlaybackCommandWorker;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
@@ -30,7 +29,6 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
     private final ApplicationEventPublisher eventPublisher;
     private final PlaybackStateRepository playbackStateRepository;
     private final QueueService queueService;
-    private final PlaybackCommandWorker playbackCommandWorker;
 
     private final Map<PlaybackTargetType, Map<Long, PlaybackStreamWorker>> workers =
             new ConcurrentHashMap<>();
@@ -68,8 +66,7 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
                     type,
                     eventPublisher, 
                     PlaybackStateDTO.ofState(state),
-                    queueService,
-                    playbackCommandWorker
+                    queueService
                 );
             } catch (Exception e) {
                 log.error("Ошибка создания {} воркера {}", type, id, e);

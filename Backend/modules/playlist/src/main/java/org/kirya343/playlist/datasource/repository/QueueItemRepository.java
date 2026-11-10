@@ -41,13 +41,13 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         clearAutomatically = true,
         flushAutomatically = true
     )
-    @Query("""
+        @Query("""
         DELETE FROM QueueItem q
-        WHERE q.audio.id = :audioId
+        WHERE q.audio.id IN :audioIds
         AND q.playlist.id = :playlistId
         """)
-    int deleteByAudioIdAndPlaylistId(
-        @Param("audioId") Long audioId,
+    int deleteAllByAudioIdsAndPlaylistId(
+        @Param("audioIds") List<Long> audioIds,
         @Param("playlistId") Long playlistId
     );
 
@@ -150,17 +150,37 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
     """, nativeQuery = true)
     Optional<QueueItem> findRandomTrack(Long playlistId);
 
-    @Modifying
-    @Transactional
+    @Modifying(
+        clearAutomatically = true,
+        flushAutomatically = true
+    )
     @Query(value = """
-        UPDATE queue_items
-        SET position = position + 1
-        WHERE playlist_id = :playlistId
-        AND position >= :position
+        UPDATE queue_items qi
+        SET qi.position = qi.position + (
+            SELECT COUNT(*)
+            FROM JSON_TABLE(
+                :positions,
+                '$[*]' COLUMNS (
+                    position BIGINT PATH '$'
+                )
+            ) p
+            WHERE p.position <= qi.position
+        )
+        WHERE qi.playlist_id = :playlistId
+        AND EXISTS (
+            SELECT 1
+            FROM JSON_TABLE(
+                :positions,
+                '$[*]' COLUMNS (
+                    position BIGINT PATH '$'
+                )
+            ) p
+            WHERE p.position <= qi.position
+        )
         """, nativeQuery = true)
     int shiftQueueItems(
         @Param("playlistId") Long playlistId,
-        @Param("position") Long position
+        @Param("positions") String positions
     );
 
     @Modifying(
@@ -178,22 +198,43 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         )
         SELECT
             :playlistId,
-            :audioId,
-            COALESCE(MAX(position), -1) + 1,
+            items.audio_id,
+            base.position + items.row_num - 1,
             :addedById,
             CURRENT_TIMESTAMP
-        FROM queue_items
-        WHERE playlist_id = :playlistId
-        HAVING NOT EXISTS (
-            SELECT 1
-            FROM queue_items qi
-            WHERE qi.playlist_id = :playlistId
-            AND qi.audio_id = :audioId
-        )
+        FROM (
+            SELECT
+                filtered.audio_id,
+                ROW_NUMBER() OVER (ORDER BY filtered.ordinal) AS row_num
+            FROM (
+                SELECT
+                    jt.audio_id,
+                    MIN(jt.ordinal) AS ordinal
+                FROM JSON_TABLE(
+                    :audioIds,
+                    '$[*]' COLUMNS (
+                        ordinal FOR ORDINALITY,
+                        audio_id BIGINT PATH '$'
+                    )
+                ) jt
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM queue_items qi
+                    WHERE qi.playlist_id = :playlistId
+                    AND qi.audio_id = jt.audio_id
+                )
+                GROUP BY jt.audio_id
+            ) filtered
+        ) items
+        CROSS JOIN (
+            SELECT COALESCE(MAX(position), -1) + 1 AS position
+            FROM queue_items
+            WHERE playlist_id = :playlistId
+        ) base
         """, nativeQuery = true)
-    int insertQueueItemAtEnd(
+    int insertQueueItemsAtEnd(
         @Param("playlistId") Long playlistId,
-        @Param("audioId") Long audioId,
+        @Param("audioIds") String audioIds, // json
         @Param("addedById") Long addedById
     );
 
@@ -201,7 +242,6 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         clearAutomatically = true,
         flushAutomatically = true
     )
-    @Transactional
     @Query(value = """
         INSERT INTO queue_items (
             playlist_id,
@@ -212,21 +252,27 @@ public interface QueueItemRepository extends JpaRepository<QueueItem, Long> {
         )
         SELECT
             :playlistId,
-            :audioId,
-            :position,
+            items.audio_id,
+            items.position,
             :addedById,
             CURRENT_TIMESTAMP
+        FROM JSON_TABLE(
+            :items,
+            '$[*]' COLUMNS (
+                audio_id BIGINT PATH '$.audioId',
+                position BIGINT PATH '$.position'
+            )
+        ) items
         WHERE NOT EXISTS (
             SELECT 1
             FROM queue_items qi
             WHERE qi.playlist_id = :playlistId
-            AND qi.audio_id = :audioId
+            AND qi.audio_id = items.audio_id
         )
         """, nativeQuery = true)
-    int insertQueueItem(
+    int insertQueueItems(
         @Param("playlistId") Long playlistId,
-        @Param("audioId") Long audioId,
-        @Param("position") Long position,
+        @Param("items") String items,
         @Param("addedById") Long addedById
     );
 

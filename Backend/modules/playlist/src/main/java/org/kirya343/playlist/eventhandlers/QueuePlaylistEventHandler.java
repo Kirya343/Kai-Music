@@ -25,7 +25,7 @@ public class QueuePlaylistEventHandler {
 
         log.debug("Обновлён плейлист: {}", event.playlistId());
 
-        Playlist playlist = playlistRepository.findById(event.playlistId()).orElseThrow();
+        Playlist playlist = playlistRepository.findByIdWithAudio(event.playlistId()).orElseThrow();
 
         if (playlist.getOwner() != null) {
             playlistWebSocketService.broadcastPlaylist(playlist.getOwner().getSub(), PlaylistDTO.ofPlaylist(playlist));

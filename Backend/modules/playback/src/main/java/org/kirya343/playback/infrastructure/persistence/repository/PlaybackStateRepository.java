@@ -5,7 +5,6 @@ import java.util.Optional;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.domain.enums.PlaybackMode;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,14 +17,31 @@ public interface PlaybackStateRepository extends JpaRepository<PlaybackState, Lo
         PlaybackTargetType targetType
     );
 
-    @EntityGraph(attributePaths = {"playlist", "playlist.queue", "playlist.queue.audio"})
+    @Query("""
+        SELECT DISTINCT ps
+        FROM PlaybackState ps
+        LEFT JOIN FETCH ps.playlist p
+        LEFT JOIN FETCH p.queue q
+        LEFT JOIN FETCH q.audio
+        WHERE ps.targetId = :targetId
+        AND ps.targetType = :targetType
+        """)
     Optional<PlaybackState> findWithPlaylistByTargetIdAndTargetType(
-        Long targetId,
-        PlaybackTargetType targetType
+        @Param("targetId") Long targetId,
+        @Param("targetType") PlaybackTargetType targetType
     );
 
-    @EntityGraph(attributePaths = {"playlist", "playlist.queue", "playlist.queue.audio"})
-    Optional<PlaybackState> findByPlaylistId(Long playlistId);
+    @Query("""
+        SELECT DISTINCT ps
+        FROM PlaybackState ps
+        LEFT JOIN FETCH ps.playlist p
+        LEFT JOIN FETCH p.queue q
+        LEFT JOIN FETCH q.audio
+        WHERE p.id = :playlistId
+        """)
+    Optional<PlaybackState> findByPlaylistId(
+        @Param("playlistId") Long playlistId
+    );
 
     @Transactional 
     @Modifying 

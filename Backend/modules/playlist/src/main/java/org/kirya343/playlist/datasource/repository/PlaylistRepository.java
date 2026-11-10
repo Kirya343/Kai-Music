@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.enums.PlaylistType;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,21 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
         WHERE ps.id = :stateId
     """)
     Optional<Playlist> findByPlaybackStateId(@Param("stateId") Long stateId);
+
+    @Query("SELECT p FROM Playlist p WHERE p.id = :playlistId")
+    @EntityGraph(attributePaths = { "queue", "queue.audio" })
+    Optional<Playlist> findByIdWithAudio(
+        @Param("playlistId") Long playlistId
+    );
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+        DELETE FROM QueueItem qi
+        WHERE qi.playlist.id = :playlistId
+        """)
+    int deleteAllByPlaylistId(
+        @Param("playlistId") Long playlistId
+    );
 
     @Query("""
         SELECT p
@@ -41,6 +57,7 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
             WHERE ps.playlist = p
         )
     """)
+    @EntityGraph(attributePaths = { "queue", "queue.audio" })
     List<Playlist> findUserPlaylists(@Param("userId") Long userId);
 
     @Modifying
@@ -56,4 +73,17 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
         )
         """, nativeQuery = true)
     int getOrCreateLikedPlaylistIfNotExists(@Param("userId") Long userId);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT IGNORE INTO queue_items (playlist_id, audio_id, position)
+        SELECT :targetPlaylistId, qi.audio_id, qi.position
+        FROM queue_items qi
+        WHERE qi.playlist_id = :sourcePlaylistId
+        """, nativeQuery = true)
+    int copyPlaylistItems(
+        @Param("sourcePlaylistId") Long sourcePlaylistId,
+        @Param("targetPlaylistId") Long targetPlaylistId
+    );
 }

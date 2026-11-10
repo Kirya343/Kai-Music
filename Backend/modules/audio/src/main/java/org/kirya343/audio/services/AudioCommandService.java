@@ -1,7 +1,6 @@
 package org.kirya343.audio.services;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.datasource.AudioFileRepository;
@@ -124,13 +123,16 @@ public class AudioCommandService {
             () -> new EntityNotFoundException("Трека не существует"));
 
         try {
+            log.debug("deleting audio {}", audioId);
             audioStorageService.deleteAudio(audio.getPath());
         } catch (Exception e) {
             log.debug("Error while deleting audio-chunks");
             throw e;
         }
 
-        audioFileRepository.save(audio);
+        audioFileRepository.delete(audio);
+
+        log.debug("deleted audio {}", audioId);
 
         eventPublisher.publishEvent(new AudioDeletedEvent(audioId));
     }

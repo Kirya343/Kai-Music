@@ -11,4 +11,4 @@ A real-time music streaming application that allows users to listen to music tog
 
 ## Documentation
 
-- [Deployment Guide](docs/deployment.md)
+- [Deployment Guide](docs/deploy.md)

@@ -34,7 +34,7 @@ const MobileNav = () => {
 
     const links: INavigationLink[] = [
         { to: "/app", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
-        { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
+        { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room?.id },
         { to: "/app/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library" },
         { to: "/app/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists" },
         { to: "/app/profile", icon: <UserIcon className={styles.linkIcon} />, title: "Profile" },

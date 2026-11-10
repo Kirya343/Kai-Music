@@ -1,4 +1,4 @@
-# Kai Music
+# Kai Music [[Fi](docs/fi/README.md)]
 
 A real-time music streaming application that allows users to listen to music together in shared rooms.
 
@@ -11,5 +11,5 @@ A real-time music streaming application that allows users to listen to music tog
 
 ## Documentation
 
-- [Full Documentation] (docs/documentation.md)
+- [Full Documentation](docs/documentation.md) [[Fi](docs/fi/documentation.md)]
 - [Deployment Guide](docs/deployment.md)

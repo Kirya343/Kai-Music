@@ -69,7 +69,7 @@ public class PlaybackCommandWorker {
 
                         case "next":
 
-                            entry = queueService.prevTrack(
+                            entry = queueService.nextTrack(
                                 playbackWorker.getTargetId(),
                                 playbackWorker.getTargetType()
                             );

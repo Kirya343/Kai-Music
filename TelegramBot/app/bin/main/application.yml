@@ -14,4 +14,4 @@ telegram:
     username: ${}BOT_USERNAME
 
 api:
-  upload-url: https://api.workswap.org/audio/upload
+  upload-url: https://api.kaimusic.app/audio/upload

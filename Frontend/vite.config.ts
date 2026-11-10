@@ -36,7 +36,7 @@ export default defineConfig({
     },
     server: {
         host: '0.0.0.0',
-        allowedHosts: ['music.workswap.org'],
+        allowedHosts: ['music.workswap.org', 'kaimusic.app'],
         port: 30000,
     },
     preview: {

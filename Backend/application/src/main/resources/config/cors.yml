@@ -2,3 +2,4 @@ cors:
   domains: 
     - ${FRONTEND_URL}
     - https://music.workswap.org
+    - https://kaimusic.app

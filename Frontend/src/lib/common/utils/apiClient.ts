@@ -7,7 +7,7 @@ import { setupHttpLogging } from "./logging/api/setupHttpConfig";
  * Base Axios instance configured for API requests.
  */
 const api = axios.create({
-    baseURL: API_BASE || "https://music.workswap.org",
+    baseURL: API_BASE || "https://api.kaimusic.app",
     withCredentials: true,
     headers: {
         Accept: "application/json",

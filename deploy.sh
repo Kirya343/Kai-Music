@@ -20,10 +20,10 @@ docker compose ps
 
 echo "=== Test frontend ==="
 curl -sS -o /dev/null -w "Frontend HTTP %{http_code}\n" \
-  -H "Host: music.workswap.org" http://127.0.0.1:18081/ || true
+  -H "Host: kaimusic.app" http://127.0.0.1:18081/ || true
 
 echo "=== Test backend ==="
 curl -sS -o /dev/null -w "Backend HTTP %{http_code}\n" \
-  -H "Host: music-api.workswap.org" http://127.0.0.1:18081/ || true
+  -H "Host: api.kaimusic.app" http://127.0.0.1:18081/ || true
 
 echo "=== Deployment finished ==="

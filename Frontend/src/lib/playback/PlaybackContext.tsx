@@ -96,7 +96,7 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
             album: playingAudio.album || "",
             artwork: [
                 {
-                    src: "https://music.workswap.org/image/logo.svg",
+                    src: "https://kaimusic.app/image/logo.svg",
                     sizes: "400x400",
                     type: "image/svg+xml"
                 }

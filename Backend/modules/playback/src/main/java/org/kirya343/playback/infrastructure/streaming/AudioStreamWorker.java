@@ -177,6 +177,11 @@ public class AudioStreamWorker
                 currentState.entryId(),
                 streamId
             );
+
+            deliveries.put(
+                chunk.sequence(), 
+                new ChunkDelivery(chunk.sequence(), ChunkDeliveryStatus.SENT, Instant.now())
+            );
         } catch (IOException e) {
 
             addLog("Exception while downloading audio chunk: %s", e);
@@ -186,9 +191,11 @@ public class AudioStreamWorker
 
     public void chunkRecived(AudioChunkFeedback chunkFeedback) {
 
-        if (chunkFeedback.streamId().equals(streamId)) return;
+        if (!chunkFeedback.streamId().equals(streamId)) return;
 
         ChunkDelivery delivery = deliveries.get(chunkFeedback.sequence());
+
+        if (!delivery) return;
 
         deliveries.put(chunkFeedback.sequence(), new ChunkDelivery(chunkFeedback.sequence(), ChunkDeliveryStatus.RECEIVED, delivery.sentAt()));
     }

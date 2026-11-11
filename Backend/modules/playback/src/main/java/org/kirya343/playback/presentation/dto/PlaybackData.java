@@ -1,11 +1,13 @@
 package org.kirya343.playback.presentation.dto;
 
-import org.kirya343.playlist.dto.PlaylistDTO;
+import java.util.List;
+
 import org.kirya343.room.dto.RoomDTO;
+import org.kirya343.user.dto.ShortUserDTO;
 
 // TODO DTO для полного плейбэка
 public record PlaybackData(
     RoomDTO room,
-    PlaylistDTO playlist
+    List<ShortUserDTO> listeners
 ) {
 }

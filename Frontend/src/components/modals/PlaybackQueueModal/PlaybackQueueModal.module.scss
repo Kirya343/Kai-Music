@@ -1,0 +1,34 @@
+@use "@/css/components/mixins/" as *;
+
+.body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    gap: 0.5rem;
+}
+
+.trackList {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    overflow: auto;
+    scrollbar-width: thin;
+    gap: 0.5rem;
+    text-align: left;
+}
+
+.addTrack {
+    border: 1px solid;
+    border-radius: 10px;
+    padding: 10px 20px;
+    text-align: center;
+
+    @include glass(true);
+
+    @include mobile {
+        display: none;
+    }
+}

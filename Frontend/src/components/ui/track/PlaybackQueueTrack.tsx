@@ -4,8 +4,8 @@ import { TrashIcon } from "@/assets/icons";
 import { IQueueItem, usePlaybackContext } from "@playback";
 import { HTMLAttributes } from "react";
 
-/** Props for the RoomTrack component */
-interface RoomTrackProps extends HTMLAttributes<HTMLDivElement> {
+/** Props for the PlaybackQueueTrack component */
+interface PlaybackQueueTrackProps extends HTMLAttributes<HTMLDivElement> {
 
     /** Playlist queue item with audio metadata to display */
     queueItem: IQueueItem, 
@@ -15,11 +15,11 @@ interface RoomTrackProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /** Displays audio track in the RoomPage */
-const RoomTrack = ({
+const PlaybackQueueTrack = ({
     queueItem,
     playing,
     ...props
-}: RoomTrackProps) => {
+}: PlaybackQueueTrackProps) => {
 
     const { 
         playbackState,
@@ -69,4 +69,4 @@ const RoomTrack = ({
     )
 }
 
-export default RoomTrack;
+export default PlaybackQueueTrack;

@@ -1,6 +1,6 @@
 import { useGlobal } from "@common";
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { PlaybackState, PlaybackMode } from "../playbackTypes";
+import { PlaybackState, PlaybackMode, PlaybackData } from "../playbackTypes";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
 import { loggerFactory } from "@common";
@@ -43,6 +43,7 @@ export const usePlaybackController = ({
     // audio state
     const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
+    const [playbackData, setPlaybackData] = useState<PlaybackData>({})
 
     /**
      * Pauses playing audio
@@ -296,6 +297,14 @@ export const usePlaybackController = ({
                 setPlaylist(playlist);
             });
 
+            const playbackDataSub = client.subscribe(`/user/queue/playback.data`, (message) => {
+                const playbackData = JSON.parse(message.body);
+
+                logger.debug("Пришло обновление playback.data: ", playbackData)
+
+                setPlaybackData(playbackData);
+            });
+
             logger.debug("Подписались на /user/queue/playback .mode, .playlist, .state")
 
             reconnect(client);
@@ -304,6 +313,7 @@ export const usePlaybackController = ({
                 playbackPlaylistSub.unsubscribe();
                 playbackModeSub.unsubscribe();
                 playbackSub.unsubscribe();
+                playbackDataSub.unsubscribe();
             }
         });
 
@@ -316,6 +326,7 @@ export const usePlaybackController = ({
         playbackState,
         playbackMode,
         playbackPlaylist: playlist,
+        playbackData,
         togglePlay,
         seek,
         changeTrack

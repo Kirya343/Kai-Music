@@ -1,9 +1,10 @@
 import { usePlaybackContext } from "@playback";
 
 import styles from "./MobileAudioMiniPlayer.module.scss"
-import { RightIcon, PlayIcon, PauseIcon } from "@/assets/icons";
-import { useGlobal } from "@common";
+import { RightIcon, PlayIcon, PauseIcon, HeartIcon } from "@/assets/icons";
+import { useData, useGlobal } from "@common";
 import ScrollableTitle from "../../ScrollableTitle/ScrollableTitle";
+import { playlistService } from "@playlist";
 
 /**
  * Component that display on bottom of pages and displays
@@ -20,6 +21,27 @@ const MobileAudioMiniPlayer = () => {
         setFullPlayerOpen, togglePlay,
         changeTrack
     } = usePlaybackContext();
+
+    const {playlistsData} = useData();
+
+    const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === playingAudio?.id)
+
+    const toggleLike = async () => {
+    
+        if (!playingAudio) return;
+    
+        try {
+            if (isLiked) {
+                console.log("Unlike", playingAudio.id)
+                await playlistService.removeLiked([playingAudio.id]);
+            } else {
+                console.log("Like", playingAudio.id)
+                await playlistService.addLiked([{ audioId: playingAudio.id }]);
+            }
+        } finally {
+
+        }
+    };
 
     const duration = playingAudio?.duration || 0
 
@@ -43,6 +65,10 @@ const MobileAudioMiniPlayer = () => {
             />
             
             <div className={styles.navigation} onClick={(e) => e.stopPropagation()}>
+
+                <button onClick={toggleLike}>
+                    <HeartIcon filled={isLiked} />
+                </button>
 
                 <button
                     aria-label={playbackState.pause ? "Resume Track" : "Pause Track"}

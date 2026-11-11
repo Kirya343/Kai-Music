@@ -5,6 +5,7 @@ import { PlaylistIcon, DoorIcon, LibraryIcon, HomeIcon, UserIcon } from "@/asset
 import { ReactNode } from "react";
 import { useData, useGlobal } from "@common";
 import clsx from "clsx";
+import { usePlaybackContext } from "@playback";
 
 
 /**
@@ -25,7 +26,7 @@ interface INavigationLink {
 const MobileNav = () => {
 
     const { isMobile } = useGlobal();
-    const { roomData } = useData();
+    const { playbackData } = usePlaybackContext();
 
     /**
      * disabling on not mobile displays
@@ -34,7 +35,7 @@ const MobileNav = () => {
 
     const links: INavigationLink[] = [
         { to: "/app", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
-        { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room?.id },
+        { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!playbackData.room?.id },
         { to: "/app/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library" },
         { to: "/app/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists" },
         { to: "/app/profile", icon: <UserIcon className={styles.linkIcon} />, title: "Profile" },

@@ -103,7 +103,7 @@ const Track = ({
     ...divProps
 }: TrackProps) => {
 
-    const { playbackState } = usePlaybackContext();
+    const { playbackState, playbackData } = usePlaybackContext();
 
     const { playlistsData } = useData();
     
@@ -135,6 +135,12 @@ const Track = ({
     
     const handlePlay = () => {
         if (currentPlaylistId === null) return;
+
+        if (playbackData.room) {
+            const success = confirm("You will leave your room, are you sure?")
+            
+            if (!success) return;
+        }
 
         playbackService.playTrack("USER", audio.id, currentPlaylistId)
     }

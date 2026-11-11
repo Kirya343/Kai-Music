@@ -75,7 +75,7 @@ const MainPage = () => {
                         <div className={styles.statItem}>
                             <DiscIcon className={clsx(styles.icon, Number(stat?.activeRooms) > 0 && "spin")}/>
 
-                            <span>Total Rooms Active: <br/><strong>{Number(stat?.activeRooms)}</strong></span>
+                            <span>Total Rooms Active: <br/><strong>{Number(stat?.activeRooms) || 0}</strong></span>
                         </div>
                     </div>
                 </div>
@@ -102,16 +102,7 @@ const MainPage = () => {
                             {rooms?.map(r => (
                                 <div className={styles.room} key={r.id} onClick={() => joinRoom(r.code)}>
                                     
-                                    <div className={styles.audioCover}>
-                                        <MusicNoteIcon/>
-                                    </div>
-
-                                    <div className={styles.meta}>
-                                        <span className={styles.roomName}>{r.title}</span>
-                                        <span className={styles.audioName}>Audio name</span>
-                                        <span className={styles.listnersCount}>
-                                            - {r.listeners?.length || 0} listeners</span>
-                                    </div>
+                                    <span className={styles.roomName}>{r.title}</span>
                                 </div>
                             ))}
                         </div>

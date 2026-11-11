@@ -2,6 +2,7 @@
 
 .track {
     display: flex;
+    text-align: left;
 
     border-radius: 10px;
     gap: 1rem;
@@ -10,6 +11,10 @@
 
     &:not(.noBorder) {
         @include glass(true);
+
+        & > * {
+            padding: 10px;
+        }
     }
 
     &.noBorder {
@@ -21,10 +26,6 @@
     &.playing .title {
         color: var(--orange);
         font-weight: 600; 
-    }
-
-    & > * {
-        padding: 10px;
     }
 }
 

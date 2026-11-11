@@ -1,6 +1,7 @@
 package org.kirya343.playback.infrastructure.streaming;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 
@@ -11,6 +12,7 @@ import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.audio.services.util.Fmp4Chunker;
 import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.domain.enums.PlaybackMode;
+import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playlist.datasource.model.Playlist;
@@ -238,6 +240,10 @@ public class AudioStreamWorker
 
     public void sendPlaylist(Playlist playlist) {
         playbackWebsocketService.sendPlaybackPlaylist(userSub, playlist);
+    }
+
+    public void sendPlaybackData(PlaybackTargetType type, Long id, List<ShortUserDTO> listeners) {
+        playbackWebsocketService.sendPlaybackData(userSub, type, id, listeners);
     }
 
     // Diadnostic voids

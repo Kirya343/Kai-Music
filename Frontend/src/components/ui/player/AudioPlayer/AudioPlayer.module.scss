@@ -96,3 +96,31 @@
         padding: 8px;
     }
 }
+
+.controls {
+    display: flex;
+    gap: 0.5rem;
+    padding: .5rem;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+    width: 100%;
+    justify-content: flex-end;
+
+    .action {
+        padding: 7px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 5px;
+        height: 44px;
+        aspect-ratio: 1;
+
+        &:hover {
+            background-color: rgba(85, 85, 85, 0.36);
+        }
+        
+        svg {
+            width: 30px;
+            height: 30px;
+        }
+    }
+}

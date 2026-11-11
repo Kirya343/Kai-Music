@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +33,6 @@ public class AudioCommandService {
     private final ObjectMapper objectMapper;
     private final M4aBuilder m4aBuilder;
     private final ApplicationEventPublisher eventPublisher;
-    private final EntityManager entityManager;
     
     public void recognize(
             Long audioId,

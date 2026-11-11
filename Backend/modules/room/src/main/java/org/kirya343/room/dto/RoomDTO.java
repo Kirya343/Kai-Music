@@ -12,16 +12,14 @@ public record RoomDTO(
     Long id,
     String title,
     Long ownerId,
-    String code,
-    List<ShortUserDTO> listeners
+    String code
 ) {
     public static RoomDTO ofRoom(ListeningRoom room, AudioFile audio) {
         return new RoomDTO(
             room.getId(),
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
             room.getOwner().getId(),
-            room.getCode(),
-            null
+            room.getCode()
         );
     }
 
@@ -31,8 +29,7 @@ public record RoomDTO(
             room.getId(),
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
             room.getOwner().getId(),
-            room.getCode(),
-            null
+            room.getCode()
         );
     }
 
@@ -41,8 +38,7 @@ public record RoomDTO(
             room.id(), 
             room.title(), 
             room.ownerId(),
-            room.code(),
-            listeners
+            room.code()
         );
     }
 }

@@ -9,8 +9,8 @@ import { CheckBoxIcon, PlusIcon, ShuffleIcon } from "@/assets/icons";
 import Loader from "@/components/ui/Loader/Loader";
 import { playlistService } from "@playlist";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
-import RoomTrack from "@/components/ui/track/RoomTrack";
-import { usePlaybackContext } from "@playback";
+import PlaybackQueueTrack from "@/components/ui/track/PlaybackQueueTrack";
+import { playbackService, usePlaybackContext } from "@playback";
 import { Navigate } from "react-router-dom";
 import { loggerFactory } from "@common";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
@@ -20,8 +20,9 @@ const logger = loggerFactory.getLogger("Pages.Room");
 
 const RoomPage = () => {
     const [selectMode, setSelectMode] = useState<boolean>(false);
-    const { playbackState, playbackPlaylist } = usePlaybackContext();
-    const { room } = useData().roomData;
+    const { playbackState, playbackPlaylist, playbackData } = usePlaybackContext();
+
+    const room = playbackData.room
 
     const { started } = useGlobal();
     const { error } = useWebSocket();
@@ -30,14 +31,11 @@ const RoomPage = () => {
 
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
-    const deleteFromRoom = async (id: number[]) => {
+    const deleteFromPlaylist = (ids: number[]) => {
+        
         if (!playbackPlaylist?.id) return;
 
-        try {
-            await playlistService.removeFromQueue(playbackPlaylist?.id, id)
-        } finally {
-
-        }
+        playlistService.removeFromQueue(playbackPlaylist.id, ids)
     }
 
     const saveRoom = async () => {
@@ -53,10 +51,6 @@ const RoomPage = () => {
         } catch (e) {
             logger.error(e)
         }
-    }
-
-    if (!room) {
-        return <Navigate to={"/app"}/>
     }
     
     return (
@@ -93,8 +87,8 @@ const RoomPage = () => {
                         </div>
 
                         <div className={styles.members}>
-                            <AvatarStack users={room?.listeners || []} />
-                            {room?.listeners?.length || 0} Listners
+                            <AvatarStack users={playbackData?.listeners || []} />
+                            {playbackData?.listeners?.length || 0} Listners
                         </div>
                     </div>
 
@@ -134,7 +128,7 @@ const RoomPage = () => {
                                     .sort((a, b) => a.position - b.position)
                                     .map(qi => [
                                         qi.id,
-                                        <RoomTrack
+                                        <PlaybackQueueTrack
                                             key={qi.id}
                                             queueItem={qi}
                                             playing={playbackState?.entryId === qi.id}
@@ -144,7 +138,7 @@ const RoomPage = () => {
                             extraActions={[
                                 {
                                     title: "Remove from queue",
-                                    func: async (id) => await deleteFromRoom(id),
+                                    func: async (ids) => await deleteFromPlaylist(ids),
                                     influence: "selected"
                                 }
                             ]}

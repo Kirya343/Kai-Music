@@ -1,7 +1,7 @@
 import { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { IAudio, TimeRange } from "@audio";
 import { countPosition, useData } from "@common";
-import { PlaybackState, PlaybackMode, playbackService } from "@playback";
+import { PlaybackState, PlaybackMode, playbackService, PlaybackData } from "@playback";
 import { useAudioPlayer } from "./hooks";
 import { Playlist } from "@playlist";
 
@@ -11,6 +11,7 @@ interface RoomPlaybackContextType {
     playbackState: PlaybackState | null;
     playbackMode: PlaybackMode;
     playbackPlaylist: Playlist | null;
+    playbackData: PlaybackData;
 
     fullPlayerOpen: boolean;
     setFullPlayerOpen: Dispatch<SetStateAction<boolean>>;
@@ -44,18 +45,23 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         playbackState, 
         playbackMode,
         playbackPlaylist,
+        playbackData,
         seek,
         togglePlay,
         changeTrack
     } = useAudioPlayer();
 
-    const playingAudio = useMemo<IAudio | null>(() => {
-        const queueItem = playbackPlaylist?.queue.find(qi => qi.id === playbackState?.entryId)
+    const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
 
-        if (!queueItem?.audio) return null;
+    useEffect(() => {
+        const audio = playbackPlaylist?.queue.find(
+            qi => qi.id === playbackState?.entryId
+        )?.audio;
 
-        return queueItem.audio;
-    }, [playbackPlaylist, playbackState])
+        if (audio) {
+            setPlayingAudio(audio);
+        }
+    }, [playbackPlaylist, playbackState]);
 
     // info
     const updateMessage = useMemo<string>(() => {
@@ -161,6 +167,7 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
             playbackState,
             playbackMode,
             playbackPlaylist,
+            playbackData,
 
             fullPlayerOpen, 
             setFullPlayerOpen,

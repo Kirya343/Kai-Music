@@ -198,6 +198,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
 
     public void subscribe(AudioStreamWorker worker, ShortUserDTO userDto) {
         worker.applyState(currentState);
+        worker.sendPlaybackData(targetType, targetId, presence.getOnlineUsers());
         presence.userConnected(userDto);
 
         userStreamWorkers.add(worker);

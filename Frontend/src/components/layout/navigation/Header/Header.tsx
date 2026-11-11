@@ -6,6 +6,7 @@ import { useData, useGlobal } from "@common";
 import { ReactNode } from "react";
 import clsx from "clsx";
 import Logo from "@/components/ui/Logo/Logo";
+import { usePlaybackContext } from "@playback";
 
 /**
  * interface for NavigationLink conponents
@@ -28,7 +29,7 @@ interface INavigationLink {
 const Header = () => {
 
     const { user, isAuthenticated } = useAuth();
-    const { roomData } = useData();
+    const { playbackData } = usePlaybackContext();
     const { isMobile } = useGlobal();
 
     /**
@@ -38,7 +39,7 @@ const Header = () => {
 
     const links: INavigationLink[] = [
         { to: "/app", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
-        { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!roomData.room },
+        { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!playbackData.room },
         { to: "/app/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library", condition: isAuthenticated },
         { to: "/app/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists", condition: isAuthenticated },
     ]

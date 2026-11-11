@@ -1,4 +1,6 @@
 import { IAudio } from "@audio";
+import { IListeningRoom } from "@room";
+import { IShortUser } from "@user";
 
 /**
  * Represents an entry of playlist queue
@@ -59,4 +61,9 @@ export enum PlaybackMode {
 export enum PlaybackTargetType {
     ROOM = "ROOM",
     USER = "USER"
+}
+
+export interface PlaybackData {
+    room?: IListeningRoom
+    listeners?: IShortUser[]
 }

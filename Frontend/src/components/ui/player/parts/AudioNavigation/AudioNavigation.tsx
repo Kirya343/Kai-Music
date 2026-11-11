@@ -1,15 +1,39 @@
 import { usePlaybackContext } from "@playback";
 import { PlaybackModeToggle } from "../PlaybackModeToggle"
 import styles from "./AudioNavigation.module.scss"
-import { LeftIcon, PauseIcon, PlayIcon, PlusIcon, RightIcon } from "@/assets/icons";
+import { HeartIcon, LeftIcon, PauseIcon, PlayIcon, PlusIcon, RightIcon } from "@/assets/icons";
+import { useData } from "@common";
+import { playlistService } from "@playlist";
 
 const AudioNavigation = () => {
 
     const {  
         togglePlay,
         playbackState,
-        changeTrack
+        changeTrack,
+        playingAudio
     } = usePlaybackContext();
+
+    const {playlistsData} = useData()
+
+    const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === playingAudio?.id)
+
+    const toggleLike = async () => {
+
+        if (!playingAudio) return;
+    
+        try {
+            if (isLiked) {
+                console.log("Unlike", playingAudio.id)
+                await playlistService.removeLiked([playingAudio.id]);
+            } else {
+                console.log("Like", playingAudio.id)
+                await playlistService.addLiked([{ audioId: playingAudio.id }]);
+            }
+        } finally {
+
+        }
+    };
 
     return playbackState && (
         <div className={styles.navigation}>
@@ -31,7 +55,9 @@ const AudioNavigation = () => {
                 onClick={() => changeTrack("next")}>
                 <RightIcon />
             </button>
-            <button><PlusIcon/></button>
+            <button onClick={toggleLike}>
+                <HeartIcon filled={isLiked} />
+            </button>
         </div>
     )
 }

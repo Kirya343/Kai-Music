@@ -15,27 +15,46 @@
 
     & > div {
         display: flex;
+    }
+}
 
-        &.info {
-            width: 30%;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: flex-start;
+.info {
+    width: 30%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.tracker {
+    width: 40%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.7rem;
+    padding-top: 0.2rem;
+}
+
+.controls {
+    width: 30%;
+    justify-content: flex-end;
+    gap: 1rem;
+
+    .action {
+        padding: 7px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 10px;
+        height: 34px;
+        aspect-ratio: 1;
+
+        &:hover {
+            background-color: rgba(85, 85, 85, 0.36);
         }
-
-        &.tracker {
-            width: 40%;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 0.5rem;
-            padding-bottom: 0.7rem;
-            padding-top: 0.2rem;
-        }
-
-        &.controls {
-            width: 30%;
-            justify-content: flex-end;
+        
+        svg {
+            width: 20px;
+            height: 20px;
         }
     }
 }

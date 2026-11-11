@@ -1,12 +1,13 @@
 import { usePlaybackContext } from "@playback";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import VolumeSlider from "../parts/VolumeSlider/VolumeSlider";
 import styles from "./AudioPlayer.module.scss";
-import { DownIcon } from "@/assets/icons";
+import { DownIcon, PlaylistIcon } from "@/assets/icons";
 import AudioNavigation from "../parts/AudioNavigation/AudioNavigation";
 import TrackPositionTracker from "../parts/TrackPositionTracker/TrackPositionTracker";
 import ScrollableTitle from "../../ScrollableTitle/ScrollableTitle";
 import KebabMenu from "../../KebabMenu/KebabMenu";
+import PlaybackQueueModal from "@/components/modals/PlaybackQueueModal/PlaybackQueueModal";
 
 /**
  * Audio is component that contains main player
@@ -21,6 +22,8 @@ const AudioPlayer = () => {
         setFullPlayerOpen,
         playbackState
     } = usePlaybackContext();
+
+    const [isOpen, setOpen] = useState(false);
 
     // displays only if playbackState is loaded
     return playbackState && playingAudio ? (
@@ -40,9 +43,18 @@ const AudioPlayer = () => {
                     <TrackPositionTracker />
                     <AudioNavigation />
                     <VolumeSlider />
+
+                    <div className={styles.controls}>
+                        <button onClick={() => setOpen(true)} className={styles.action}>
+                            <PlaylistIcon/>
+                        </button>
+                    </div>
+
                     {updateMessage && <div className={styles.update}>{updateMessage}</div>}
                 </div>
             )}
+
+            <PlaybackQueueModal isOpen={isOpen} onClose={() => setOpen(false)}/>
         </>
     ) : <></>
 };

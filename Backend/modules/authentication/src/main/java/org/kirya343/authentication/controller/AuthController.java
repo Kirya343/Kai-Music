@@ -1,31 +1,20 @@
 package org.kirya343.authentication.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Map;
 
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.controllers.PublicEndpoint;
-import org.kirya343.security.jwt.JwtService;
 import org.kirya343.authentication.service.AuthCookiesService;
 import org.kirya343.authentication.service.AuthService;
-import org.kirya343.user.datasource.User;
-import org.kirya343.user.datasource.UserRepository;
+import org.kirya343.authentication.dto.AuthResponse;
 import org.kirya343.authentication.dto.LoginRequest;
 import org.kirya343.authentication.dto.RegisterRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -36,16 +25,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
-
     private final AuthCookiesService cookiesService;
-    private final JwtService jwtService;
-    private final UserRepository userRepository;
     private final AuthService authService;
 
     @PostMapping("/login")
     @PublicEndpoint 
-    public ResponseEntity<?> login(
+    public AuthResponse login(
         @Valid @RequestBody LoginRequest request, 
         HttpServletResponse response
     ) throws IOException, ServletException {
@@ -54,7 +39,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @PublicEndpoint 
-    public ResponseEntity<?> register(
+    public AuthResponse register(
         @Valid @RequestBody RegisterRequest regRequest,
         HttpServletRequest request,
         HttpServletResponse response
@@ -62,83 +47,15 @@ public class AuthController {
         return authService.registerLocal(regRequest, request, response);
     }
 
-    @GetMapping("/discord")
-    @PublicEndpoint 
-    public void redirectToDiscord(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws IOException {
-
-        response.sendRedirect("/login/oauth2/code/discord");
-    }
-
     @PostMapping("/refresh")
     @PublicEndpoint 
-    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        logger.debug("Обновляем токен пользователя");
-        try {
-            String refreshToken = getTokenFromCookies(request, "refreshToken");
-            logger.debug("Токен найден? {}", refreshToken);
-
-            if (refreshToken == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nothing to refresh");
-
-            Boolean isTokenOld = jwtService.isTokenOld(refreshToken);
-
-            if (isTokenOld) {
-                cookiesService.deleteAuthCookies(response);
-
-                logger.debug("Token of user is old! Deleting...");
-
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("UserId is undefined");
-            }
-
-            Long userId = jwtService.validateAndGetUserId(refreshToken);
-
-            logger.debug("userId: {}", userId);
-
-            if (userId == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "UserId is undefined");
-
-            User user = userRepository.findById(userId).orElse(null);
-
-            logger.debug("Пользователь найден");
-
-            if (user == null) throw new ResponseStatusException(HttpStatus.NO_CONTENT, "User does not exist");
-
-            cookiesService.setAuthCookies(response, user);
-
-            return ResponseEntity.ok().build();
-        } catch (ServletException e) {
-            logger.debug("Ошибка генерации токена: {}", e);
-            
-            return ResponseEntity.internalServerError()
-                    .body("Token generation error: " + e.getMessage());
-        }
-    }
-
-    private String getTokenFromCookies(HttpServletRequest request, String cookieName) {
-        if (request.getCookies() == null) return null;
-
-        return Arrays.stream(request.getCookies())
-                .filter(c -> cookieName.equals(c.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        authService.refreshToken(request, response);
     }
 
     @PostMapping("/logout")
     @Authenticated
-    public ResponseEntity<?> logout(HttpServletResponse response) {
-
-        try {
-            
-            cookiesService.deleteAuthCookies(response);
-
-            return ResponseEntity.ok(Map.of("message", "You are successfully logged out"));
-
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError()
-                    .body("Token generation error: " + e.getMessage());
-        }
+    public void logout(HttpServletResponse response) {
+        cookiesService.deleteAuthCookies(response);
     }
 }

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.JOSEException;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +38,7 @@ public class AuthCookiesService {
     @Value("${app.cookie.sameSite}")
     private String cookieSameSite;
     
-    public void setAuthCookies(HttpServletResponse response, User user) throws ServletException {
+    public void setAuthCookies(HttpServletResponse response, User user) {
 
         UserAuthData authData = authDataService.load(
             Objects.requireNonNull(user.getId())
@@ -53,7 +52,7 @@ public class AuthCookiesService {
             accessToken = jwtIssuer.issueAccessToken(authData);
             refreshToken = jwtIssuer.issueRefreshToken(authData);
         } catch (JOSEException e) {
-            throw new ServletException("Ошибка генерации JWT", e);
+            throw new IllegalStateException("Ошибка генерации JWT", e);
         }
 
         logger.debug("accessToken: {}", accessToken);
@@ -66,7 +65,7 @@ public class AuthCookiesService {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
     }
 
-    public void deleteAuthCookies(HttpServletResponse response) throws ServletException {
+    public void deleteAuthCookies(HttpServletResponse response) {
 
         ResponseCookie refreshCookie = setTokenCookie("refreshToken", "", Duration.ZERO);
         ResponseCookie accessCookie = setTokenCookie("accessToken", "", Duration.ZERO);

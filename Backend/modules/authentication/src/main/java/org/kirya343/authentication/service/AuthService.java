@@ -1,25 +1,19 @@
 package org.kirya343.authentication.service;
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Map;
 
-import org.kirya343.common.exceptions.UserNotFoundException;
 import org.kirya343.security.jwt.JwtService;
 import org.kirya343.user.services.UserCommandService;
 import org.kirya343.user.datasource.User;
 import org.kirya343.user.datasource.UserRepository;
+import org.kirya343.authentication.dto.AuthResponse;
 import org.kirya343.authentication.dto.LoginRequest;
 import org.kirya343.authentication.dto.RegisterRequest;
 import org.kirya343.security.core.enums.AuthProvider;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,101 +30,97 @@ public class AuthService {
     private final UserCommandService userCommandService;
     private final AuthCookiesService cookiesService;
     
-    public ResponseEntity<?> login(LoginRequest request, HttpServletResponse response) {
+    public AuthResponse login(LoginRequest request, HttpServletResponse response) {
+
+        long start = System.nanoTime();
 
         User user = userRepository.findByEmail(request.email()).orElse(null);
 
+        long afterQuery = System.nanoTime();
+
         if (user == null) {
-            return ResponseEntity.ok(Map.of("success", false, "message", "Account does not exist"));
+            return new AuthResponse(false, "Account does not exist");
         }
 
         if (!user.getProviders().contains(AuthProvider.LOCAL)) {
-            return ResponseEntity.ok(Map.of("success", false, "message", "This account does not support local logging in"));
+            return new AuthResponse(false, "This account does not support local logging in");
         }
 
         if (!userCommandService.authenticate(user, request.password())) {
-            return ResponseEntity.ok(Map.of("success", false, "message", "Incorrect password"));
+            return new AuthResponse(false, "Incorrect password");
         }
 
-        try {
-            cookiesService.setAuthCookies(response, user);
-        } catch (ServletException e) {
-            log.error("Ошибка создания куков пользователя {}: {}", user.getId(), e);
-        }
+        long afterAuth = System.nanoTime();
 
-        return ResponseEntity.ok(Map.of("success", true, "message", "You successfuly signed in"));
+        cookiesService.setAuthCookies(response, user);
+
+        long afterCookies = System.nanoTime();
+
+        log.debug(
+            "Login timing: query={}ms, auth={}ms, cookies={}ms",
+            (afterQuery - start) / 1_000_000,
+            (afterAuth - afterQuery) / 1_000_000,
+            (afterCookies - afterAuth) / 1_000_000
+        );
+
+        return new AuthResponse(true, "You successfuly signed in");
     }
 
-    public ResponseEntity<?> registerLocal(
+    public AuthResponse registerLocal(
         RegisterRequest regRequest, 
         HttpServletRequest request,
         HttpServletResponse response
     ) {
 
-        if (userRepository.existsByName(regRequest.name())) {
+        if (userRepository.existsByEmail(regRequest.email())) {
             log.debug("Пользователь с таким именем уже зарегистрирован");
-            return ResponseEntity.ok(
-                Map.of("success", false, 
-                       "message", "This name is already registered"
-                ));
+            return new AuthResponse(false, "This email is already registered");
         }
 
-        User user = userCommandService.registerLocal(regRequest.email(), regRequest.name(), regRequest.password(), request);
+        User user = userCommandService.registerLocal(
+            regRequest.email(), 
+            regRequest.name(), 
+            regRequest.password(), 
+            request
+        );
 
-        try {
-            cookiesService.setAuthCookies(response, user);
-        } catch (ServletException e) {
-            log.error("Ошибка создания куков пользователя {}: {}", user.getId(), e);
-        }
+        cookiesService.setAuthCookies(response, user);
 
-        return ResponseEntity.ok(Map.of("success", true, "message", "You successfully signed up"));
+        return new AuthResponse(true, "You successfully signed up");
     }
 
-    public void refreshToken( HttpServletRequest request, HttpServletResponse response) {
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
         log.debug("Обновляем токен пользователя");
-        try {
 
-            Long userId = jwtService.validateAndGetUserId(getTokenFromCookies(request, "refreshToken"));
+        String refreshToken = getTokenFromCookies(request, "refreshToken");
+        log.debug("Токен найден? {}", refreshToken);
 
-            log.debug("userId: {}", userId);
+        if (refreshToken == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nothing to refresh");
 
-            User user = null;
-            if (userId != null) {
-                user = userRepository.findById(userId).orElse(null);
-                log.debug("Пользователь найден по id: {}", user != null);
+        Boolean isTokenOld = jwtService.isTokenOld(refreshToken);
 
-                if (user == null) {
-                    log.debug("Пользователь не найден, создаём временного");
-                    throw new UserNotFoundException(userId.toString());
-                }
-            } else {
-                throw new IllegalStateException("RefreshToken не содержит ID пользователя. Авторизуйтесь повторно");
-            }
+        if (isTokenOld) {
+            cookiesService.deleteAuthCookies(response);
 
-            userRepository.save(user);
+            log.debug("Token of user is old! Deleting...");
 
-            cookiesService.setAuthCookies(response, user); // 4. обновляем куки с токенами
-
-        } catch (Exception e) {
-            log.error("Ошибка сервера при обновлении токена: {}", e);
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Ошибка сервера при обновлении токена.");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "UserId is undefined");
         }
-    }
 
-    public void redirectToGoogle(
-        String redirect,
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws IOException {
-        log.debug("redirect: " + redirect);
+        Long userId = jwtService.validateAndGetUserId(refreshToken);
 
-        Long userId = jwtService.validateAndGetUserId(getTokenFromCookies(request, "refreshToken"));
-        String redirectUrl = URLEncoder.encode(redirect, StandardCharsets.UTF_8);
+        log.debug("userId: {}", userId);
 
-        request.getSession().setAttribute("tempUserId", userId);
-        request.getSession().setAttribute("redirectUrl", redirectUrl);
+        if (userId == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "UserId is undefined");
 
-        response.sendRedirect("/oauth2/authorization/google");
+        User user = userRepository.findById(userId).orElse(null);
+
+        log.debug("Пользователь найден");
+
+        if (user == null) throw new ResponseStatusException(HttpStatus.NO_CONTENT, "User does not exist");
+
+        cookiesService.setAuthCookies(response, user);
     }
 
     private String getTokenFromCookies(HttpServletRequest request, String cookieName) {

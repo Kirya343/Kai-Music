@@ -86,7 +86,7 @@ public class AudioStorageService {
 
     public AudioChunk getMediaChunk(
         String audioDirectory,
-        int sequence
+        long sequence
     ) throws IOException {
 
         String fileName = String.format(

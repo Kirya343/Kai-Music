@@ -42,6 +42,14 @@ public class Fmp4Chunker {
         );
     }
 
+    public AudioChunk getAudioChunk(long sequence) throws IOException {
+
+        return audioStorageService.getMediaChunk(
+            audioDirectory,
+            sequence
+        );
+    }
+
     public AudioChunk initializationChunk()
         throws IOException {
 

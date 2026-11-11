@@ -1,6 +1,6 @@
-import { AudioChunk, TimeRange } from "@audio";
+import { AudioChunk, AudioChunkFeedback, TimeRange } from "@audio";
 import { useWebSocket } from "@websocket";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { Children, RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { loggerFactory } from "@common";
 
 const logger = loggerFactory.getLogger("Audio.Buffer");
@@ -181,7 +181,20 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
                     initialization: message.headers["initialization"] === "true"
                 };
 
+                logger.debug("Пришёл чанк: ", chunk.sequence)
+
                 handleAudioChunk(chunk);
+
+                const chunkFeedback: AudioChunkFeedback = {
+                    streamId: chunk.streamId,
+                    sequence: chunk.sequence,
+                    initialization: chunk.initialization
+                }
+
+                client.publish({
+                    destination: "/app/audio.feedback",
+                    body: JSON.stringify(chunkFeedback)
+                });
             });
 
             return () => {

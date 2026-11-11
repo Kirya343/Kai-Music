@@ -1,6 +1,8 @@
 package org.kirya343.playback.presentation.websocket;
 
+import org.kirya343.audio.dto.AudioChunkFeedback;
 import org.kirya343.playback.application.service.PlaybackSessionService;
+import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.SubscribePlaybackRequest;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
@@ -17,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PlaybackWebSocketController {
 
     private final PlaybackSessionService playbackSessionService;
+    private final AudioStreamWorkerManager audioStreamWorkerManager;
     
     @MessageMapping("/playback.reconnect")
     @Authenticated
@@ -33,5 +36,15 @@ public class PlaybackWebSocketController {
         @AuthUser UserAuthData authData
     ) {
         playbackSessionService.subscribe(authData, request.type(), request.id());
+    }
+
+    @MessageMapping("/audio.feedback")
+    @Authenticated
+    public void subscribe(
+        AudioChunkFeedback chunk,
+        @AuthUser UserAuthData authData
+    ) {
+        log.debug("Получили чанк фидбэка {}", chunk.toString());
+        audioStreamWorkerManager.get(authData.sub()).chunkRecived(chunk);
     }
 }

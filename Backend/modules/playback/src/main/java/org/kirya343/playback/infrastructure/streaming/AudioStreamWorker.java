@@ -1,18 +1,23 @@
 package org.kirya343.playback.infrastructure.streaming;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.dto.AudioChunk;
+import org.kirya343.audio.dto.AudioChunkFeedback;
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.audio.services.util.Fmp4Chunker;
 import org.kirya343.playback.application.command.PlaybackCommand;
+import org.kirya343.playback.domain.enums.ChunkDeliveryStatus;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.presentation.dto.ChunkDelivery;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playlist.datasource.model.Playlist;
@@ -47,6 +52,8 @@ public class AudioStreamWorker
     private final AudioStorageService audioStorageService;
     private final PlaybackWebsocketService playbackWebsocketService;
     private final AudioQueryService audioQueryService;
+
+    private final ConcurrentHashMap<Long, ChunkDelivery> deliveries = new ConcurrentHashMap<>();
 
     public AudioStreamWorker(
         String userSub,
@@ -88,6 +95,7 @@ public class AudioStreamWorker
         if (state == null) return;
 
         streamId = UUID.randomUUID();
+        deliveries.clear();
 
         playbackWebsocketService.sendPlaybackState(userSub, state, streamId);
 
@@ -134,16 +142,55 @@ public class AudioStreamWorker
                     streamId
                 );
 
+                deliveries.putIfAbsent(
+                    chunk.sequence(), 
+                    new ChunkDelivery(chunk.sequence(), ChunkDeliveryStatus.SENT, Instant.now())
+                );
+
                 buffered += chunk.durationMs() / 1000.0;
             }
 
             bufferedUntil = buffered;
+
+            deliveries.values().stream()
+                .filter(delivery ->
+                    delivery.status() == ChunkDeliveryStatus.SENT &&
+                    delivery.sentAt().isBefore(Instant.now().minusSeconds(2))
+                )
+                .forEach(this::resendChunk);
 
         } catch (IOException e) {
 
             addLog("Exception while downloading audio chunk: %s", e);
             throw new RuntimeException(e);
         }
+    }
+
+    private void resendChunk(ChunkDelivery chunkDelivery) {
+
+        try {
+            AudioChunk chunk = chunker.getAudioChunk(chunkDelivery.sequence());
+
+            playbackWebsocketService.sendChunk(
+                userSub,
+                chunk,
+                currentState.entryId(),
+                streamId
+            );
+        } catch (IOException e) {
+
+            addLog("Exception while downloading audio chunk: %s", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void chunkRecived(AudioChunkFeedback chunkFeedback) {
+
+        if (chunkFeedback.streamId().equals(streamId)) return;
+
+        ChunkDelivery delivery = deliveries.get(chunkFeedback.sequence());
+
+        deliveries.put(chunkFeedback.sequence(), new ChunkDelivery(chunkFeedback.sequence(), ChunkDeliveryStatus.RECEIVED, delivery.sentAt()));
     }
 
     public void updateState(PlaybackStateDTO state) {

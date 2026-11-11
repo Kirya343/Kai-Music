@@ -22,6 +22,12 @@ export interface AudioChunk {
     streamId: string;
 };
 
+export interface AudioChunkFeedback {
+    streamId: string;
+    sequence: number;
+    initialization: boolean;
+}
+
 /**
  * Represents time ranges
  */

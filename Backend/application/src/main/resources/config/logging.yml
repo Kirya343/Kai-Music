@@ -5,3 +5,5 @@ logging:
     org.springframework.web.servlet.resource: INFO
     org.springframework.security: INFO
     org.kirya343: DEBUG
+    org.kirya343.security: INFO
+    org.kirya343.authentication.service.AuthCookiesService: INFO

@@ -10,17 +10,14 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Permission {
 
-    public Permission(String name) {
-        this.name = name;
+    public Permission(String id) {
+        this.id = id;
     }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Setter
-    @Column(unique = true, nullable = false)
-    private String name;
+    @Column(nullable = false)
+    private String id;
 
     @Setter
     @Column(length = 512)

@@ -35,14 +35,14 @@ public class PermissionsService {
         roles.stream()
             .filter(role -> role.getPermissions() != null)
             .flatMap(role -> role.getPermissions().stream())
-            .map(Permission::getName)
+            .map(Permission::getId)
             .map(SimpleGrantedAuthority::new)
             .forEach(authorities::add);
 
         // roles with ROLE_
         roles.stream()
-            .map(Role::getName)
-            .map(roleName -> "ROLE_" + roleName)
+            .map(Role::getId)
+            .map(roleId -> "ROLE_" + roleId)
             .map(SimpleGrantedAuthority::new)
             .forEach(authorities::add);
 

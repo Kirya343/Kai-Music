@@ -6,13 +6,12 @@ import java.util.List;
 import org.kirya343.permission.datasource.model.Permission;
 
 public record PermissionDTO(
-    Long id,
-    String name,
+    String id,
     String comment
 ) { 
 
     public static PermissionDTO ofPermission(Permission perm) {
-        return new PermissionDTO(perm.getId(), perm.getName(), perm.getComment());
+        return new PermissionDTO(perm.getId(), perm.getComment());
     }
 
     public static List<PermissionDTO> ofList(Collection<Permission> perms) {

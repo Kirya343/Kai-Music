@@ -1,5 +1,6 @@
 package org.kirya343.permission.datasource.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -12,30 +13,29 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Role {
 
-    public Role(String name, int level) {
-        this.name = name;
-        this.level = level;
+    public Role(String id) {
+        this.id = id;
     }
 
-    public Role(String name, Set<Permission> permissions, int level) {
-        this.name = name;
+    public Role(String id, Set<Permission> permissions) {
+        this.id = id;
         this.permissions = permissions;
-        this.level = level;
     }
 
-    @Id 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @Id
     @Setter
     @Column(unique = true)
-    private String name;
+    private String id;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "role_inheritance",
+        joinColumns = @JoinColumn(name = "role_id"),
+        inverseJoinColumns = @JoinColumn(name = "parent_role_id")
+    )
+    private Set<Role> inheritedRoles = new HashSet<>();
 
     @Setter
-    @Column(nullable = false)
-    private int level = 0;
-
-    @Setter
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Permission> permissions;
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<Permission> permissions = new HashSet<>();
 }

@@ -62,13 +62,13 @@ public class PermissionController {
 
     @PostMapping("/create/role")
     @RequiredPermission("CREATE_ROLE")
-    public Long createRole(@RequestParam String roleName) {
+    public String createRole(@RequestParam String roleName) {
         return permissionCommandSevice.createRole(roleName).getId();
     }
 
     @PostMapping("/create/permission")
     @RequiredPermission("CREATE_PERMISSION")
-    public Long createPermission(@RequestParam String permissionName) {
+    public String createPermission(@RequestParam String permissionName) {
         return permissionCommandSevice.createPermisson(permissionName).getId();
     }
 

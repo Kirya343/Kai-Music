@@ -27,9 +27,8 @@ public class PermissionCommandSevice {
         }
     }
 
-    public Role createRole(String roleName) {
-        Role role = new Role(roleName, 0);
-        return roleRepository.save(role);
+    public Role createRole(String roleId) {
+        return roleRepository.save(new Role(roleId));
     }
 
     public Permission createPermisson(String permissionName) {

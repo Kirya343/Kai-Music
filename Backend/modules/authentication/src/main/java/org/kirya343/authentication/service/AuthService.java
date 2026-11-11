@@ -94,7 +94,7 @@ public class AuthService {
         log.debug("Обновляем токен пользователя");
 
         String refreshToken = getTokenFromCookies(request, "refreshToken");
-        log.debug("Токен найден? {}", refreshToken);
+        log.debug("Токен найден? {}", refreshToken != null ? (refreshToken.substring(0, 50) + "...") : null);
 
         if (refreshToken == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Nothing to refresh");
 

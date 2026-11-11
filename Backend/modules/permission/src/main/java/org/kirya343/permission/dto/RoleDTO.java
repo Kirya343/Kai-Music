@@ -6,12 +6,10 @@ import java.util.List;
 import org.kirya343.permission.datasource.model.Role;
 
 public record RoleDTO(
-    Long id,
-    String name,
-    int level
+    String id
 ) {
     public static RoleDTO ofRole(Role role) {
-        return new RoleDTO(role.getId(), role.getName(), role.getLevel());
+        return new RoleDTO(role.getId());
     }
 
     public static List<RoleDTO> ofList(Collection<Role> roles) {

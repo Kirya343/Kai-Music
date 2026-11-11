@@ -43,19 +43,9 @@ const LibraryTrack = ({
     const extraActions = useMemo<IKebabAction[]>(() => {
         return [
             {
-                icon: <ShazamIcon/>,
-                title: "Autofill info with Shazam",
-                func: async () => await audioService.recognizeAudio(audio.id)
-            },
-            {
                 icon: <PenIcon/>,
                 title: "Edit audio info",
                 func: () => openEditModal(audio)
-            },
-            {
-                icon: <TrashIcon/>,
-                title: "Delete from library",
-                func: () => handleDelete(audio),
             },
             ...(importPlaylistId ? [{
                 icon: <PlusIcon />,

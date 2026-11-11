@@ -37,7 +37,7 @@ export const upload = (
  * @param audioId - ID of the audio track.
  * @param audio - Updated audio metadata.
  */
-export const updateAudio = (audioId: number, audio: IAudioUpdate) => audioApi.patch<void>(`/${audioId}`, audio)
+export const update = (audioId: number, audio: IAudioUpdate) => audioApi.patch<void>(`/${audioId}`, audio)
 
 /**
  * Deletes an audio track.

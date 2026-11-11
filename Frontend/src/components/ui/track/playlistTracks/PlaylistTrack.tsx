@@ -1,10 +1,10 @@
 import { TrashIcon, CheckmarkIcon, PenIcon, PlusIcon, ShazamIcon } from "@/assets/icons"
 import { playlistService } from "@playlist"
 import { audioService, IAudio } from "@audio"
-import Track, { ITrackAction } from "./Track/Track"
+import Track, { ITrackAction } from "../Track/Track"
 import { IQueueItem } from "@playback"
 import { HTMLAttributes } from "react"
-import { IKebabAction } from "../KebabMenu/KebabMenu"
+import { IKebabAction } from "../../KebabMenu/KebabMenu"
 
 /**
  * Props for the PlaylistTrack component
@@ -52,11 +52,6 @@ const PlaylistTrack = ({
     const actions: ITrackAction[] = [];
 
     const extraActions: IKebabAction[] = [
-        {
-            icon: <ShazamIcon/>,
-            title: "Autofill info with Shazam",
-            func: async () => await audioService.recognizeAudio(queueItem.audio.id)
-        },
         {
             icon: <PenIcon/>,
             title: "Edit audio info",

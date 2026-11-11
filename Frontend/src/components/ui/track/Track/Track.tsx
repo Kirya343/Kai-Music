@@ -124,18 +124,20 @@ const Track = ({
         }
     };
 
-    const finalActions = useMemo<ITrackAction[]>(() => {
-        const array = actions ?? []
-        
-        array.push({
+    const finalActions = useMemo<ITrackAction[]>(() => [
+        ...(actions ?? []),
+        {
             icon: <HeartIcon filled={isLiked} />,
             title: "Like",
             func: toggleLike
-        })
-
-        return array;
-    }, [isLiked, actions])
+        }
+    ], [isLiked, actions]);
     
+    const handlePlay = () => {
+        if (currentPlaylistId === null) return;
+
+        playbackService.playTrack("USER", audio.id, currentPlaylistId)
+    }
 
     return (
         <div 
@@ -147,12 +149,9 @@ const Track = ({
                 className
             )}
         >
-            <div className={styles.body} onClick={onClick}>
+            <div className={styles.body} onClick={handlePlay}>
 
-                <div 
-                    className={styles.audioCover} 
-                    onClick={() => currentPlaylistId !== null && playbackService.playTrack("USER", audio.id, currentPlaylistId)}
-                >
+                <div className={styles.audioCover}>
                     <MusicNoteIcon/>
                 </div>
 

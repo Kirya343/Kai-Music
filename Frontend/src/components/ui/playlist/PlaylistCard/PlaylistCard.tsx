@@ -40,6 +40,7 @@ const PlaylistCard = ({
         <article className={styles.playlistCard}>
             <div className={styles.body} onClick={onClick}>
                 <span className={styles.title}>{playlist.title}</span>
+                <span className={styles.tracks}>{playlist.queue.length} tracks</span>
             </div>
 
             <div className={styles.actions}>

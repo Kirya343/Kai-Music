@@ -17,6 +17,7 @@ import org.kirya343.playlist.enums.PlaylistType;
 import org.kirya343.playlist.service.PlaylistCommandService;
 import org.kirya343.user.datasource.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +38,7 @@ public class AudioPlaylistEventHandler {
     private final UserRepository userRepository;
     private final PlaylistCommandService playlistCommandService;
     
-    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
+    @EventListener
     public void handleDeleted(AudioDeletedEvent event) {
 
         log.debug("deleting entries by audio {}", event.audioId());
@@ -49,6 +50,8 @@ public class AudioPlaylistEventHandler {
             .collect(Collectors.toSet());
 
         queueItemRepository.deleteAll(entries);
+
+        queueItemRepository.flush();
 
         playlistsIds.forEach(id -> eventPublisher.publishEvent(new QueueChangedEvent(id)));
     }

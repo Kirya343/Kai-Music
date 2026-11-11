@@ -1,16 +1,17 @@
 import styles from "./PlaylistPage.module.scss"
 import { useMemo, useState } from "react";
-import { Playlist, playlistService } from "@playlist";
+import { Playlist, playlistService, PlaylistType } from "@playlist";
 import { IAudio } from "@audio";
 import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
-import PlaylistTrack from "@/components/ui/track/PlaylistTrack";
+import PlaylistTrack from "@/components/ui/track/playlistTracks/PlaylistTrack";
 import { useParams } from "react-router-dom";
-import { CheckBoxIcon, CirclePlusIcon, PenIcon, TrashIcon } from "@/assets/icons";
+import { CheckBoxIcon, CirclePlusIcon, TrashIcon } from "@/assets/icons";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
-import { usePlaybackContext } from "@playback";
+import { IQueueItem, usePlaybackContext } from "@playback";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
+import UploadsPlaylistTrack from "@/components/ui/track/playlistTracks/UploadsPlaylistTrack";
 
 const PlaylistPage = ({}: {}) => {
 
@@ -65,16 +66,28 @@ const PlaylistPage = ({}: {}) => {
                         .sort((a, b) => a.id - b.id)
                         .map((qi, idx) => [
                             qi.id,
-                            <PlaylistTrack
-                                key={idx}
-                                queueItem={qi}
-                                trackNumber={idx + 1}
-                                isInPlaylist={false}
-                                currentPlaylistId={playlist.id}
-                                openEditModal={setAudioFileView}
-                                handleRemove={playlistsData.removeAudio}
-                                playing={playingAudioId === qi.audio.id}
-                            />
+                            playlist.type === PlaylistType.UPLOADED ? (
+                                <UploadsPlaylistTrack
+                                    key={idx}
+                                    queueItem={qi}
+                                    trackNumber={idx + 1}
+                                    isInPlaylist={false}
+                                    currentPlaylistId={playlist.id}
+                                    openEditModal={setAudioFileView}
+                                    playing={playingAudioId === qi.audio.id}
+                                />
+                            ) : (
+                                <PlaylistTrack
+                                    key={idx}
+                                    queueItem={qi}
+                                    trackNumber={idx + 1}
+                                    isInPlaylist={false}
+                                    currentPlaylistId={playlist.id}
+                                    openEditModal={setAudioFileView}
+                                    handleRemove={playlistsData.removeAudio}
+                                    playing={playingAudioId === qi.audio.id}
+                                />
+                            )
                         ])
                 )}
                 extraActions={[

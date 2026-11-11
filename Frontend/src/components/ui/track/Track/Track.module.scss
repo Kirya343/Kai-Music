@@ -6,7 +6,6 @@
     border-radius: 10px;
     gap: 1rem;
     justify-content: space-between;
-    padding: 10px;
     cursor: pointer;
 
     &:not(.noBorder) {
@@ -22,6 +21,10 @@
     &.playing .title {
         color: var(--orange);
         font-weight: 600; 
+    }
+
+    & > * {
+        padding: 10px;
     }
 }
 

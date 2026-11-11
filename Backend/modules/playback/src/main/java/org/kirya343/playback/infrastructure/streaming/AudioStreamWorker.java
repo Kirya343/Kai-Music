@@ -195,7 +195,7 @@ public class AudioStreamWorker
 
         ChunkDelivery delivery = deliveries.get(chunkFeedback.sequence());
 
-        if (!delivery) return;
+        if (delivery == null) return;
 
         deliveries.put(chunkFeedback.sequence(), new ChunkDelivery(chunkFeedback.sequence(), ChunkDeliveryStatus.RECEIVED, delivery.sentAt()));
     }

@@ -135,16 +135,16 @@ public class AudioStreamWorker
 
                 chunk = chunker.nextAudioChunk();
 
+                deliveries.putIfAbsent(
+                    chunk.sequence(), 
+                    new ChunkDelivery(chunk.sequence(), ChunkDeliveryStatus.SENT, Instant.now())
+                );
+
                 playbackWebsocketService.sendChunk(
                     userSub,
                     chunk,
                     currentState.entryId(),
                     streamId
-                );
-
-                deliveries.putIfAbsent(
-                    chunk.sequence(), 
-                    new ChunkDelivery(chunk.sequence(), ChunkDeliveryStatus.SENT, Instant.now())
                 );
 
                 buffered += chunk.durationMs() / 1000.0;
@@ -171,16 +171,16 @@ public class AudioStreamWorker
         try {
             AudioChunk chunk = chunker.getAudioChunk(chunkDelivery.sequence());
 
+            deliveries.put(
+                chunk.sequence(), 
+                new ChunkDelivery(chunk.sequence(), ChunkDeliveryStatus.SENT, Instant.now())
+            );
+
             playbackWebsocketService.sendChunk(
                 userSub,
                 chunk,
                 currentState.entryId(),
                 streamId
-            );
-
-            deliveries.put(
-                chunk.sequence(), 
-                new ChunkDelivery(chunk.sequence(), ChunkDeliveryStatus.SENT, Instant.now())
             );
         } catch (IOException e) {
 

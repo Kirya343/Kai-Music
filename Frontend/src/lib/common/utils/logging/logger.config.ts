@@ -7,7 +7,7 @@ const config: LoggerConfig = {
 
     categories: {
         Audio: {
-            Buffer: "DEBUG",
+            Buffer: "INFO",
             MediaSource: "INFO",
             Playback: "DEBUG",
         },

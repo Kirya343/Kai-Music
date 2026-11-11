@@ -30,6 +30,8 @@ const PlaybackQueueTrack = ({
 
     const handleTrackClick = async (qiId: number) => {
 
+        console.log("Клик по треку в плейбэке")
+
         if (playbackState?.entryId === qiId) {
             togglePlay()
         } else {

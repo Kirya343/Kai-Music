@@ -155,7 +155,7 @@ const Track = ({
                 className
             )}
         >
-            <div className={styles.body} onClick={handlePlay}>
+            <div className={styles.body} onClick={onClick ?? handlePlay}>
 
                 <div className={styles.audioCover}>
                     <MusicNoteIcon/>

@@ -36,4 +36,8 @@
     width: 100%;
     gap: 1rem;
     align-items: flex-end;
+    
+    @include mobile {
+        flex-direction: column;
+    }
 }

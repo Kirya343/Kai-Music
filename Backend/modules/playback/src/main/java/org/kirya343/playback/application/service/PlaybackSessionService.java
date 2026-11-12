@@ -6,8 +6,8 @@ import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
-import org.kirya343.playback.infrastructure.streaming.AudioStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.UserStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
 import org.kirya343.room.datasource.ListeningRoom;
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PlaybackSessionService {
 
-    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final UserStreamWorkerManager audioStreamWorkerManager;
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     private final UserPlaybackRepository userPlaybackRepository;
     private final UserRepository userRepository;
@@ -45,7 +45,7 @@ public class PlaybackSessionService {
             : targetId;
 
         PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(targetType, resolvedTargetId);
-        AudioStreamWorker userWorker = audioStreamWorkerManager.get(authData.sub());
+        UserStreamWorker userWorker = audioStreamWorkerManager.get(authData.sub());
 
         User user = userRepository.findById(authData.id()).orElseThrow();
 

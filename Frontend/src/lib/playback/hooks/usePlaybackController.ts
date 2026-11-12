@@ -1,11 +1,12 @@
-import { useGlobal } from "@common";
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { countPosition, useGlobal } from "@common";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PlaybackState, PlaybackMode, PlaybackData } from "../playbackTypes";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
 import { loggerFactory } from "@common";
 import { Playlist } from "@playlist";
 import { Client } from "@stomp/stompjs";
+import { IAudio } from "@audio";
 
 const logger = loggerFactory.getLogger("Audio.Playback");
 
@@ -39,11 +40,47 @@ export const usePlaybackController = ({
     const unsyncedStateRef = useRef<PlaybackState | null>(null);
     const debounceTimeoutRef = useRef<number | null>(null);
     const awaitingStateRef = useRef(false);
+    const prevPlaybackStateRef = useRef<PlaybackState | null>(null);
 
     // audio state
     const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
+    const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
+
+    useEffect(() => {
+        const audio = playlist?.queue.find(
+            qi => qi.id === playbackState?.entryId
+        )?.audio;
+
+        if (audio) {
+            setPlayingAudio(audio);
+        }
+    }, [playlist, playbackState]);
+
+    // info
+    const updateMessage = useMemo<string>(() => {
+        if (!playbackState || !prevPlaybackStateRef.current) return "";
+
+        const newState = playbackState;
+        const prevState = prevPlaybackStateRef.current;
+
+        let message = `${newState.user} `
+
+        if (newState.entryId != prevState.entryId) {
+            message += `started playing track #${newState.entryId}`;
+        } else if (newState.pause != prevState.pause && newState.pause) {
+            message += `paused the playback`
+        } else if (newState.pause != prevState.pause && !newState.pause) {
+            message += `resumed playback`
+        } else if (newState.position != prevState.position) {
+            message += `seeked to ${countPosition(newState.position)}`
+        }
+
+        prevPlaybackStateRef.current = playbackState
+
+        return message;
+    }, [playbackState]);
 
     /**
      * Pauses playing audio
@@ -327,6 +364,8 @@ export const usePlaybackController = ({
         playbackMode,
         playbackPlaylist: playlist,
         playbackData,
+        playingAudio,
+        updateMessage,
         togglePlay,
         seek,
         changeTrack

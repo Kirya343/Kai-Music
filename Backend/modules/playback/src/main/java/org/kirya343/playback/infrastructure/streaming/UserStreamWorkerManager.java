@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
@@ -21,31 +20,31 @@ import lombok.extern.slf4j.Slf4j;
 @Component 
 @Slf4j 
 @RequiredArgsConstructor 
-public class AudioStreamWorkerManager 
+public class UserStreamWorkerManager 
     implements DiagnosticComponent {
 
-    private final AudioQueryService audioQueryService;
     private final PlaybackWebsocketService playbackWebsocketService;
     private final AudioStorageService audioStorageService;
+    private final AudioStreamService audioStreamService;
 
-    private final Map<String, AudioStreamWorker> workers =
+    private final Map<String, UserStreamWorker> workers =
         new ConcurrentHashMap<>();
 
-    public AudioStreamWorker get(String userSub) {
+    public UserStreamWorker get(String userSub) {
 
         log.debug("Пытаемся получить воркер для пользователя {}", userSub);
 
-        AudioStreamWorker worker = workers.get(userSub);
+        UserStreamWorker worker = workers.get(userSub);
 
         if (worker == null) {
 
             log.debug("Создаём новый воркер для пользователя {}", userSub);
 
-            worker = new AudioStreamWorker(
+            worker = new UserStreamWorker(
                 userSub,
-                audioQueryService,
                 audioStorageService,
-                playbackWebsocketService
+                playbackWebsocketService,
+                audioStreamService
             );
 
             log.debug("Кладём к остальным воркер для пользователя {}", userSub);
@@ -56,12 +55,12 @@ public class AudioStreamWorkerManager
         return worker;
     }
 
-    public void register(AudioStreamWorker worker) {
+    public void register(UserStreamWorker worker) {
         workers.put(worker.getUserSub(), worker);
     }
 
     public void unregister(String userSub) {
-        AudioStreamWorker worker = workers.remove(userSub);
+        UserStreamWorker worker = workers.remove(userSub);
 
         log.debug("Удаляем воркер {}", userSub);
 
@@ -101,7 +100,7 @@ public class AudioStreamWorkerManager
 
                 String userSub = args[0];
 
-                AudioStreamWorker worker = workers.get(userSub);
+                UserStreamWorker worker = workers.get(userSub);
 
                 if (worker == null) {
                     return new TextResult(String.format("Worker of user %s is offline", userSub));
@@ -134,7 +133,7 @@ public class AudioStreamWorkerManager
 
                 String userSub = args[0];
 
-                AudioStreamWorker worker = workers.get(userSub);
+                UserStreamWorker worker = workers.get(userSub);
 
                 if (worker == null) {
                     return new TextResult(String.format("Worker of user %s is offline", userSub));

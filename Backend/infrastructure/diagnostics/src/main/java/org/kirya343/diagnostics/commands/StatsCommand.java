@@ -4,7 +4,7 @@ package org.kirya343.diagnostics.commands;
 import java.lang.management.ManagementFactory;
 
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
 import org.kirya343.presence.global.services.PresenceService;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ public class StatsCommand implements DiagnosticCommand {
 
     private final PresenceService presenceService;
     private final PlaybackStreamWorkerManager playbackworkers;
-    private final AudioStreamWorkerManager audioWorkers;
+    private final UserStreamWorkerManager audioWorkers;
 
     public String getName() {
         return "stats";

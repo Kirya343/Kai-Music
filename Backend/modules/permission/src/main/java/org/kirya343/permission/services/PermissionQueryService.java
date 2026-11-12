@@ -31,7 +31,7 @@ public class PermissionQueryService {
         return PermissionDTO.ofList(perms);
     }
 
-    public List<PermissionDTO> getPermissionDtosByRole(Long roleId) {
+    public List<PermissionDTO> getPermissionDtosByRole(String roleId) {
         Role role = roleRepository.findById(roleId).orElseThrow();
         Set<Permission> perms = role.getPermissions();
 

@@ -52,7 +52,7 @@ public class UserCommandService {
     public User registerLocal(String email, String name, String password, HttpServletRequest request) {
         
         String hashed = passwordEncoder.encode(password);
-        Role role = roleRepository.findByName("USER");
+        Role role = roleRepository.getReferenceById("USER");
         Set<Role> roles = new HashSet<>();
         roles.add(role);
         User user = new User(

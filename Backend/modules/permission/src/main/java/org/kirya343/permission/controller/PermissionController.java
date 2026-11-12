@@ -46,15 +46,15 @@ public class PermissionController {
 
     @GetMapping("/{roleId}/get")
     @RequiredPermission("GET_PERMISSIONS_BY_ROLE")
-    public List<PermissionDTO> getPermissionsByRole(@NonNull @PathVariable Long roleId) {
+    public List<PermissionDTO> getPermissionsByRole(@NonNull @PathVariable String roleId) {
         return permissionQueryService.getPermissionDtosByRole(roleId);
     }
 
     @PutMapping("/{roleId}/save")
     @RequiredPermission("MANAGE_PERMISSIONS")
     public void savePermissionsForRole(
-        @PathVariable Long roleId,
-        @RequestParam Long permissionId,
+        @PathVariable String roleId,
+        @RequestParam String permissionId,
         @RequestParam boolean enabled
     ) {
         permissionCommandSevice.updateRolePermission(roleId, permissionId, enabled);
@@ -75,22 +75,22 @@ public class PermissionController {
     @PatchMapping("/update/permission/{permissionId}")
     @RequiredPermission("UPDATE_PERMISSION")
     public void updatePermission(
-        @PathVariable Long permissionId,
-        @RequestParam(required = false) String name, 
+        @PathVariable String permissionId,
+        @RequestParam(required = false) String newPermissionId, 
         @RequestParam(required = false) String comment
     ) {
-        permissionRepository.updatePermission(permissionId, name, comment);
+        permissionRepository.updatePermission(permissionId, newPermissionId, comment);
     }
 
     @PostMapping("/user/role")
     @RequiredPermission("ADD_USER_ROLE")
-    public void userAddRole(@RequestParam Long userId, @RequestParam Long roleId) {
+    public void userAddRole(@RequestParam Long userId, @RequestParam String roleId) {
         roleRepository.addRoleToUser(userId, roleId);
     }
 
     @DeleteMapping("/user/role")
     @RequiredPermission("REMOVE_USER_ROLE")
-    public void userRemoveRole(@RequestParam Long userId, @RequestParam Long roleId) {
+    public void userRemoveRole(@RequestParam Long userId, @RequestParam String roleId) {
         roleRepository.removeRoleFromUser(userId, roleId);
     }
 }

@@ -18,7 +18,7 @@ public class PermissionCommandSevice {
     private final PermissionRepository permissionRepository;
 
     @Transactional
-    public void updateRolePermission(Long roleId, Long permissionId, boolean enabled) {
+    public void updateRolePermission(String roleId, String permissionId, boolean enabled) {
 
         if (enabled) {
             roleRepository.addPermissionToRole(roleId, permissionId);

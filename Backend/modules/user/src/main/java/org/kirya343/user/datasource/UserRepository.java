@@ -22,14 +22,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     List<User> findByRolesContaining(Role role);
-    List<User> findByRoles_Name(String roleName);
-    List<User> findByRoles_NameIn(List<String> roleNames);
+    List<User> findByRoles_Id(String roleId);
+    List<User> findByRoles_IdIn(List<String> roleIds);
 
     List<User> findByStatus(UserStatus status);
 
     boolean existsByEmail(String email);
     boolean existsByName(String name);
-    boolean existsByIdAndRoles_Name(Long userId, String roleName);
+    boolean existsByIdAndRoles_Id(Long userId, String roleId);
 
     Page<User> findAllByStatusOrderByCreatedAtDesc(Pageable pageable, UserStatus type);
 

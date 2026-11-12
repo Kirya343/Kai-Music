@@ -11,9 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface RoleRepository extends JpaRepository<Role, Long> {
-
-    Role findByName(String name);
+public interface RoleRepository extends JpaRepository<Role, String> {
     
     List<Role> findByPermissionsContaining(Permission permission);
 
@@ -31,13 +29,13 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     @Query(
         value = """
             insert into role_permissions (role_id, permissions_id)
-            values (:roleId, :permissionId)
+            values (:id, :permissionId)
             """,
         nativeQuery = true
     )
     void addPermissionToRole(
-            @Param("roleId") Long roleId,
-            @Param("permissionId") Long permissionId
+            @Param("roleId") String roleId,
+            @Param("permissionId") String permissionId
     );
 
     @Modifying
@@ -50,8 +48,8 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
         nativeQuery = true
     )
     void removePermissionFromRole(
-            @Param("roleId") Long roleId,
-            @Param("permissionId") Long permissionId
+            @Param("roleId") String roleId,
+            @Param("permissionId") String permissionId
     );
 
     @Modifying
@@ -65,7 +63,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     )
     void addRoleToUser(
             @Param("userId") Long userId,
-            @Param("roleId") Long roleId
+            @Param("roleId") String roleId
     );
 
     @Modifying
@@ -79,7 +77,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
     )
     void removeRoleFromUser(
             @Param("userId") Long userId,
-            @Param("roleId") Long roleId
+            @Param("roleId") String roleId
     );
 }
 

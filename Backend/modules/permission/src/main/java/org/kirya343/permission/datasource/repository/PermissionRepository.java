@@ -9,9 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface PermissionRepository extends JpaRepository<Permission, Long> {
-
-    Permission findByName(String name);
+public interface PermissionRepository extends JpaRepository<Permission, String> {
 
     List<Permission> findAllByIdIn(List<Long> ids);
 
@@ -20,13 +18,13 @@ public interface PermissionRepository extends JpaRepository<Permission, Long> {
     @Query("""
         update Permission p
         set
-            p.name = coalesce(:name, p.name),
+            p.id = coalesce(:newId, p.id),
             p.comment = coalesce(:comment, p.comment)
-        where p.id = :permissionId
+        where p.id = :id
     """)
     void updatePermission(
-            @Param("permissionId") Long permissionId,
-            @Param("name") String name,
+            @Param("id") String id,
+            @Param("newId") String newId,
             @Param("comment") String comment
     );
 }

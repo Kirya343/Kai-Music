@@ -10,12 +10,10 @@ import org.kirya343.audio.event.AudioUploadedEvent;
 import org.kirya343.common.event.playback.QueueChangedEvent;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
-import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.playlist.dto.queue.QueueItemCreateDTO;
-import org.kirya343.playlist.enums.PlaylistType;
-import org.kirya343.playlist.service.PlaylistCommandService;
-import org.kirya343.user.datasource.UserRepository;
+import org.kirya343.playlist.service.PlaylistQueryService;
+import org.kirya343.playlist.service.PlaylistQueueService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -34,9 +32,8 @@ public class AudioPlaylistEventHandler {
 
     private final QueueItemRepository queueItemRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final PlaylistRepository playlistRepository;
-    private final UserRepository userRepository;
-    private final PlaylistCommandService playlistCommandService;
+    private final PlaylistQueueService playlistQueueService;
+    private final PlaylistQueryService playlistQueryService;
     
     @EventListener
     public void handleDeleted(AudioDeletedEvent event) {
@@ -74,16 +71,9 @@ public class AudioPlaylistEventHandler {
 
         log.debug("AudioUploadedEvent handle: {}", event.audioId());
 
-        Playlist playlist = playlistRepository.findPlaylistByTypeByOwnerId(event.userId(), PlaylistType.UPLOADED)
-            .orElseGet(() -> 
-                playlistRepository.save(
-                    new Playlist(
-                        "Uploaded songs", 
-                        userRepository.getReferenceById(event.userId()), 
-                        PlaylistType.UPLOADED
-                    )));
+        Playlist playlist = playlistQueryService.getOrCreateUploadedPlaylist(event.userId());
 
-        playlistCommandService.addToQueue(
+        playlistQueueService.addToQueue(
             playlist.getId(), 
             event.userId(), 
             List.of(new QueueItemCreateDTO(event.audioId(), null))

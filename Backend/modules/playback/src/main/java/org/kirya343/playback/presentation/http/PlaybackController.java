@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
-import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.PlaybackCommand;
@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 public class PlaybackController {
 
     private final PlaybackStateRepository playbackStateRepository;
-    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final UserStreamWorkerManager audioStreamWorkerManager;
     private final PlaybackSessionService playbackSessionService;
     private final PlaybackService playbackService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();

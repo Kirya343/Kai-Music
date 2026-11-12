@@ -14,7 +14,7 @@ import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.playlist.dto.queue.QueueItemCreateDTO;
-import org.kirya343.playlist.service.PlaylistCommandService;
+import org.kirya343.playlist.service.PlaylistQueueService;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.services.RoomCommandService;
 import org.kirya343.security.core.dto.UserAuthData;
@@ -33,10 +33,10 @@ public class PlaybackService {
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     private final PlaybackSessionService playbackSessionService;
     private final RoomCommandService roomCommandService;
-    private final PlaylistCommandService playlistCommandService;
     private final QueueItemRepository queueItemRepository;
     private final PlaylistRepository playlistRepository;
     private final UserPlaybackRepository userPlaybackRepository;
+    private final PlaylistQueueService playlistQueueService;
     
     public void updatePlaybackMode(PlaybackMode mode, UserAuthData authData) {
         UserPlayback userPlayback = userPlaybackRepository.findById(authData.id()).orElseThrow();
@@ -71,12 +71,12 @@ public class PlaybackService {
 
         playlistRepository.deleteAllByPlaylistId(queuePlaylistId);
 
-        playlistCommandService.addToQueue(queuePlaylistId, authData.id(), List.of(new QueueItemCreateDTO(audioId, null)));
+        playlistQueueService.addToQueue(queuePlaylistId, authData.id(), List.of(new QueueItemCreateDTO(audioId, null)));
 
         if (playlistId == null) {
-            playlistCommandService.addRundomTracks(30, queuePlaylistId, authData);
+            playlistQueueService.addRundomTracks(30, queuePlaylistId, authData);
         } else {
-            playlistCommandService.importPlaylist(queuePlaylistId, playlistId, authData);
+            playlistQueueService.importPlaylist(queuePlaylistId, playlistId, authData);
         }
 
         QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(queuePlaylistId, audioId).orElse(null);

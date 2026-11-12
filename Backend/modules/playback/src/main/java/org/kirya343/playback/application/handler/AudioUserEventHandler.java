@@ -1,6 +1,6 @@
 package org.kirya343.playback.application.handler;
 
-import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
 import org.kirya343.user.dto.event.UserDisconnectedEvent;
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class AudioUserEventHandler {
 
     private final ListeningRoomRepository listeningRoomRepository;
-    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final UserStreamWorkerManager audioStreamWorkerManager;
 
     @Async
     @EventListener

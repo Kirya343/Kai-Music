@@ -5,7 +5,7 @@ import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
 import org.kirya343.playback.application.event.PlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
-import org.kirya343.playback.infrastructure.streaming.AudioStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
@@ -28,7 +28,7 @@ public class PlaybackCommandWorker {
     private final QueueService queueService;
     private final QueueItemRepository queueItemRepository;
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
-    private final AudioStreamWorkerManager audioStreamWorkerManager;
+    private final UserStreamWorkerManager audioStreamWorkerManager;
 
     @EventListener 
     public void handle(PlaybackCommand cmd) {
@@ -99,7 +99,6 @@ public class PlaybackCommandWorker {
                         0.0, 
                         false
                     );
-
 
                     playbackWorker.setCurrentAudio(entry.getAudio());
 

@@ -36,8 +36,6 @@ export const usePlaybackContext = () => {
 
 export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 
-    const prevPlaybackStateRef = useRef<PlaybackState | null>(null);
-
     const { 
         pausePlayback, 
         audioRef, bufferedRanges,
@@ -46,46 +44,14 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
         playbackMode,
         playbackPlaylist,
         playbackData,
+        playingAudio,
+
+        updateMessage,
+
         seek,
         togglePlay,
         changeTrack
     } = useAudioPlayer();
-
-    const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
-
-    useEffect(() => {
-        const audio = playbackPlaylist?.queue.find(
-            qi => qi.id === playbackState?.entryId
-        )?.audio;
-
-        if (audio) {
-            setPlayingAudio(audio);
-        }
-    }, [playbackPlaylist, playbackState]);
-
-    // info
-    const updateMessage = useMemo<string>(() => {
-        if (!playbackState || !prevPlaybackStateRef.current) return "";
-
-        const newState = playbackState;
-        const prevState = prevPlaybackStateRef.current;
-
-        let message = `${newState.user} `
-
-        if (newState.entryId != prevState.entryId) {
-            message += `started playing track #${newState.entryId}`;
-        } else if (newState.pause != prevState.pause && newState.pause) {
-            message += `paused the playback`
-        } else if (newState.pause != prevState.pause && !newState.pause) {
-            message += `resumed playback`
-        } else if (newState.position != prevState.position) {
-            message += `seeked to ${countPosition(newState.position)}`
-        }
-
-        prevPlaybackStateRef.current = playbackState
-
-        return message;
-    }, [playbackState]);
 
     // ui
     const [fullPlayerOpen, setFullPlayerOpen] = useState<boolean>(false);
@@ -157,7 +123,9 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     }, [
         playingAudio,
         playbackState,
-        seek
+        seek,
+        togglePlay,
+        changeTrack
     ]);
     
     return (

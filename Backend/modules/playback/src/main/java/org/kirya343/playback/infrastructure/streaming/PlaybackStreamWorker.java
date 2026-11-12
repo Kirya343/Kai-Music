@@ -47,7 +47,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
 
     private static final int CHUNK_INTERVAL_SECONDS = 2;
 
-    private final Set<AudioStreamWorker> userStreamWorkers =
+    private final Set<UserStreamWorker> userStreamWorkers =
         ConcurrentHashMap.newKeySet();
 
     @Getter 
@@ -92,7 +92,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         eventPublisher.publishEvent(cmd);
     }
 
-    public void broadcast(Consumer<AudioStreamWorker> action) {
+    public void broadcast(Consumer<UserStreamWorker> action) {
         userStreamWorkers.forEach(action);
     }
 
@@ -174,7 +174,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         }
 
         try {
-            userStreamWorkers.forEach(AudioStreamWorker::tick);
+            userStreamWorkers.forEach(UserStreamWorker::tick);
         } catch (Exception e) {
             log.error("Ошибка обработки тика юзеров: {}", e);
         }
@@ -196,7 +196,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         }
     }
 
-    public void subscribe(AudioStreamWorker worker, ShortUserDTO userDto) {
+    public void subscribe(UserStreamWorker worker, ShortUserDTO userDto) {
         worker.applyState(currentState);
         worker.sendPlaybackData(targetType, targetId, presence.getOnlineUsers());
         presence.userConnected(userDto);
@@ -204,7 +204,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         userStreamWorkers.add(worker);
     }
 
-    public void unsubscribe(AudioStreamWorker worker) {
+    public void unsubscribe(UserStreamWorker worker) {
         userStreamWorkers.remove(worker);
         presence.userDisconnected(worker.getUserSub());
     }

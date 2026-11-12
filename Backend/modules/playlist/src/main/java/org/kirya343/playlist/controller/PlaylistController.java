@@ -8,6 +8,7 @@ import org.kirya343.playlist.dto.PlaylistCreateDTO;
 import org.kirya343.playlist.dto.PlaylistDTO;
 import org.kirya343.playlist.dto.queue.QueueItemCreateDTO;
 import org.kirya343.playlist.service.PlaylistCommandService;
+import org.kirya343.playlist.service.PlaylistQueueService;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
 import org.kirya343.security.core.dto.UserAuthData;
@@ -32,6 +33,7 @@ public class PlaylistController {
 
     private final PlaylistRepository playlistRepository;
     private final PlaylistCommandService playlistCommandService;
+    private final PlaylistQueueService playlistQueueService;
 
     @GetMapping("/{playlistId}")
     @Authenticated
@@ -74,7 +76,7 @@ public class PlaylistController {
         @RequestParam Long playlistId,
         @AuthUser UserAuthData authData
     ) {
-        playlistCommandService.importPlaylist(targetPlaylistId, playlistId, authData);
+        playlistQueueService.importPlaylist(targetPlaylistId, playlistId, authData);
     }
 
     @DeleteMapping("/{playlistId}")
@@ -83,7 +85,7 @@ public class PlaylistController {
         @PathVariable Long playlistId,
         @AuthUser UserAuthData authData
     ) {
-        playlistRepository.deleteById(playlistId);
+        playlistCommandService.deletePlaylist(playlistId, authData);
     }
 
     @PostMapping("/{playlistId}/queue")
@@ -93,7 +95,7 @@ public class PlaylistController {
         @RequestBody List<QueueItemCreateDTO> list,
         @AuthUser UserAuthData authData
     ) {
-        playlistCommandService.addQueueList(list, playlistId, authData);
+        playlistQueueService.addQueueList(list, playlistId, authData);
     }
 
     @PostMapping("/liked")
@@ -102,7 +104,7 @@ public class PlaylistController {
         @RequestBody List<QueueItemCreateDTO> list,
         @AuthUser UserAuthData authData
     ) {
-        playlistCommandService.setAudiosLiked(list, authData);
+        playlistQueueService.setAudiosLiked(list, authData);
     }
 
     @PostMapping("/{playlistId}/queue/rundom")
@@ -112,7 +114,7 @@ public class PlaylistController {
         @RequestParam Integer amount,
         @AuthUser UserAuthData authData
     ) {
-        playlistCommandService.addRundomTracks(amount, playlistId, authData);
+        playlistQueueService.addRundomTracks(amount, playlistId, authData);
     }
 
     @DeleteMapping("/{playlistId}/queue")
@@ -122,7 +124,7 @@ public class PlaylistController {
         @RequestBody List<Long> list,
         @AuthUser UserAuthData authData
     ) {
-        playlistCommandService.removeQueueList(list, playlistId, authData);
+        playlistQueueService.removeQueueList(list, playlistId, authData);
     }
 
     @DeleteMapping("/liked")
@@ -131,6 +133,6 @@ public class PlaylistController {
         @RequestBody List<Long> list,
         @AuthUser UserAuthData authData
     ) {
-        playlistCommandService.unsetAudiosLiked(list, authData);
+        playlistQueueService.unsetAudiosLiked(list, authData);
     }
 }

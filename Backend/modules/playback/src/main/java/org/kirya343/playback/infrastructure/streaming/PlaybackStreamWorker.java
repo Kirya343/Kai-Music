@@ -61,13 +61,15 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         PlaybackTargetType targetType,
         ApplicationEventPublisher eventPublisher,
         PlaybackStateDTO currentState,
-        QueueService queueService
+        QueueService queueService,
+        AudioFile audio
     ) {
 
         this.targetId = targetId;
         this.targetType = targetType;
         this.eventPublisher = eventPublisher;
         this.queueService = queueService;
+        this.currentAudio = audio;
 
         this.scheduler =
             Executors.newSingleThreadScheduledExecutor(r -> {
@@ -78,7 +80,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
                 return thread;
             });
 
-        if (currentState != null) {
+        if (currentState != null && this.currentAudio != null) {
             addLog("Created RoomStreamWorker for %s, with state: %s, %s, %s",
                 targetId, currentState.entryId(), currentState.position(), currentState.pause());
 
@@ -99,6 +101,8 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
     public void applyState(PlaybackStateDTO state) {
 
         if (state == null) return;
+
+        addLog("currentAudio %s", currentAudio.getName());
 
         addLog("applyState %s", state.position());
 

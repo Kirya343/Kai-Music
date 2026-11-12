@@ -24,6 +24,8 @@ public class AudioStreamService {
 
     public void initializeUser(StreamContext context) {
 
+        log.debug("initializing user {}", context.getUserSub());
+
         playbackWebsocketService.sendPlaybackState(
             context.getUserSub(), 
             context.getCurrentState(), 

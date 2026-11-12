@@ -8,6 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
+import org.kirya343.audio.datasource.AudioFile;
+import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 
@@ -29,6 +31,7 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
     private final ApplicationEventPublisher eventPublisher;
     private final PlaybackStateRepository playbackStateRepository;
     private final QueueService queueService;
+    private final AudioQueryService audioQueryService;
 
     private final Map<PlaybackTargetType, Map<Long, PlaybackStreamWorker>> workers =
             new ConcurrentHashMap<>();
@@ -60,13 +63,16 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
                 .findByTargetIdAndTargetType(id, type)
                 .orElse(null);
 
+            AudioFile audio = audioQueryService.getAudioByQueueItem(state.getEntryId());
+
             try {
                 worker = new PlaybackStreamWorker(
                     id,
                     type,
                     eventPublisher, 
                     PlaybackStateDTO.ofState(state),
-                    queueService
+                    queueService,
+                    audio
                 );
             } catch (Exception e) {
                 log.error("Ошибка создания {} воркера {}", type, id, e);

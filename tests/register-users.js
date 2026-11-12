@@ -1,6 +1,7 @@
 
 import http from 'k6/http';
 import { SharedArray } from 'k6/data';
+import exec from 'k6/execution';
 
 const env = open('./.env')
     .split(/\r?\n/)
@@ -40,7 +41,7 @@ export const options = {
 };
 
 export default function () {
-    const user = users[__ITER];
+    const user = users[exec.scenario.iterationInTest];
 
     const response = http.post(
         `${BASE_URL}/auth/register`,

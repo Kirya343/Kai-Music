@@ -55,7 +55,9 @@ public class PlaybackWebsocketService {
             "Sending {} chunk to {}: chunk={}, audio={}", 
             chunk.initialization() ? "initialization" : "media", 
             userSub, 
-            chunk.sequence());
+            chunk.sequence(),
+            entryId
+        );
 
         headers.put("content-type", "audio/mp4");
         headers.put("sequence", chunk.sequence());

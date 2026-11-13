@@ -40,6 +40,8 @@ public class PlaybackContext {
     }
 
     public PlaybackStateDTO getState() {
+        if (state == null) return null;
+
         return new PlaybackStateDTO(
             state.user(),
             state.entryId(),

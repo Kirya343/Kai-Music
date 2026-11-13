@@ -53,7 +53,17 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
     }
 
     public void changeTrack(QueueItem entry, String initiator) {
-        execute(() -> trackManager.changeTrack(entry, initiator));
+        execute(() -> {
+            trackManager.changeTrack(entry, initiator);
+
+            PlaybackContext context = trackManager.getCurrentPlayback();
+
+            subscriberManager.applyState(context);
+
+            publishPlaybackEvent(context.getState());
+
+            tickScheduler.start(this::tickInternal);
+        });
     }
 
     public void broadcast(Consumer<UserStreamWorker> action) {
@@ -120,12 +130,15 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         this.tickScheduler = new PlaybackTickScheduler("playback" + targetType + "-" + targetId);
             
         if (currentState != null) {
-            addLog("Created RoomStreamWorker for %s, with state: %s, %s, %s",
-                targetId, currentState.entryId(), currentState.position(), currentState.pause());            
+            log.debug("Created PlayStreamWorker {}-{}, with state: {}",
+                targetType,
+                targetId, 
+                currentState.toString()
+            );            
 
             this.applyState(currentState);
         } else {
-            addLog("Created StreamWorker for %s", targetId);
+            log.debug("Created PlayStreamWorker {}-{}", targetType, targetId);
         }
     }
 

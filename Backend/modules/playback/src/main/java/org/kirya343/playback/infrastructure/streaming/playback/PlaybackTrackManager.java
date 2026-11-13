@@ -31,9 +31,22 @@ public class PlaybackTrackManager {
 
     public PlaybackContext applyState(PlaybackStateDTO state) {
 
-        log.debug("applyState %s", state.position());
+        log.debug(
+            "applyState {}", 
+            state.toString()
+        );
 
-        if (currentPlayback == null) {
+        if (
+            currentPlayback == null || 
+            currentPlayback.getState() == null ||
+            !currentPlayback.getState().entryId().equals(state.entryId())
+        ) {
+
+            log.debug(
+                "CurrentPlayback is null, fetching audio by entry {}", 
+                state.entryId()
+            );
+
             AudioFile audio = audioQueryService.getAudioByQueueItem(state.entryId());
             currentPlayback = createPlaybackContext(audio);
         } 
@@ -45,21 +58,22 @@ public class PlaybackTrackManager {
         return context;
     }
     
-    public  void changeTrack(String initiator) {
+    public void changeTrack(String initiator) {
 
         try {
             QueueItem entry = queueService.nextTrack(targetId, targetType);
 
-            log.debug("Found next track: %s", entry.getId());
+            log.debug("Found next track: {}", entry.getId());
 
             changeTrack(entry, initiator);
 
         } catch (EntityNotFoundException e) {
+
+            log.debug("Exception while auto-switching track:", e);
+
             PlaybackContext context = currentPlayback;
 
             if (context == null) return;
-
-            log.debug("Exception while auto-switching track: %s", e);
 
             PlaybackStateDTO newState = new PlaybackStateDTO(
                 initiator,

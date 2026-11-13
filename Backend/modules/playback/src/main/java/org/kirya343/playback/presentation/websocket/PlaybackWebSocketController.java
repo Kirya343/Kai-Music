@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PlaybackWebSocketController {
 
     private final PlaybackSessionService playbackSessionService;
-    private final UserStreamWorkerManager audioStreamWorkerManager;
+    private final UserStreamWorkerManager userStreamWorkerManager;
     
     @MessageMapping("/playback.reconnect")
     @Authenticated
@@ -27,6 +27,11 @@ public class PlaybackWebSocketController {
         @AuthUser UserAuthData authData
     ) {
         log.debug("Перезапуск сессии пользователя {}", authData.name());
+
+        if (userStreamWorkerManager.exist(authData.sub())) {
+            log.debug("Сессия пользователя {} уже активна", authData.name());
+            return;
+        }
 
         playbackSessionService.restoreSession(authData);
     }
@@ -47,6 +52,6 @@ public class PlaybackWebSocketController {
         @AuthUser UserAuthData authData
     ) {
         log.debug("Получили чанк фидбэка {}", chunk.toString());
-        audioStreamWorkerManager.get(authData.sub()).chunkRecived(chunk);
+        userStreamWorkerManager.get(authData.sub()).chunkRecived(chunk);
     }
 }

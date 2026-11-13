@@ -45,16 +45,16 @@ public class PlaybackSubscriberManager {
     public void subscribe(UserStreamWorker worker, ShortUserDTO userDto) {
         log.debug("Subscribing user {} to {} id: {}", userDto.name(), targetType, targetId);
 
+        userStreamWorkers.add(worker);
+        presence.userConnected(userDto);
+
         PlaybackContext context = currentPlayback;
 
         if (context == null) return;
 
-        userStreamWorkers.add(worker);
-        presence.userConnected(userDto);
+        worker.applyState(context);
 
         log.debug("Sending playbackData to user {}: {}-{}, {} listeners", userDto.name(), targetType, targetId, presence.countAll());
-
-        worker.applyState(context);
 
         broadcast(w -> w.sendPlaybackData(targetType, targetId, presence.getOnlineUsers()));
     }
@@ -68,10 +68,16 @@ public class PlaybackSubscriberManager {
 
     public void applyState(PlaybackContext context) {
 
-        userStreamWorkers.forEach(w -> w.applyState(context));
-
         PlaybackStateDTO state = context.getState();
 
-        log.debug("START STATE: entryId=%s, position=%s", state.entryId(), state.position());
+        log.debug(
+            "START STATE: ({}, {}, {}) subscribers: {}", 
+            state.entryId(), 
+            state.position(),
+            state.pause(),
+            userStreamWorkers.size()
+        );
+
+        userStreamWorkers.forEach(w -> w.applyState(context));
     }
 }

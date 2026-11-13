@@ -1,7 +1,9 @@
-package org.kirya343.playback.infrastructure.streaming.playback;
+package org.kirya343.playback.infrastructure.streaming.user;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.kirya343.audio.dto.AudioChunk;
 import org.kirya343.audio.services.util.Fmp4Chunker;
@@ -57,22 +59,31 @@ public class AudioStreamService {
 
         try {
 
-            log.debug("fillBuffer to user {}", context.getUserSub());
-
             double buffered = context.getBufferedUntil();
             double target = context.getPlaybackContext().getCurrentPosition() + BUFFER_SECONDS;
+
+            List<String> chunks = new ArrayList<>();
 
             while (
                 buffered < target &&
                 chunker.hasNext()
             ) {
-                log.debug("buffered {}, target {}", buffered, target);
-
                 AudioChunk chunk = chunker.nextAudioChunk();
 
                 sendChunk(chunk, context);
 
-                buffered += chunk.durationMs() / 1000.0;
+                chunks.addLast(String.valueOf(chunk.sequence()));
+
+                buffered = (chunk.sequence() + 1) * (chunk.durationMs() / 1000.0);
+            }
+
+            if (chunks.size() > 0) {
+                log.debug("fillBuffer to user {} {} -> {}: {}", 
+                    context.getUserSub(), 
+                    context.getBufferedUntil(), 
+                    buffered, 
+                    chunks
+                );
             }
 
             context.setBufferedUntil(buffered);

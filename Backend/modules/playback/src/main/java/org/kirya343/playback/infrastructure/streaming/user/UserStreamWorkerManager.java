@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.playback.infrastructure.streaming.playback.AudioStreamService;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +27,10 @@ public class UserStreamWorkerManager
 
     private final Map<String, UserStreamWorker> workers =
         new ConcurrentHashMap<>();
+
+    public boolean exist(String userSub) {
+        return workers.containsKey(userSub);
+    }
 
     public UserStreamWorker get(String userSub) {
 

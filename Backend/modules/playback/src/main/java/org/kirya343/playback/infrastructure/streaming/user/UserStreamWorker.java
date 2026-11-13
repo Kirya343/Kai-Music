@@ -9,7 +9,6 @@ import org.kirya343.playback.domain.dto.PlaybackContext;
 import org.kirya343.playback.domain.dto.StreamContext;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
-import org.kirya343.playback.infrastructure.streaming.playback.AudioStreamService;
 import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;

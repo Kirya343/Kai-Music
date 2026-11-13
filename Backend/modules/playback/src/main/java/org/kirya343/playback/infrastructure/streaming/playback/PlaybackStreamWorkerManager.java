@@ -149,43 +149,6 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
             }
         };
 
-        DiagnosticCommand infoCommand = new DiagnosticCommand() {
-
-            public String getName() {
-                return "info";
-            }
-
-            public String getDescription() {
-                return "Shows stream worker info";
-            }
-            
-            public StreamingResult execute(String[] args) {
-
-                if (args.length != 2) {
-                    throw new IllegalArgumentException(
-                        "Usage: stream-workers room <type> <id>"
-                    );
-                }
-
-                PlaybackTargetType type;
-                Long id;
-
-                try {
-                    type = PlaybackTargetType.valueOf(args[0]);
-                    id = Long.parseLong(args[1]);
-                } catch (NumberFormatException exception) {
-                    throw new IllegalArgumentException(
-                        "Target ID must be a number: " + args[0]
-                    );
-                }
-
-                return new StreamingResult(
-                    () -> get(type, id).getInfo().getContent(),
-                    StreamMode.REPLACE
-                );
-            }
-        };
-
-        return List.of(logsCommand, infoCommand);
+        return List.of(logsCommand);
     }
 }

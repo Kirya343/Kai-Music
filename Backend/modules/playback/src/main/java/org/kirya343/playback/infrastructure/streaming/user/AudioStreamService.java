@@ -28,6 +28,10 @@ public class AudioStreamService {
 
     public void initializeUser(StreamContext context) {
 
+        if (context.isClosed()) {
+            throw new IllegalStateException("Stream " + context.getStreamId() + " is closed");
+        }
+
         PlaybackStateDTO state = context.getPlaybackContext().getState();
 
         log.debug("initializing user {}", context.getUserSub());
@@ -55,6 +59,10 @@ public class AudioStreamService {
     
     public void fillBuffer(StreamContext context) {
 
+        if (context.isClosed()) {
+            throw new IllegalStateException("Stream " + context.getStreamId() + " is closed");
+        }
+
         Fmp4Chunker chunker = context.getPlaybackContext().getChunker();
 
         try {
@@ -66,12 +74,18 @@ public class AudioStreamService {
 
             while (
                 buffered < target &&
-                chunker.hasNext()
+                chunker.hasNext(context.getNextSequence()) &&
+                context.canSendChunk()
             ) {
-                AudioChunk chunk = chunker.nextAudioChunk();
+                AudioChunk chunk = chunker.getAudioChunk(context.getNextSequence());
+
+                if (chunk == null) {
+                    break;
+                }
 
                 sendChunk(chunk, context);
-
+                context.advanceSequence();
+                
                 chunks.addLast(String.valueOf(chunk.sequence()));
 
                 buffered = (chunk.sequence() + 1) * (chunk.durationMs() / 1000.0);

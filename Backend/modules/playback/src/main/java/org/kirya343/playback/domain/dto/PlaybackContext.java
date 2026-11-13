@@ -26,17 +26,10 @@ public class PlaybackContext {
         this.chunker = chunker;
     }
 
-    public void seekChunker(double position) {
-
-        log.debug("Перематываем чанкер на позицию: {}", state.position());
-
-        chunker.seek(position);
-    }
-
     public void applyState(PlaybackStateDTO state) {
         this.state = state;
 
-        seekChunker(state.position());
+        playbackStartedAt = System.nanoTime();
     }
 
     public PlaybackStateDTO getState() {

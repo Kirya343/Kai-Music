@@ -2,6 +2,7 @@ package org.kirya343.playback.infrastructure.streaming.playback;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -40,12 +41,16 @@ public class PlaybackTickScheduler
     public void start(Runnable action) {
         stop();
 
-        task = scheduler.scheduleAtFixedRate(
-            action,
-            0,
-            TICK_INTERVAL_SECONDS,
-            TimeUnit.SECONDS
-        );
+        try {
+            task = scheduler.scheduleAtFixedRate(
+                () -> executeSafely(action),
+                0,
+                TICK_INTERVAL_SECONDS,
+                TimeUnit.SECONDS
+            );
+        } catch (RejectedExecutionException e) {
+            log.debug("Scheduler {} is shutting down, cannot start task", name);
+        }
     }
 
     public void stop() {
@@ -70,13 +75,19 @@ public class PlaybackTickScheduler
     }
 
     public void execute(Runnable action) {
-        scheduler.execute(() -> {
-            try {
-                action.run();
-            } catch (Exception e) {
-                log.error("Playback worker error", e);
-            }
-        });
+        try {
+            scheduler.execute(() -> executeSafely(action));
+        } catch (RejectedExecutionException e) {
+            log.debug("Scheduler {} is shutting down, cannot execute task", name);
+        }
+    }
+
+    private void executeSafely(Runnable action) {
+        try {
+            action.run();
+        } catch (Exception e) {
+            log.error("Playback worker error: {}", name, e);
+        }
     }
 
     // Diadnostic commands
@@ -112,7 +123,7 @@ public class PlaybackTickScheduler
                         builder.addRow("Scheduled task: " + task);
                     }
 
-                    return toString();
+                    return builder.toString();
                 };
             }
         });

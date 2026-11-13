@@ -10,10 +10,6 @@ import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWor
 import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
-import org.kirya343.room.datasource.ListeningRoom;
-import org.kirya343.room.datasource.ListeningRoomRepository;
-import org.kirya343.room.dto.RoomDTO;
-import org.kirya343.room.services.RoomWebSocketService;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.user.datasource.User;
 import org.kirya343.user.datasource.UserRepository;
@@ -32,8 +28,6 @@ public class PlaybackSessionService {
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     private final UserPlaybackRepository userPlaybackRepository;
     private final UserRepository userRepository;
-    private final RoomWebSocketService roomWebSocketService;
-    private final ListeningRoomRepository listeningRoomRepository;
     private final PlaybackStateRepository playbackStateRepository;
 
     public void subscribe(UserAuthData authData, PlaybackTargetType targetType, Long targetId) {
@@ -54,17 +48,6 @@ public class PlaybackSessionService {
         userPlaybackRepository.save(new UserPlayback(authData.id(), resolvedTargetId, targetType));
 
         // broadcasting
-
-        switch (targetType) {
-            case ROOM:
-                
-                ListeningRoom room = listeningRoomRepository.findById(resolvedTargetId).orElseThrow();
-                roomWebSocketService.broadcastRoomInfo(authData.sub(), RoomDTO.ofRoom(room));
-                break;
-        
-            default:
-                break;
-        }
 
         PlaybackState state = playbackStateRepository
             .findWithPlaylistByTargetIdAndTargetType(resolvedTargetId, targetType)

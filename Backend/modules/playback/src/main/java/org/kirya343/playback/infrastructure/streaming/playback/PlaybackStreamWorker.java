@@ -1,6 +1,7 @@
 package org.kirya343.playback.infrastructure.streaming.playback;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
@@ -36,36 +37,38 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
     private final PlaybackTrackManager trackManager; 
     private final PlaybackTickScheduler tickScheduler;
 
-    private void execute(Runnable action) {
-        tickScheduler.execute(action);
-    }
-
     public void applyState(PlaybackStateDTO state) {
         if (state == null) return;
 
-        execute(() -> {
-            PlaybackContext context = trackManager.applyState(state);
-
-            subscriberManager.applyState(context);
-
-            tickScheduler.start(this::tickInternal);
-
-            publishPlaybackEvent(state);
-        });
+        execute(() -> updatePlayback(
+            () -> trackManager.applyState(state)
+        ));
     }
 
     public void changeTrack(QueueItem entry, String initiator) {
-        execute(() -> {
-            trackManager.changeTrack(entry, initiator);
+        execute(() -> updatePlayback(
+            () -> trackManager.changeTrack(entry, initiator)
+        ));
+    }
 
-            PlaybackContext context = trackManager.getCurrentPlayback();
+    private void execute(Runnable action) {
+        try {
+            tickScheduler.execute(action);
+        } catch (Exception e) {
+            log.error("Executing exception: ", e);
+            throw e;
+        }
+    }
 
-            subscriberManager.applyState(context);
+    private void updatePlayback(Supplier<PlaybackContext> action) {
+        PlaybackContext context = action.get();
 
-            publishPlaybackEvent(context.getState());
+        subscriberManager.applyState(context);
 
-            tickScheduler.start(this::tickInternal);
-        });
+        eventPublisher.publishEvent(
+            new PlaybackEvent(targetId, targetType, context.getState()));
+
+        tickScheduler.start(this::tickInternal);
     }
 
     public void broadcast(Consumer<UserStreamWorker> action) {
@@ -84,15 +87,12 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         tickScheduler.shutdown();
     }
 
-    private void publishPlaybackEvent(PlaybackStateDTO state) {
-        eventPublisher.publishEvent(
-            new PlaybackEvent(targetId, targetType, state));
-    }
-
     private void tickInternal() {
         PlaybackContext context = trackManager.getCurrentPlayback();
 
-        if (context == null) return;
+        if (context == null) {
+            throw new IllegalStateException("PlaybackContext is null");
+        }
 
         if (context.needChangeTrack()) {
             eventPublisher.publishEvent(new ChangeTrack(

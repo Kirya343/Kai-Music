@@ -8,11 +8,8 @@ import { PlaybackMode, usePlaybackContext, playbackService, PlaybackTargetType }
 export const PlaybackModeToggle = () => {
 
     const { playbackMode } = usePlaybackContext();
-    const { roomData } = useData();
 
     const nextMode = async () => {
-
-        if (!roomData.room) return;
         
         const modes = [
             PlaybackMode.NORMAL,

@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j 
 public class StreamContext {
 
-    private final UUID streamId = UUID.randomUUID();
+    private final UUID streamId;
     private final String userSub;
 
     private volatile double bufferedUntil;
@@ -24,14 +24,31 @@ public class StreamContext {
     private final ConcurrentHashMap<Long, ChunkDelivery> deliveries =
         new ConcurrentHashMap<>();
 
+    private long nextSequence;
+    private boolean isClosed = false;
+
+    private static final int MAX_IN_FLIGHT_CHUNKS = 2;
+
     public StreamContext(
         PlaybackContext playbackContext,
         String userSub
     ) {
         this.playbackContext = playbackContext;
         this.userSub = userSub;
+
+        Double position = playbackContext.getState().position();
         
-        this.bufferedUntil = playbackContext.getState().position();
+        this.bufferedUntil = position;
+
+        this.nextSequence = playbackContext
+            .getChunker()
+            .getSequenceByPosition(position);
+
+        seek(position);
+
+        streamId = UUID.randomUUID();
+
+        log.debug("Creating new StreamContext: {}, bufferedUntil", streamId, bufferedUntil);
     }
 
     public void setBufferedUntil(double value) {
@@ -55,5 +72,36 @@ public class StreamContext {
                 ChunkDeliveryStatus.RECEIVED, 
                 delivery.sentAt()
             ));
+    }
+
+    public void seek(double position) {
+        nextSequence = playbackContext
+            .getChunker()
+            .getSequenceByPosition(position);
+
+        bufferedUntil = position;
+        deliveries.clear();
+    }
+
+    public long getNextSequence() {
+        return nextSequence;
+    }
+
+    public void advanceSequence() {
+        nextSequence++;
+    }
+
+    public long getInFlightCount() {
+        return deliveries.values().stream()
+            .filter(d -> d.status() == ChunkDeliveryStatus.SENT)
+            .count();
+    }
+
+    public boolean canSendChunk() {
+        return getInFlightCount() < MAX_IN_FLIGHT_CHUNKS;
+    }
+
+    public void close() {
+        isClosed = true;
     }
 }

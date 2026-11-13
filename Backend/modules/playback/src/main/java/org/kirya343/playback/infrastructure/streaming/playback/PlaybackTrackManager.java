@@ -82,7 +82,7 @@ public class PlaybackTrackManager {
         }
     }
 
-    public void changeTrack(QueueItem entry, String initiator) {
+    public PlaybackContext changeTrack(QueueItem entry, String initiator) {
         log.debug("Changing track, new entry: {}", entry.getId());
 
         currentPlayback = createPlaybackContext(entry.getAudio());
@@ -95,6 +95,8 @@ public class PlaybackTrackManager {
         );
 
         applyState(newState);
+
+        return currentPlayback;
     }
 
     private PlaybackContext createPlaybackContext(AudioFile audioFile) {

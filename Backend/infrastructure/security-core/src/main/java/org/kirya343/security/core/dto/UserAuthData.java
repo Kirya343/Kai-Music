@@ -16,4 +16,8 @@ public record UserAuthData(
         Objects.requireNonNull(sub, "sub must not be null");
         Objects.requireNonNull(status, "status must not be null");
     }
+
+    public static UserAuthData server() {
+        return new UserAuthData(Long.valueOf(0), "", "Server", UserStatus.ACTIVE);
+    }
 }

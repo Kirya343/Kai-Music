@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
+import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.event.PlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.dto.PlaybackContext;
@@ -11,6 +12,7 @@ import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.QueueItem;
+import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.user.dto.ShortUserDTO;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -67,15 +69,15 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
     }
 
     public void broadcast(Consumer<UserStreamWorker> action) {
-        execute(() -> subscriberManager.broadcast(action));
+        subscriberManager.broadcast(action);
     }
 
     public void subscribe(UserStreamWorker worker, ShortUserDTO userDto) {
-        execute(() -> subscriberManager.subscribe(worker, userDto));
+        subscriberManager.subscribe(worker, userDto);
     }
 
     public void unsubscribe(UserStreamWorker worker) {
-        execute(() -> subscriberManager.unsubscribe(worker));
+        subscriberManager.unsubscribe(worker);
     }
 
     public void shutdown() {
@@ -93,7 +95,12 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         if (context == null) return;
 
         if (context.needChangeTrack()) {
-            trackManager.changeTrack("Server");
+            eventPublisher.publishEvent(new ChangeTrack(
+                "next", 
+                UserAuthData.server(), 
+                targetId, 
+                targetType
+            ));
             return;
         }
 
@@ -127,10 +134,10 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
             trackManager.getCurrentPlayback()
         );
 
-        this.tickScheduler = new PlaybackTickScheduler("playback" + targetType + "-" + targetId);
+        this.tickScheduler = new PlaybackTickScheduler(targetType + "-" + targetId);
             
         if (currentState != null) {
-            log.debug("Created PlayStreamWorker {}-{}, with state: {}",
+            log.debug("Created PlaybackStreamWorker {}-{}, with state: {}",
                 targetType,
                 targetId, 
                 currentState.toString()
@@ -138,7 +145,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
 
             this.applyState(currentState);
         } else {
-            log.debug("Created PlayStreamWorker {}-{}", targetType, targetId);
+            log.debug("Created PlaybackStreamWorker {}-{}", targetType, targetId);
         }
     }
 

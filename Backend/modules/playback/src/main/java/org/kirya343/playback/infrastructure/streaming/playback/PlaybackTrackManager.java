@@ -36,11 +36,7 @@ public class PlaybackTrackManager {
             state.toString()
         );
 
-        if (
-            currentPlayback == null || 
-            currentPlayback.getState() == null ||
-            !currentPlayback.getState().entryId().equals(state.entryId())
-        ) {
+        if (currentPlayback == null) {
 
             log.debug(
                 "CurrentPlayback is null, fetching audio by entry {}", 
@@ -87,6 +83,8 @@ public class PlaybackTrackManager {
     }
 
     public void changeTrack(QueueItem entry, String initiator) {
+        log.debug("Changing track, new entry: {}", entry.getId());
+
         currentPlayback = createPlaybackContext(entry.getAudio());
 
         PlaybackStateDTO newState = new PlaybackStateDTO(

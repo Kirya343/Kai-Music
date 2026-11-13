@@ -8,8 +8,10 @@ import org.kirya343.playback.domain.enums.ChunkDeliveryStatus;
 import org.kirya343.playback.presentation.dto.ChunkDelivery;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter 
+@Slf4j 
 public class StreamContext {
 
     private final UUID streamId = UUID.randomUUID();
@@ -41,6 +43,8 @@ public class StreamContext {
         if (!streamId.equals(chunkFeedback.streamId())) {
             return;
         }
+
+        log.debug("Получили чанк фидбэка: {}", chunkFeedback.sequence());
         
         long sequence = chunkFeedback.sequence();
 

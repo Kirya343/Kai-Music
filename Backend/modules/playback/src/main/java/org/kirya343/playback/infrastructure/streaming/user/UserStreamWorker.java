@@ -47,7 +47,7 @@ public class UserStreamWorker
         this.playbackWebsocketService = playbackWebsocketService;
         this.audioStreamService = audioStreamService;
 
-        addLog("Created UserAudioStreamWorker for %s", userSub);
+        log.debug("Created UserAudioStreamWorker for {}", userSub);
     }
 
     public void subscribe(PlaybackStreamWorker worker, ShortUserDTO userDTO) {
@@ -61,6 +61,12 @@ public class UserStreamWorker
 
     public void unsubscribe() {
         if (subscribedWorker != null) {
+            log.debug(
+                "Unubscribing user {} from {}-{}", 
+                userSub, 
+                subscribedWorker.getTargetType(), 
+                subscribedWorker.getTargetId());
+
             subscribedWorker.unsubscribe(this);
         }
     }
@@ -94,7 +100,7 @@ public class UserStreamWorker
     }
 
     private void tick(StreamContext context) {
-        addLog("Tick to user %s", userSub);
+        log.debug("Tick to user {}", userSub);
         
         audioStreamService.fillBuffer(context);
     }

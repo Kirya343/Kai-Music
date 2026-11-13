@@ -51,7 +51,6 @@ public class PlaybackWebSocketController {
         AudioChunkFeedback chunk,
         @AuthUser UserAuthData authData
     ) {
-        log.debug("Получили чанк фидбэка {}", chunk.toString());
         userStreamWorkerManager.get(authData.sub()).chunkRecived(chunk);
     }
 }

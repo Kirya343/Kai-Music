@@ -1,26 +1,40 @@
 package org.kirya343.playback.infrastructure.streaming.playback;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import io.github.kirya343.terminal.api.command.DiagnosticCommand;
+import io.github.kirya343.terminal.api.component.DiagnosticComponent;
+import io.github.kirya343.terminal.api.provider.StreamingDataProvider;
+import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
+import io.github.kirya343.terminal.result.StreamMode;
+import io.github.kirya343.terminal.result.StreamingResult;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j 
-public class PlaybackTickScheduler {
+public class PlaybackTickScheduler
+    implements DiagnosticComponent {
 
     private static final long TICK_INTERVAL_SECONDS = 2;
 
-    private final ScheduledExecutorService scheduler;
+    private final ScheduledThreadPoolExecutor scheduler;
     private ScheduledFuture<?> task;
 
-    public PlaybackTickScheduler(String threadName) {
-        this.scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
-            Thread thread = new Thread(r, threadName);
+    private final String name;
+
+    public PlaybackTickScheduler(String name) {
+        this.name = name;
+
+        this.scheduler = new ScheduledThreadPoolExecutor(1, r -> {
+            Thread thread = new Thread(r, "playback-" + name);
             thread.setDaemon(true);
             return thread;
         });
+
+        scheduler.setRemoveOnCancelPolicy(true);
     }
     
     public void start(Runnable action) {
@@ -61,6 +75,45 @@ public class PlaybackTickScheduler {
                 action.run();
             } catch (Exception e) {
                 log.error("Playback worker error", e);
+            }
+        });
+    }
+
+    // Diadnostic commands
+
+    public String getComponentId() {
+        return "tick-executor " + name;
+    }
+
+    public List<DiagnosticCommand> getCommands() {
+        
+        return List.of(new DiagnosticCommand() {
+            public String getName() {
+                return "queue";
+            }
+
+            public String getDescription() {
+                return "Shows sheduler queue";
+            }
+
+            public StreamingResult execute(String[] args) {
+                return new StreamingResult(getData(), StreamMode.REPLACE);
+            }
+
+            private StreamingDataProvider getData() {
+                return () -> {
+                    DiagnosticTextBuilder builder = new DiagnosticTextBuilder("TickExecuror queue");
+                    
+                    BlockingQueue<Runnable> queue = scheduler.getQueue();
+
+                    log.debug("Queue size: {}", queue.size());
+
+                    for (Runnable task : queue) {
+                        builder.addRow("Scheduled task: " + task);
+                    }
+
+                    return toString();
+                };
             }
         });
     }

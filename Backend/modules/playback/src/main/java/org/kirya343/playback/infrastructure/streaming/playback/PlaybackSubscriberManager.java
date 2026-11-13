@@ -1,7 +1,7 @@
 package org.kirya343.playback.infrastructure.streaming.playback;
 
-import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import org.kirya343.playback.domain.dto.PlaybackContext;
@@ -22,7 +22,8 @@ public class PlaybackSubscriberManager {
 
     private volatile PlaybackContext currentPlayback;
 
-    private final Set<UserStreamWorker> userStreamWorkers = new HashSet<>();
+    private final Set<UserStreamWorker> userStreamWorkers =
+        ConcurrentHashMap.newKeySet();
 
     @Getter 
     private final PlaybackPresence presence = new PlaybackPresence();
@@ -43,20 +44,20 @@ public class PlaybackSubscriberManager {
     }
 
     public void subscribe(UserStreamWorker worker, ShortUserDTO userDto) {
-        log.debug("Subscribing user {} to {} id: {}", userDto.name(), targetType, targetId);
+        log.debug("Subscribing user {} to {}-{}", userDto.name(), targetType, targetId);
 
         userStreamWorkers.add(worker);
         presence.userConnected(userDto);
 
-        PlaybackContext context = currentPlayback;
-
-        if (context == null) return;
-
-        worker.applyState(context);
-
         log.debug("Sending playbackData to user {}: {}-{}, {} listeners", userDto.name(), targetType, targetId, presence.countAll());
 
         broadcast(w -> w.sendPlaybackData(targetType, targetId, presence.getOnlineUsers()));
+
+        PlaybackContext context = currentPlayback;
+
+        if (context != null) {
+            worker.applyState(context);
+        }
     }
 
     public void unsubscribe(UserStreamWorker worker) {
@@ -78,6 +79,6 @@ public class PlaybackSubscriberManager {
             userStreamWorkers.size()
         );
 
-        userStreamWorkers.forEach(w -> w.applyState(context));
+        broadcast(w -> w.applyState(context));
     }
 }

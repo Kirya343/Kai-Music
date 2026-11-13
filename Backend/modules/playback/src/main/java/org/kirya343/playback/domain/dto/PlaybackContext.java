@@ -40,6 +40,10 @@ public class PlaybackContext {
     }
 
     public PlaybackStateDTO getState() {
+        return state;
+    }
+
+    public PlaybackStateDTO getCurrentState() {
         if (state == null) return null;
 
         return new PlaybackStateDTO(

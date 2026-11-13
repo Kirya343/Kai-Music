@@ -52,11 +52,12 @@ public class PlaybackWebsocketService {
         Map<String, Object> headers = new HashMap<>();
 
         log.debug(
-            "Sending {} chunk to {}: chunk={}, audio={}", 
+            "Sending {} chunk to {}: chunk={}, entry={}, stream={}", 
             chunk.initialization() ? "initialization" : "media", 
             userSub, 
             chunk.sequence(),
-            entryId
+            entryId,
+            streamId
         );
 
         headers.put("content-type", "audio/mp4");

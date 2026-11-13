@@ -27,6 +27,7 @@ public class AudioUserEventHandler {
 
         if (room == null) return;
 
+        audioStreamWorkerManager.get(event.authData().sub()).unsubscribe();
         audioStreamWorkerManager.unregister(event.authData().sub());
     }
 }

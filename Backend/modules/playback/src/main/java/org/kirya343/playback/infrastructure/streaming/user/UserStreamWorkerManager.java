@@ -34,8 +34,6 @@ public class UserStreamWorkerManager
 
     public UserStreamWorker get(String userSub) {
 
-        log.debug("Пытаемся получить воркер для пользователя {}", userSub);
-
         UserStreamWorker worker = workers.get(userSub);
 
         if (worker == null) {

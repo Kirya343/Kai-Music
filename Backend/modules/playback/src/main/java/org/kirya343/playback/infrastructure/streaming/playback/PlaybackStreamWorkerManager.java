@@ -96,10 +96,11 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
     public void removeWorker(PlaybackTargetType type, Long id) {
 
         PlaybackStreamWorker worker = workers
-            .computeIfAbsent(type, key -> new ConcurrentHashMap<>()).remove(id);
+            .computeIfAbsent(type, key -> new ConcurrentHashMap<>())
+            .remove(id);
 
         if (worker != null) {
-            worker.cancelTask();
+            worker.shutdown();
         }
     }
 

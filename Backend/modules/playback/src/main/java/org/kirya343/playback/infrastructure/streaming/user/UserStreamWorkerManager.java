@@ -1,10 +1,9 @@
-package org.kirya343.playback.infrastructure.streaming;
+package org.kirya343.playback.infrastructure.streaming.user;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
 
@@ -24,15 +23,16 @@ public class UserStreamWorkerManager
     implements DiagnosticComponent {
 
     private final PlaybackWebsocketService playbackWebsocketService;
-    private final AudioStorageService audioStorageService;
     private final AudioStreamService audioStreamService;
 
     private final Map<String, UserStreamWorker> workers =
         new ConcurrentHashMap<>();
 
-    public UserStreamWorker get(String userSub) {
+    public boolean exist(String userSub) {
+        return workers.containsKey(userSub);
+    }
 
-        log.debug("Пытаемся получить воркер для пользователя {}", userSub);
+    public UserStreamWorker get(String userSub) {
 
         UserStreamWorker worker = workers.get(userSub);
 
@@ -42,7 +42,6 @@ public class UserStreamWorkerManager
 
             worker = new UserStreamWorker(
                 userSub,
-                audioStorageService,
                 playbackWebsocketService,
                 audioStreamService
             );

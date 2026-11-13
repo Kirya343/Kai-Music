@@ -16,8 +16,6 @@ const logger = loggerFactory.getLogger("Pages.Main");
 
 const MainPage = () => {
 
-    const { roomData } = useData()
-
     const [rooms, setRooms] = useState<IListeningRoom[] | null>(null);
     const [isOpen, setOpen] = useState<boolean>(false);
     const [stat, setStat] = useState<{activeListners: number, activeRooms: number} | null>(null);
@@ -48,7 +46,6 @@ const MainPage = () => {
     const joinRoom = async (code: string) => {
         try {
             await roomService.joinRoom(code);
-            roomData.syncRoom();
             navigate("/app/room");
         } catch (e) {
             logger.error(e);

@@ -1,23 +1,27 @@
 package org.kirya343.audio.services.util;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.audio.dto.AudioChunk;
 import org.kirya343.audio.services.storage.AudioStorageService;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j 
+@Slf4j
 public class Fmp4Chunker {
 
+    private static final int CHUNK_DURATION_SECONDS = 5;
+
     private final AudioStorageService audioStorageService;
-    private final int CHUNK_DURATION_SECONDS = 5;
-
     private final String audioDirectory;
-
     private final int chunkCount;
 
-    private int index = 0;
+    private final Map<Integer, AudioChunk> cache = new ConcurrentHashMap<>();
+
+    private volatile AudioChunk initializationChunk;
 
     public Fmp4Chunker(
         AudioStorageService audioStorageService,
@@ -29,53 +33,63 @@ public class Fmp4Chunker {
         this.chunkCount = chunkCount;
     }
 
-    public AudioChunk nextAudioChunk() throws IOException {
-        if (!hasNext()) {
+    public AudioChunk getAudioChunk(long sequence) throws IOException {
+        if (sequence < 0 || sequence >= chunkCount) {
             return null;
         }
 
-        int sequence = index++;
+        try {
+            return cache.computeIfAbsent((int) sequence, key -> {
+                try {
+                    log.debug("Loading chunk {} from storage", key);
 
-        return audioStorageService.getMediaChunk(
-            audioDirectory,
-            sequence
-        );
+                    return audioStorageService.getMediaChunk(
+                        audioDirectory,
+                        key
+                    );
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
     }
 
-    public AudioChunk getAudioChunk(long sequence) throws IOException {
+    public AudioChunk initializationChunk() throws IOException {
+        AudioChunk chunk = initializationChunk;
 
-        return audioStorageService.getMediaChunk(
-            audioDirectory,
-            sequence
-        );
+        if (chunk != null) {
+            return chunk;
+        }
+
+        synchronized (this) {
+            if (initializationChunk == null) {
+                initializationChunk =
+                    audioStorageService.getInitializationChunk(audioDirectory);
+            }
+
+            return initializationChunk;
+        }
     }
 
-    public AudioChunk initializationChunk()
-        throws IOException {
-
-        return audioStorageService.getInitializationChunk(
-            audioDirectory
-        );
+    public boolean hasNext(long sequence) {
+        return sequence < chunkCount;
     }
 
-    public boolean hasNext() {
-        return index < chunkCount;
-    }
-
-    public void seek(double positionSeconds) {
-        log.debug(
-            "chunker seek to {}",
-            positionSeconds
-        );
-
+    public int getSequenceByPosition(double positionSeconds) {
         if (positionSeconds <= 4) {
             positionSeconds = 0;
         } else {
             positionSeconds -= 3;
         }
 
-        index = (int) Math.floor(
+        return (int) Math.floor(
             positionSeconds / CHUNK_DURATION_SECONDS
         );
+    }
+
+    public int getChunkCount() {
+        return chunkCount;
     }
 }

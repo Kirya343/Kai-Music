@@ -5,8 +5,7 @@ import java.util.stream.Collectors;
 
 import org.kirya343.playback.diagnostics.PlaybackDiagnosticService;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
-
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
 import org.springframework.stereotype.Component;
 
 import io.github.kirya343.terminal.api.command.DiagnosticCommand;

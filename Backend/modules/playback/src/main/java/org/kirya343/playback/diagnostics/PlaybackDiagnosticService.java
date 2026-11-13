@@ -2,8 +2,7 @@ package org.kirya343.playback.diagnostics;
 
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
 import org.springframework.stereotype.Service;
 
 import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
@@ -23,20 +22,20 @@ public class PlaybackDiagnosticService {
 
     public DiagnosticTextBuilder renderOnlineRoom(PlaybackTargetType type, Long id) {
 
-        PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(type, id);
+        //PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(type, id);
 
-        AudioFile audio = playbackWorker.getCurrentAudio();
+        //AudioFile audio = playbackWorker.getCurrentPlayback().getAudio();
 
         return new DiagnosticTextBuilder()
             .setTitle(type + "-streamer: " + id)
-            .addRow("Status: ONLINE")
-            // .addRow("Listeners: " + playbackWorker.()
+            .addRow("Status: ONLINE");
+            // .addRow("Listeners: " + playbackWorker.getPresence()
             //         .getOnlineUsers()
             //         .stream()
             //         .map(ShortUserDTO::name)
             //         .toList()
             // )
-            .addRow( "Playing Audio: " + (audio != null ? audio.getName() : null));
+            //.addRow( "Playing Audio: " + (audio != null ? audio.getName() : null));
     }
 
     public DiagnosticTextBuilder renderAudioData(AudioFile audio) {

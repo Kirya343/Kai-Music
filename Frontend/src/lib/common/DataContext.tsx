@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect } from "react";
 import { CreatePlaylist, Playlist, usePlaylistsData } from "@playlist";
 import { IAudio, useAudioData } from "@audio";
 import { IQueueItem } from "@playback";
-import { IListeningRoom, useRoomData } from "@room";
+import { IListeningRoom } from "@room";
 
 /**
  * Defines the acpplication data context.
@@ -10,7 +10,6 @@ import { IListeningRoom, useRoomData } from "@room";
 interface DataContextType {
     playlistsData: IPlaylistsData;
     audiosData: IAudiosData;
-    roomData: IRoomData;
 }
 
 
@@ -57,19 +56,6 @@ interface IAudiosData {
 }
 
 /**
- * Defines the current room data and room's playlist.
- */
-interface IRoomData {
-    /** Room data. */
-    room: IListeningRoom | null;
-
-    /** Shows is data already synced or not */
-    synced: boolean;
-
-    syncRoom: () => void
-}
-
-/**
  * Context for accessing application-wide data.
  *
  * Provides access to audio and playlist data managed by their respective hooks.
@@ -98,7 +84,6 @@ export const DataProvider = ({ children }: { children?: React.ReactNode }) => {
 
     const audiosData = useAudioData();
     const playlistsData = usePlaylistsData();
-    const roomData = useRoomData();
 
     useEffect(() => {
         playlistsData.syncPlaylists();
@@ -108,8 +93,7 @@ export const DataProvider = ({ children }: { children?: React.ReactNode }) => {
     return (
         <DataContext.Provider value={{
             audiosData,
-            playlistsData,
-            roomData
+            playlistsData
          }}>
             {children}
         </DataContext.Provider>

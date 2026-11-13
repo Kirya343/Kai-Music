@@ -52,10 +52,13 @@ public class PlaybackWebsocketService {
         Map<String, Object> headers = new HashMap<>();
 
         log.debug(
-            "Sending {} chunk to {}: chunk={}, audio={}", 
+            "Sending {} chunk to {}: chunk={}, entry={}, stream={}", 
             chunk.initialization() ? "initialization" : "media", 
             userSub, 
-            chunk.sequence());
+            chunk.sequence(),
+            entryId,
+            streamId
+        );
 
         headers.put("content-type", "audio/mp4");
         headers.put("sequence", chunk.sequence());
@@ -101,10 +104,15 @@ public class PlaybackWebsocketService {
                 RoomDTO.ofRoom(listeningRoomRepository.findById(id).orElse(null)), 
                 listeners
             );
-        } else {
+        } else if (type.equals(PlaybackTargetType.USER)) {
             playbackData = new PlaybackData(
                 null,
                 null
+            );
+        } else {
+            playbackData = new PlaybackData(
+                null,
+                listeners
             );
         }
 

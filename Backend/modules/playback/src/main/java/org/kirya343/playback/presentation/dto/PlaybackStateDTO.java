@@ -20,4 +20,8 @@ public record PlaybackStateDTO(
             state.isPaused()
         );
     }
+
+    public String toString() {
+        return String.format("(%s, %s, %s, %s)", user(), entryId(), position(), pause());
+    }
 }

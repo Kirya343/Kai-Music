@@ -5,7 +5,7 @@ import { IListeningRoom, roomService } from "@room";
 import Modal from "../Modal/Modal";
 import { useData } from "@common";
 import { useWebSocket } from "@websocket";
-import { playbackService } from "@playback";
+import { playbackService, usePlaybackContext } from "@playback";
 
 /**
  * RoomReturnModal is component that helps to return to room that was before 
@@ -14,8 +14,8 @@ import { playbackService } from "@playback";
 const RoomReturnModal = () => {
 
     const { client } = useWebSocket();
+    const { playbackData } = usePlaybackContext();
  
-    const { room, synced } = useData().roomData;
     const navigate = useNavigate();
     const [isOpen, setOpen] = useState(true)
 
@@ -46,11 +46,11 @@ const RoomReturnModal = () => {
         }
     }
 
-    return isOpen && room && synced && (
+    return isOpen && (
         <Modal
             isOpen={true} 
             onClose={() => setOpen(false)}
-            title={`You have left room ${room.title}`}
+            title={`You have left room ${playbackData.room?.title}`}
         >
             <div className={styles.body}>
                 <button className={styles.btn} onClick={leaveRoom}>Cancel</button>

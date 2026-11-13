@@ -3,19 +3,18 @@ package org.kirya343.playback.infrastructure.command;
 import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
-import org.kirya343.playback.application.event.PlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
-import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
+import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.security.core.dto.UserAuthData;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PlaybackCommandWorker {
 
-    private final ApplicationEventPublisher publisher;
     private final QueueService queueService;
     private final QueueItemRepository queueItemRepository;
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
@@ -45,79 +43,70 @@ public class PlaybackCommandWorker {
                 .getSubscribedWorker();
         }
 
-        PlaybackStateDTO state = null;
+        switch (cmd) {
+            case UpdatePlayback c -> { 
 
-        try {
-            switch (cmd) {
-                case UpdatePlayback c -> { 
-                    
-                    state = c.state();
-                }
-                case ChangeTrack c -> {
+                playbackWorker.applyState(c.state());
+            }
+            case ChangeTrack c -> {
 
-                    QueueItem entry = null;
-                    
-                    switch (c.changing()) {
-                        case "prev":
-
-                            entry = queueService.prevTrack(
-                                playbackWorker.getTargetId(),
-                                playbackWorker.getTargetType()
-                            );
-
-                            break;
-
-                        case "next":
-
-                            entry = queueService.nextTrack(
-                                playbackWorker.getTargetId(),
-                                playbackWorker.getTargetType()
-                            );
-                            
-                            break;
-                    
-                        default:
-
-                            try {
-
-                                log.debug("Getting QueueEntry by {}", c.changing());
-
-                                Long entryId = Long.parseLong(c.changing());
-
-                                entry = queueItemRepository.findByIdWithAudio(entryId).orElseThrow();
-
-                            } catch (NumberFormatException e) {
-                                throw e;
-                            }
-                            
-                            break;
-                    }
-
-                    state = new PlaybackStateDTO(
-                        cmd.user().name(), 
-                        entry.getId(), 
-                        0.0, 
-                        false
+                try {
+                    QueueItem entry = getSuitableTrack(
+                        c, 
+                        playbackWorker.getTargetId(), 
+                        playbackWorker.getTargetType()
                     );
 
-                    playbackWorker.setCurrentAudio(entry.getAudio());
+                    playbackWorker.changeTrack(entry, cmd.user().name());
 
+                } catch (EntityNotFoundException e) {
+                    log.warn("No suitable track found. Stopping playback scheduler.");
+                    playbackWorker.stop();
                 }
-                default -> throw new RuntimeException("Введена неверная команда");
-            };
 
-            playbackWorker.applyState(state);
+            }
+            default -> throw new RuntimeException("Введена неверная команда");
+        };
+    }
 
-            publisher.publishEvent(
-                new PlaybackEvent(
-                    playbackWorker.getTargetId(),
-                    playbackWorker.getTargetType(), 
-                    state, 
-                    authData
-                ));
+    private QueueItem getSuitableTrack(
+        ChangeTrack cmd, 
+        Long id, 
+        PlaybackTargetType type
+    ) throws IllegalStateException {
 
-        } catch (Exception e) {
-            log.debug("Ошибка обработки команды комнаты: {}", e);
+        QueueItem entry = null;
+
+        switch (cmd.changing()) {
+            case "prev":
+
+                entry = queueService.prevTrack(id, type);
+
+                break;
+
+            case "next":
+
+                entry = queueService.nextTrack(id, type);
+                
+                break;
+        
+            default:
+
+                try {
+
+                    log.debug("Getting QueueEntry by {}", cmd.changing());
+
+                    Long entryId = Long.parseLong(cmd.changing());
+
+                    entry = queueItemRepository.findByIdWithAudio(entryId).orElseThrow();
+
+                } catch (NumberFormatException e) {
+                    throw e;
+                }
+                
+                break;
         }
+
+        return entry;
     }
 }

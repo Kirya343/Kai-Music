@@ -1,10 +1,8 @@
 package org.kirya343.playback.diagnostics.command;
 
-import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.playback.diagnostics.PlaybackDiagnosticService;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
 import org.springframework.stereotype.Component;
 
 import io.github.kirya343.terminal.api.command.DiagnosticCommand;
@@ -62,13 +60,13 @@ public class RoomCommand implements DiagnosticCommand {
 
         if (isOnline) {
 
-            PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(PlaybackTargetType.ROOM, roomId);
+            //PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(PlaybackTargetType.ROOM, roomId);
 
-            AudioFile audio = playbackWorker.getCurrentAudio();
+            //AudioFile audio = playbackWorker.getCurrentPlayback().getAudio();
 
             builder = diagnosticService.renderOnlineRoom(PlaybackTargetType.ROOM, roomId);
 
-            builder.addSection(diagnosticService.renderAudioData(audio));
+            //builder.addSection(diagnosticService.renderAudioData(audio));
             builder.addSection(diagnosticService.renderStreamWorker(PlaybackTargetType.ROOM, roomId));
         } else {
             builder = diagnosticService.renderOfflineRoom(PlaybackTargetType.ROOM, roomId);

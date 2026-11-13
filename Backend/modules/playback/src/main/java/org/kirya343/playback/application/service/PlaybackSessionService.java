@@ -6,14 +6,10 @@ import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
-import org.kirya343.room.datasource.ListeningRoom;
-import org.kirya343.room.datasource.ListeningRoomRepository;
-import org.kirya343.room.dto.RoomDTO;
-import org.kirya343.room.services.RoomWebSocketService;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.user.datasource.User;
 import org.kirya343.user.datasource.UserRepository;
@@ -32,8 +28,6 @@ public class PlaybackSessionService {
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     private final UserPlaybackRepository userPlaybackRepository;
     private final UserRepository userRepository;
-    private final RoomWebSocketService roomWebSocketService;
-    private final ListeningRoomRepository listeningRoomRepository;
     private final PlaybackStateRepository playbackStateRepository;
 
     public void subscribe(UserAuthData authData, PlaybackTargetType targetType, Long targetId) {
@@ -55,25 +49,14 @@ public class PlaybackSessionService {
 
         // broadcasting
 
-        switch (targetType) {
-            case ROOM:
-                
-                ListeningRoom room = listeningRoomRepository.findById(resolvedTargetId).orElseThrow();
-                roomWebSocketService.broadcastRoomInfo(authData.sub(), RoomDTO.ofRoom(room));
-                break;
-        
-            default:
-                break;
-        }
-
         PlaybackState state = playbackStateRepository
             .findWithPlaylistByTargetIdAndTargetType(resolvedTargetId, targetType)
             .orElseGet(() -> playbackStateRepository.save(new PlaybackState(resolvedTargetId, targetType, null)));
         
         log.debug(
-            "Отправляем плейлист пользователю {}: {}", 
+            "Отправляем плейлист пользователю {}: {} треков", 
             state.getPlaylist().getId(), 
-            state.getPlaylist().getQueue().stream().map(qi -> qi.getAudio().getId()).toList());
+            state.getPlaylist().getQueue().size());
 
         userWorker.sendPlaylist(state.getPlaylist());
         userWorker.sendPlaybackMode(state.getPlaybackMode());

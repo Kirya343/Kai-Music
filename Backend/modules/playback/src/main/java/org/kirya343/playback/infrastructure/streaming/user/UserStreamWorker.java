@@ -1,18 +1,16 @@
-package org.kirya343.playback.infrastructure.streaming;
+package org.kirya343.playback.infrastructure.streaming.user;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.dto.AudioChunkFeedback;
-import org.kirya343.audio.services.storage.AudioStorageService;
-import org.kirya343.audio.services.util.Fmp4Chunker;
-import org.kirya343.playback.application.command.PlaybackCommand;
+import org.kirya343.playback.domain.dto.PlaybackContext;
 import org.kirya343.playback.domain.dto.StreamContext;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.infrastructure.streaming.playback.AudioStreamService;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playlist.datasource.model.Playlist;
@@ -35,7 +33,6 @@ public class UserStreamWorker
 
     private ScheduledFuture<?> task;
 
-    private final AudioStorageService audioStorageService;
     private final PlaybackWebsocketService playbackWebsocketService;
     private final AudioStreamService audioStreamService;
     private final ReentrantLock streamLock = new ReentrantLock();
@@ -44,20 +41,14 @@ public class UserStreamWorker
 
     public UserStreamWorker(
         String userSub,
-        AudioStorageService audioStorageService,
         PlaybackWebsocketService playbackWebsocketService,
         AudioStreamService audioStreamService
     ) {
         this.userSub = userSub;
-        this.audioStorageService = audioStorageService;
         this.playbackWebsocketService = playbackWebsocketService;
         this.audioStreamService = audioStreamService;
 
         addLog("Created UserAudioStreamWorker for %s", userSub);
-    }
-
-    public void submit(PlaybackCommand cmd) {
-        subscribedWorker.submit(cmd);
     }
 
     public void subscribe(PlaybackStreamWorker worker, ShortUserDTO userDTO) {
@@ -75,12 +66,12 @@ public class UserStreamWorker
         }
     }
 
-    public void applyState(PlaybackStateDTO state) {
-        if (state == null) return;
+    public void applyState(PlaybackContext context) {
+        if (context == null) return;
 
         streamLock.lock();
         try {
-            currentStream = createStreamContext(state);
+            currentStream = createStreamContext(context);
 
             audioStreamService.initializeUser(currentStream);
 
@@ -137,34 +128,8 @@ public class UserStreamWorker
         playbackWebsocketService.sendPlaybackData(userSub, type, id, listeners);
     }
 
-    public StreamContext createStreamContext(PlaybackStateDTO state) {
-        return new StreamContext(
-            UUID.randomUUID(), 
-            userSub,
-            loadChunker(state),
-            state
-        );
-    }
-
-    private Fmp4Chunker loadChunker(PlaybackStateDTO stateDTO) {
-
-        AudioFile audioFile = subscribedWorker.getCurrentAudio();
-
-        if (audioFile == null) {
-            throw new IllegalStateException("Audiofile for chunker not found");
-        }
-
-        Fmp4Chunker chunker = new Fmp4Chunker(
-            audioStorageService,
-            audioFile.getPath(),
-            audioFile.getChunks()
-        );
-        
-        addLog("Перематываем чанкер для пользователя %s на позицию: %s", userSub, stateDTO.position());
-
-        chunker.seek(stateDTO.position());
-
-        return chunker;
+    public StreamContext createStreamContext(PlaybackContext playbackContext) {
+        return new StreamContext(playbackContext, userSub);
     }
 
     // Diadnostic voids
@@ -177,7 +142,7 @@ public class UserStreamWorker
 
         if (context == null) return builder;
 
-        PlaybackStateDTO state = context.getCurrentState();
+        PlaybackStateDTO state = context.getPlaybackContext().getState();
 
         DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
             .addRow("position: " + state.position())

@@ -1,4 +1,4 @@
-package org.kirya343.playback.infrastructure.streaming;
+package org.kirya343.playback.infrastructure.streaming.playback;
 
 import java.util.List;
 import java.util.Map;
@@ -8,8 +8,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
-import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.services.AudioQueryService;
+import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 
@@ -32,6 +32,7 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
     private final PlaybackStateRepository playbackStateRepository;
     private final QueueService queueService;
     private final AudioQueryService audioQueryService;
+    private final AudioStorageService audioStorageService;
 
     private final Map<PlaybackTargetType, Map<Long, PlaybackStreamWorker>> workers =
             new ConcurrentHashMap<>();
@@ -53,40 +54,43 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
         log.debug("Пытаемся получить {} воркер для {}", type, id);
 
         PlaybackStreamWorker worker = workers
-            .computeIfAbsent(type, key -> new ConcurrentHashMap<>()).get(id);
+            .computeIfAbsent(type, key -> new ConcurrentHashMap<>())
+            .computeIfAbsent(id, key -> createWorker(id, type));
 
         if (worker == null) {
 
-            log.debug("Создаём новый {} воркер {}", type, id);
-
-            PlaybackState state = playbackStateRepository
-                .findByTargetIdAndTargetType(id, type)
-                .orElse(null);
-
-            AudioFile audio = audioQueryService.getAudioByQueueItem(state.getEntryId());
-
-            try {
-                worker = new PlaybackStreamWorker(
-                    id,
-                    type,
-                    eventPublisher, 
-                    PlaybackStateDTO.ofState(state),
-                    queueService,
-                    audio
-                );
-            } catch (Exception e) {
-                log.error("Ошибка создания {} воркера {}", type, id, e);
-                throw e;
-            }
-
-            log.debug("Кладём к остальным {} воркер {}", type, id);
-
-            workers
-                .computeIfAbsent(type, key -> new ConcurrentHashMap<>())
-                .putIfAbsent(id, worker);
+            createWorker(id, type);
         }
 
         return worker;
+    }
+
+    private PlaybackStreamWorker createWorker(Long id, PlaybackTargetType type) {
+
+        log.debug("Создаём новый {} воркер {}", type, id);
+
+        PlaybackState state = playbackStateRepository
+                .findByTargetIdAndTargetType(id, type)
+                .orElse(null);
+
+        try {
+            PlaybackStreamWorker worker = new PlaybackStreamWorker(
+                id,
+                type,
+                eventPublisher, 
+                PlaybackStateDTO.ofState(state),
+                queueService,
+                audioStorageService,
+                audioQueryService
+            );
+
+            log.debug("Успешно создан {} воркер {}", type, id);
+
+            return worker;
+        } catch (Exception e) {
+            log.error("Ошибка создания {} воркера {}", type, id, e);
+            throw e;
+        }
     }
 
     public void removeWorker(PlaybackTargetType type, Long id) {

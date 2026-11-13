@@ -1,10 +1,10 @@
-package org.kirya343.playback.infrastructure.streaming;
+package org.kirya343.playback.infrastructure.streaming.user;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.kirya343.audio.services.storage.AudioStorageService;
+import org.kirya343.playback.infrastructure.streaming.playback.AudioStreamService;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +24,6 @@ public class UserStreamWorkerManager
     implements DiagnosticComponent {
 
     private final PlaybackWebsocketService playbackWebsocketService;
-    private final AudioStorageService audioStorageService;
     private final AudioStreamService audioStreamService;
 
     private final Map<String, UserStreamWorker> workers =
@@ -42,7 +41,6 @@ public class UserStreamWorkerManager
 
             worker = new UserStreamWorker(
                 userSub,
-                audioStorageService,
                 playbackWebsocketService,
                 audioStreamService
             );

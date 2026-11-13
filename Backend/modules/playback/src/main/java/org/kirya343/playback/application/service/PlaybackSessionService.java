@@ -6,10 +6,10 @@ import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
 import org.kirya343.room.dto.RoomDTO;
@@ -71,9 +71,9 @@ public class PlaybackSessionService {
             .orElseGet(() -> playbackStateRepository.save(new PlaybackState(resolvedTargetId, targetType, null)));
         
         log.debug(
-            "Отправляем плейлист пользователю {}: {}", 
+            "Отправляем плейлист пользователю {}: {} треков", 
             state.getPlaylist().getId(), 
-            state.getPlaylist().getQueue().stream().map(qi -> qi.getAudio().getId()).toList());
+            state.getPlaylist().getQueue().size());
 
         userWorker.sendPlaylist(state.getPlaylist());
         userWorker.sendPlaybackMode(state.getPlaybackMode());

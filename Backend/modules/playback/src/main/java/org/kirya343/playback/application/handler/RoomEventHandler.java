@@ -32,7 +32,7 @@ public class RoomEventHandler {
         state.setPosition(event.stateDTO().position());
         state.setEntryId(event.stateDTO().entryId());
         state.setPaused(event.stateDTO().pause());
-        state.setInitiatorName(event.authData().name());
+        state.setInitiatorName(event.stateDTO().user());
         
         playbackStateRepository.save(state);
     }

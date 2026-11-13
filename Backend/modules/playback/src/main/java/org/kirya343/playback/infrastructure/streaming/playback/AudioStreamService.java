@@ -1,12 +1,14 @@
-package org.kirya343.playback.infrastructure.streaming;
+package org.kirya343.playback.infrastructure.streaming.playback;
 
 import java.io.IOException;
 import java.time.Instant;
 
 import org.kirya343.audio.dto.AudioChunk;
+import org.kirya343.audio.services.util.Fmp4Chunker;
 import org.kirya343.playback.domain.dto.StreamContext;
 import org.kirya343.playback.domain.enums.ChunkDeliveryStatus;
 import org.kirya343.playback.presentation.dto.ChunkDelivery;
+import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
 
@@ -24,19 +26,23 @@ public class AudioStreamService {
 
     public void initializeUser(StreamContext context) {
 
+        PlaybackStateDTO state = context.getPlaybackContext().getState();
+
         log.debug("initializing user {}", context.getUserSub());
 
         playbackWebsocketService.sendPlaybackState(
             context.getUserSub(), 
-            context.getCurrentState(), 
+            state,
             context.getStreamId()
         );
 
         try {
             playbackWebsocketService.sendChunk(
                 context.getUserSub(), 
-                context.getChunker().initializationChunk(), 
-                context.getCurrentState().entryId(),
+                context.getPlaybackContext()
+                    .getChunker()
+                    .initializationChunk(), 
+                state.entryId(),
                 context.getStreamId()
             );
 
@@ -47,20 +53,22 @@ public class AudioStreamService {
     
     public void fillBuffer(StreamContext context) {
 
+        Fmp4Chunker chunker = context.getPlaybackContext().getChunker();
+
         try {
 
             log.debug("fillBuffer to user {}", context.getUserSub());
 
             double buffered = context.getBufferedUntil();
-            double target = context.getCurrentPosition() + BUFFER_SECONDS;
+            double target = context.getPlaybackContext().getCurrentPosition() + BUFFER_SECONDS;
 
             while (
                 buffered < target &&
-                context.getChunker().hasNext()
+                chunker.hasNext()
             ) {
                 log.debug("buffered {}, target {}", buffered, target);
 
-                AudioChunk chunk = context.getChunker().nextAudioChunk();
+                AudioChunk chunk = chunker.nextAudioChunk();
 
                 sendChunk(chunk, context);
 
@@ -92,7 +100,9 @@ public class AudioStreamService {
         playbackWebsocketService.sendChunk(
             context.getUserSub(),
             chunk,
-            context.getCurrentState().entryId(),
+            context.getPlaybackContext()
+                .getState()
+                .entryId(),
             context.getStreamId()
         );
     }
@@ -100,7 +110,9 @@ public class AudioStreamService {
     private void resendChunk(ChunkDelivery chunkDelivery, StreamContext context) {
 
         try {
-            AudioChunk chunk = context.getChunker().getAudioChunk(chunkDelivery.sequence());
+            AudioChunk chunk = context.getPlaybackContext()
+                .getChunker()
+                .getAudioChunk(chunkDelivery.sequence());
 
             sendChunk(chunk, context);
         } catch (IOException e) {

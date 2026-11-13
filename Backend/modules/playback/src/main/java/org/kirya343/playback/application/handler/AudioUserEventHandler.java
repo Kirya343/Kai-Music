@@ -1,6 +1,6 @@
 package org.kirya343.playback.application.handler;
 
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
 import org.kirya343.room.datasource.ListeningRoom;
 import org.kirya343.room.datasource.ListeningRoomRepository;
 import org.kirya343.user.dto.event.UserDisconnectedEvent;

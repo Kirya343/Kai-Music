@@ -101,10 +101,15 @@ public class PlaybackWebsocketService {
                 RoomDTO.ofRoom(listeningRoomRepository.findById(id).orElse(null)), 
                 listeners
             );
-        } else {
+        } else if (type.equals(PlaybackTargetType.USER)) {
             playbackData = new PlaybackData(
                 null,
                 null
+            );
+        } else {
+            playbackData = new PlaybackData(
+                null,
+                listeners
             );
         }
 

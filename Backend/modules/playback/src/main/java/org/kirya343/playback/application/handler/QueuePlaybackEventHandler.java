@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.kirya343.common.event.playback.QueueChangedEvent;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,7 +2,7 @@ package org.kirya343.playback.presentation.websocket;
 
 import org.kirya343.audio.dto.AudioChunkFeedback;
 import org.kirya343.playback.application.service.PlaybackSessionService;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.SubscribePlaybackRequest;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
@@ -26,6 +26,8 @@ public class PlaybackWebSocketController {
     public void reconnect(
         @AuthUser UserAuthData authData
     ) {
+        log.debug("Перезапуск сессии пользователя {}", authData.name());
+
         playbackSessionService.restoreSession(authData);
     }
 
@@ -40,7 +42,7 @@ public class PlaybackWebSocketController {
 
     @MessageMapping("/audio.feedback")
     @Authenticated
-    public void subscribe(
+    public void feedback(
         AudioChunkFeedback chunk,
         @AuthUser UserAuthData authData
     ) {

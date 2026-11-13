@@ -6,7 +6,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.PlaybackCommand;
@@ -17,6 +16,7 @@ import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
 import org.kirya343.security.core.dto.UserAuthData;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,11 +35,11 @@ import lombok.RequiredArgsConstructor;
 public class PlaybackController {
 
     private final PlaybackStateRepository playbackStateRepository;
-    private final UserStreamWorkerManager audioStreamWorkerManager;
     private final PlaybackSessionService playbackSessionService;
     private final PlaybackService playbackService;
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
+    private final ApplicationEventPublisher eventPublisher;
     
     @GetMapping("/playback-state")
     @Authenticated
@@ -69,7 +69,7 @@ public class PlaybackController {
 
         PlaybackCommand cmd = new UpdatePlayback(state, authData, null, null);
 
-        audioStreamWorkerManager.get(authData.sub()).submit(cmd);
+        eventPublisher.publishEvent(cmd);
     }
 
     @PostMapping("/change-track")
@@ -85,7 +85,7 @@ public class PlaybackController {
 
         PlaybackCommand cmd = new ChangeTrack(changing, authData, null, null);
 
-        audioStreamWorkerManager.get(authData.sub()).submit(cmd);
+        eventPublisher.publishEvent(cmd);
     }
 
     @PostMapping("/subscribe")

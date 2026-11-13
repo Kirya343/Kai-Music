@@ -3,16 +3,13 @@ package org.kirya343.playback.infrastructure.command;
 import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
-import org.kirya343.playback.application.event.PlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
-import org.kirya343.playback.infrastructure.streaming.UserStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
-import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
 import org.kirya343.security.core.dto.UserAuthData;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -24,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PlaybackCommandWorker {
 
-    private final ApplicationEventPublisher publisher;
     private final QueueService queueService;
     private final QueueItemRepository queueItemRepository;
     private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
@@ -45,13 +41,11 @@ public class PlaybackCommandWorker {
                 .getSubscribedWorker();
         }
 
-        PlaybackStateDTO state = null;
-
         try {
             switch (cmd) {
                 case UpdatePlayback c -> { 
-                    
-                    state = c.state();
+
+                    playbackWorker.applyState(c.state());
                 }
                 case ChangeTrack c -> {
 
@@ -93,29 +87,11 @@ public class PlaybackCommandWorker {
                             break;
                     }
 
-                    state = new PlaybackStateDTO(
-                        cmd.user().name(), 
-                        entry.getId(), 
-                        0.0, 
-                        false
-                    );
-
-                    playbackWorker.setCurrentAudio(entry.getAudio());
+                    playbackWorker.changeTrack(entry, cmd.user().name());
 
                 }
                 default -> throw new RuntimeException("Введена неверная команда");
             };
-
-            playbackWorker.applyState(state);
-
-            publisher.publishEvent(
-                new PlaybackEvent(
-                    playbackWorker.getTargetId(),
-                    playbackWorker.getTargetType(), 
-                    state, 
-                    authData
-                ));
-
         } catch (Exception e) {
             log.debug("Ошибка обработки команды комнаты: {}", e);
         }

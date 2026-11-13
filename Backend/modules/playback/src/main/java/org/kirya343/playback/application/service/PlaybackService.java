@@ -2,14 +2,13 @@ package org.kirya343.playback.application.service;
 
 import java.util.List;
 
-import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
-import org.kirya343.playback.infrastructure.streaming.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.playlist.datasource.repository.PlaylistRepository;
 import org.kirya343.playlist.datasource.repository.QueueItemRepository;
@@ -81,6 +80,6 @@ public class PlaybackService {
 
         QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(queuePlaylistId, audioId).orElse(null);
 
-        playbackStreamWorkerManager.get(targetType, targetId).submit(new ChangeTrack(qi.getId().toString(), authData, null, null));
+        playbackStreamWorkerManager.get(targetType, targetId).changeTrack(qi, authData.name());
     }
 }

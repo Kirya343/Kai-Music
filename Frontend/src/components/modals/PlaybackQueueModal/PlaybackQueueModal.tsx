@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./PlaybackQueueModal.module.scss"
 import Modal from "@/components/modals/Modal/Modal";
-import { usePlaybackContext } from "@playback";
+import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import TrackImportModal from "../TrackImportModal/TrackImportModal";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 import PlaybackQueueTrack from "@/components/ui/track/PlaybackQueueTrack";
@@ -22,7 +22,9 @@ const PlaybackQueueModal = ({
 
     const [importOpen, setImportOpen] = useState<boolean>(false)
     const [selectMode, setSelectMode] = useState<boolean>(false);
-    const { playbackState, playbackPlaylist } = usePlaybackContext();
+    const { playbackState } = usePlaybackState();
+
+    const { playbackPlaylist } = usePlaybackPlaylist();
 
     const deleteFromPlaylist = (ids: number[]) => {
             

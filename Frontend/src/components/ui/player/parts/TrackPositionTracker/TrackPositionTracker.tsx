@@ -1,16 +1,14 @@
-import { usePlaybackContext } from "@playback";
+import { usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
 import styles from "./TrackPositionTracker.module.scss"
 import { countPosition } from "@common";
 
 const TrackPositionTracker = () => {
 
     // controls from RoomPlaybackContext
-    const { 
-        seek,
-        bufferedRanges,
-        playingAudio,
-        playbackState
-    } = usePlaybackContext();
+    const { bufferedRanges } = usePlaybackAudio();
+    const { playbackState } = usePlaybackState();
+    const { playingAudio } = usePlaybackPlaylist();
+    const { seek } = usePlaybackControls();
 
     // variables to control the scrolling title
     const duration = playingAudio?.duration || 0

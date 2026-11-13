@@ -1,13 +1,7 @@
 ```
-src/
-└── playback/
-    ├── hooks/
-    │   └── usePlaybackContext.ts
-    └── ...
 
 tests/
 ├── unit/
-│   ├── usePlaybackContext.test.ts
 │   ├── useAudioStream.test.ts
 │   └── audioBuffer.test.ts
 └── e2e/

@@ -1,7 +1,7 @@
 import { playlistService } from "@playlist";
 import Track, { ITrackAction } from "./Track/Track";
 import { TrashIcon } from "@/assets/icons";
-import { IQueueItem, usePlaybackContext } from "@playback";
+import { IQueueItem, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
 import { HTMLAttributes } from "react";
 
 /** Props for the PlaybackQueueTrack component */
@@ -21,12 +21,9 @@ const PlaybackQueueTrack = ({
     ...props
 }: PlaybackQueueTrackProps) => {
 
-    const { 
-        playbackState,
-        togglePlay,
-        playbackPlaylist,
-        changeTrack
-    } = usePlaybackContext();
+    const { playbackState } = usePlaybackState();
+    const { playbackPlaylist } = usePlaybackPlaylist();
+    const { changeTrack, togglePlay } = usePlaybackControls();
 
     const handleTrackClick = async (qiId: number) => {
 

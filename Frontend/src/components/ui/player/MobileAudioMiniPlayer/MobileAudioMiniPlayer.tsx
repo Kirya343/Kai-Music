@@ -1,4 +1,4 @@
-import { usePlaybackContext } from "@playback";
+import { usePlaybackControls, usePlaybackPlaylist, usePlaybackState, usePlaybackUI } from "@playback";
 
 import styles from "./MobileAudioMiniPlayer.module.scss"
 import { RightIcon, PlayIcon, PauseIcon, HeartIcon } from "@/assets/icons";
@@ -16,13 +16,12 @@ const MobileAudioMiniPlayer = () => {
 
     const { isMobile } = useGlobal();
 
-    const { 
-        playbackState, playingAudio, 
-        setFullPlayerOpen, togglePlay,
-        changeTrack
-    } = usePlaybackContext();
+    const { playbackState } = usePlaybackState();
+    const { playingAudio } = usePlaybackPlaylist();
+    const { setFullPlayerOpen } = usePlaybackUI();
+    const { togglePlay, changeTrack } = usePlaybackControls();
 
-    const {playlistsData} = useData();
+    const { playlistsData } = useData();
 
     const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === playingAudio?.id)
 

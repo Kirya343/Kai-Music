@@ -1,13 +1,12 @@
 import { RepeatAllIcon, NoRepeatIcon, RepeatOneIcon, ShuffleIcon } from "@/assets/icons";
-import { useData } from "@common";
-import { PlaybackMode, usePlaybackContext, playbackService, PlaybackTargetType } from "@playback";
+import { PlaybackMode, playbackService, usePlaybackState } from "@playback";
 
 /**
  * PlaybackModeToggle is component that switches playbackMode of playlist that playing at the moment
  */
 export const PlaybackModeToggle = () => {
 
-    const { playbackMode } = usePlaybackContext();
+    const { playbackMode } = usePlaybackState();
 
     const nextMode = async () => {
         

@@ -4,7 +4,7 @@ import { HeartIcon, MusicNoteIcon, PlayingAudioIcon } from "@/assets/icons"
 import { countPosition, useData } from "@common"
 import { HTMLAttributes, ReactNode, useMemo } from "react"
 import clsx from "clsx"
-import { playbackService, usePlaybackContext } from "@playback"
+import { playbackService, usePlaybackData, usePlaybackState } from "@playback"
 import KebabMenu, { IKebabAction } from "@/components/ui/KebabMenu/KebabMenu"
 import { playlistService } from "@playlist"
 
@@ -103,8 +103,8 @@ const Track = ({
     ...divProps
 }: TrackProps) => {
 
-    const { playbackState, playbackData } = usePlaybackContext();
-
+    const { playbackState } = usePlaybackState();
+    const playbackData = usePlaybackData();
     const { playlistsData } = useData();
     
     const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === audio.id)

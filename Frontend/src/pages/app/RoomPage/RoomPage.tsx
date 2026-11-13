@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { IRoomUpdate, roomService } from "@room";
 import styles from "./RoomPage.module.scss";
 import AudioMiniPlayer from "@/components/ui/player/MobileAudioMiniPlayer/MobileAudioMiniPlayer";
-import { getRandomColor, useData, useGlobal } from "@common";
+import { useGlobal } from "@common";
 import { useWebSocket } from "@websocket";
 import KebabMenu from "@/components/ui/KebabMenu/KebabMenu";
 import { CheckBoxIcon, PlusIcon, ShuffleIcon } from "@/assets/icons";
@@ -10,17 +10,19 @@ import Loader from "@/components/ui/Loader/Loader";
 import { playlistService } from "@playlist";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
 import PlaybackQueueTrack from "@/components/ui/track/PlaybackQueueTrack";
-import { playbackService, usePlaybackContext } from "@playback";
-import { Navigate } from "react-router-dom";
 import { loggerFactory } from "@common";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 import AvatarStack from "@/components/ui/AvatarStack/AvatarStack";
+import { usePlaybackData, usePlaybackPlaylist, usePlaybackState } from "@playback";
 
 const logger = loggerFactory.getLogger("Pages.Room");
 
 const RoomPage = () => {
     const [selectMode, setSelectMode] = useState<boolean>(false);
-    const { playbackState, playbackPlaylist, playbackData } = usePlaybackContext();
+
+    const { playbackState } = usePlaybackState();
+    const { playbackPlaylist } = usePlaybackPlaylist();
+    const playbackData = usePlaybackData();
 
     const room = playbackData.room
 

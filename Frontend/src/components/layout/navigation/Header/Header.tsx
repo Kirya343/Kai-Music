@@ -2,11 +2,11 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import styles from "./Header.module.scss"
 import { useAuth } from "@user";
 import { PlaylistIcon, DoorIcon, LibraryIcon, UserIcon, HomeIcon } from "@/assets/icons";
-import { useData, useGlobal } from "@common";
+import { useGlobal } from "@common";
 import { ReactNode } from "react";
 import clsx from "clsx";
 import Logo from "@/components/ui/Logo/Logo";
-import { usePlaybackContext } from "@playback";
+import { usePlaybackData } from "@playback";
 
 /**
  * interface for NavigationLink conponents
@@ -29,7 +29,7 @@ interface INavigationLink {
 const Header = () => {
 
     const { user, isAuthenticated } = useAuth();
-    const { playbackData } = usePlaybackContext();
+    const playbackData = usePlaybackData();
     const { isMobile } = useGlobal();
 
     /**

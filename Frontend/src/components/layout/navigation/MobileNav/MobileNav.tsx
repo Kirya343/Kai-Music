@@ -3,9 +3,9 @@ import styles from "./MobileNav.module.scss"
 import { PlaylistIcon, DoorIcon, LibraryIcon, HomeIcon, UserIcon } from "@/assets/icons";
 
 import { ReactNode } from "react";
-import { useData, useGlobal } from "@common";
+import { useGlobal } from "@common";
 import clsx from "clsx";
-import { usePlaybackContext } from "@playback";
+import { usePlaybackData } from "@playback";
 
 
 /**
@@ -26,7 +26,7 @@ interface INavigationLink {
 const MobileNav = () => {
 
     const { isMobile } = useGlobal();
-    const { playbackData } = usePlaybackContext();
+    const playbackData = usePlaybackData();
 
     /**
      * disabling on not mobile displays

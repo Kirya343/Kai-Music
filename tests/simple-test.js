@@ -1,5 +1,6 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import env from "./utils/env-reader.js"
 
 export const options = {
     stages: [
@@ -14,8 +15,8 @@ export const options = {
     },
 };
 
-const BASE_URL = __ENV.BASE_URL;
-const PATH = __ENV.PATH || '/room/list/page';
+const BASE_URL = env.BASE_URL;
+const PATH = env.PATH || '/room/list/page';
 
 export default function () {
     const response = http.get(`${BASE_URL}${PATH}`);

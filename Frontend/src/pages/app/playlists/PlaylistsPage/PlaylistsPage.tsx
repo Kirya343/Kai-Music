@@ -5,12 +5,12 @@ import PlaylistCreateModal from "@/components/modals/PlaylistCreateModal/Playlis
 import LibraryPlaylist from "@/components/ui/playlist/LibraryPlaylist";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
-import { usePlaybackContext } from "@playback";
+import { usePlaybackPlaylist } from "@playback";
 
 const PlaylistsPage = () => {
 
     const { playlistsData } = useData();
-    const { playbackPlaylist } = usePlaybackContext();
+    const { playbackPlaylist } = usePlaybackPlaylist();
     
     const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.playlists);
 

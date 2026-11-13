@@ -1,40 +1,16 @@
-import { createContext, Dispatch, SetStateAction, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { IAudio, TimeRange } from "@audio";
-import { countPosition, useData } from "@common";
-import { PlaybackState, PlaybackMode, playbackService, PlaybackData } from "@playback";
+import { PlaybackState, PlaybackMode, PlaybackData } from "@playback";
 import { useAudioPlayer } from "./hooks";
 import { Playlist } from "@playlist";
+import { PlaybackStateProvider } from "./contexts/PlaybackStateContext";
+import { PlaybackAudioProvider } from "./contexts/PlaybackAudioContext";
+import { PlaybackControlsProvider } from "./contexts/PlaybackControlsContext";
+import { PlaybackPlaylistProvider } from "./contexts/PlaybackPlaylistContext";
+import { PlaybackDataProvider } from "./contexts/PlaybackDataContext";
+import { PlaybackUIProvider } from "./contexts/PlaybackUIContext";
 
-interface RoomPlaybackContextType {
-    playingAudio: IAudio | null;
-
-    playbackState: PlaybackState | null;
-    playbackMode: PlaybackMode;
-    playbackPlaylist: Playlist | null;
-    playbackData: PlaybackData;
-
-    fullPlayerOpen: boolean;
-    setFullPlayerOpen: Dispatch<SetStateAction<boolean>>;
-    updateMessage: string;
-    audioRef: React.RefObject<HTMLAudioElement | null>;
-    togglePlay: () => void;
-    changeTrack: (changing: "prev" | "next" | number) => void;
-    bufferedRanges: TimeRange[];
-    pausePlayback: () => void;
-    seek: (position: number) => void;
-}
-
-const RoomPlaybackContext = createContext<RoomPlaybackContextType | null>(null);
-
-export const usePlaybackContext = () => {
-    const ctx = useContext(RoomPlaybackContext);
-    if (!ctx) {
-        throw new Error("usePlaybackContext must be used inside AuthProvider");
-    }
-    return ctx;
-}
-
-export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
+export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 
     const { 
         pausePlayback, 
@@ -129,25 +105,36 @@ export const RoomPlaybackProvider = ({ children }: { children?: React.ReactNode 
     ]);
     
     return (
-        <RoomPlaybackContext.Provider value={{ 
-            playingAudio,
-
-            playbackState,
-            playbackMode,
-            playbackPlaylist,
-            playbackData,
-
-            fullPlayerOpen, 
-            setFullPlayerOpen,
-            updateMessage,
-            audioRef, 
-            togglePlay,
-            changeTrack,
-            bufferedRanges,
-            pausePlayback,
-            seek
+        <PlaybackStateProvider value={{
+            playbackState, 
+            playbackMode
         }}>
-            {children}
-        </RoomPlaybackContext.Provider>
+            <PlaybackAudioProvider value={{
+                audioRef,
+                bufferedRanges
+            }}>
+                <PlaybackControlsProvider value={{
+                    togglePlay,
+                    changeTrack,
+                    pausePlayback,
+                    seek
+                }}>
+                    <PlaybackPlaylistProvider value={{
+                        playingAudio,
+                        playbackPlaylist
+                    }}>
+                        <PlaybackDataProvider value={playbackData}>
+                            <PlaybackUIProvider value={{
+                                fullPlayerOpen,
+                                setFullPlayerOpen,
+                                updateMessage
+                            }}>
+                                {children}
+                            </PlaybackUIProvider>
+                        </PlaybackDataProvider>
+                    </PlaybackPlaylistProvider>
+                </PlaybackControlsProvider>
+            </PlaybackAudioProvider>
+        </PlaybackStateProvider>
     );
 };

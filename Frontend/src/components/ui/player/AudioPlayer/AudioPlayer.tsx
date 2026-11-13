@@ -1,5 +1,5 @@
-import { usePlaybackContext } from "@playback";
-import { useEffect, useRef, useState } from "react";
+import { usePlaybackAudio, usePlaybackPlaylist, usePlaybackState, usePlaybackUI } from "@playback";
+import { useState } from "react";
 import VolumeSlider from "../parts/VolumeSlider/VolumeSlider";
 import styles from "./AudioPlayer.module.scss";
 import { DownIcon, PlaylistIcon } from "@/assets/icons";
@@ -16,12 +16,9 @@ import PlaybackQueueModal from "@/components/modals/PlaybackQueueModal/PlaybackQ
 const AudioPlayer = () => {
 
     // controls from RoomPlaybackContext
-    const {  
-        updateMessage, 
-        fullPlayerOpen, playingAudio,
-        setFullPlayerOpen,
-        playbackState
-    } = usePlaybackContext();
+    const { playbackState } = usePlaybackState();
+    const { updateMessage, fullPlayerOpen, setFullPlayerOpen } = usePlaybackUI();
+    const { playingAudio } = usePlaybackPlaylist();
 
     const [isOpen, setOpen] = useState(false);
 

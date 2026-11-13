@@ -8,7 +8,7 @@ import { useParams } from "react-router-dom";
 import { CheckBoxIcon, CirclePlusIcon, TrashIcon } from "@/assets/icons";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
-import { IQueueItem, usePlaybackContext } from "@playback";
+import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 import UploadsPlaylistTrack from "@/components/ui/track/playlistTracks/UploadsPlaylistTrack";
@@ -23,7 +23,8 @@ const PlaylistPage = ({}: {}) => {
     const [selectMode, setSelectMode] = useState<boolean>(false);
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
-    const { playbackState, playbackPlaylist } = usePlaybackContext();
+    const { playbackState } = usePlaybackState();
+    const { playbackPlaylist } = usePlaybackPlaylist();
 
     const { playlistsData } = useData();
         

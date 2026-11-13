@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import styles from "./RoomReturnModal.module.scss"
 import { useNavigate } from "react-router-dom";
-import { IListeningRoom, roomService } from "@room";
 import Modal from "../Modal/Modal";
-import { useData } from "@common";
 import { useWebSocket } from "@websocket";
-import { playbackService, usePlaybackContext } from "@playback";
+import { playbackService, usePlaybackData } from "@playback";
 
 /**
  * RoomReturnModal is component that helps to return to room that was before 
@@ -14,7 +12,7 @@ import { playbackService, usePlaybackContext } from "@playback";
 const RoomReturnModal = () => {
 
     const { client } = useWebSocket();
-    const { playbackData } = usePlaybackContext();
+    const playbackData = usePlaybackData();
  
     const navigate = useNavigate();
     const [isOpen, setOpen] = useState(true)

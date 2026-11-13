@@ -6,7 +6,7 @@ import { CirclePlusIcon, CheckmarkIcon, CrossIcon } from "@/assets/icons";
 import LibraryTrack from "@/components/ui/track/LibraryTrack";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData } from "@common";
-import { usePlaybackContext } from "@playback";
+import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 import Loader from "@/components/ui/Loader/Loader";
 
@@ -22,8 +22,9 @@ const LibraryPage = () => {
     } = useLibrary();
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
-    
-    const { playbackState, playbackPlaylist } = usePlaybackContext();
+
+    const { playbackState } = usePlaybackState();
+    const { playbackPlaylist } = usePlaybackPlaylist();
 
     const playingAudioId = useMemo(() => {
         return playbackPlaylist?.queue.find(

@@ -1,4 +1,4 @@
-import { usePlaybackContext } from "@playback";
+import { usePlaybackAudio, usePlaybackPlaylist, usePlaybackState } from "@playback";
 
 import styles from "./DesktopAudioPlayer.module.scss"
 import { useGlobal } from "@common";
@@ -22,7 +22,8 @@ const DesktopAudioPlayer = () => {
  
     const { isMobile } = useGlobal();
 
-    const { playbackState, playingAudio } = usePlaybackContext();
+    const { playbackState } = usePlaybackState();
+    const { playingAudio } = usePlaybackPlaylist();
 
     return playingAudio && playbackState && !isMobile && (
         <div 

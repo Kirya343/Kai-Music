@@ -56,7 +56,14 @@ public class PlaybackSubscriberManager {
         PlaybackContext context = currentPlayback;
 
         if (context != null) {
-            worker.applyState(context);
+            log.error("Appling state to: ", worker.getUserSub());
+
+            try {
+                worker.applyState(context);
+            } catch (Exception e) {
+                log.error("Appling state exception: ", e);
+                throw e;
+            }
         }
     }
 
@@ -68,6 +75,8 @@ public class PlaybackSubscriberManager {
     }
 
     public void applyState(PlaybackContext context) {
+
+        currentPlayback = context;
 
         PlaybackStateDTO state = context.getState();
 

@@ -87,6 +87,10 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         tickScheduler.shutdown();
     }
 
+    public void stop() {
+        tickScheduler.stop();
+    }
+
     private void tickInternal() {
         PlaybackContext context = trackManager.getCurrentPlayback();
 

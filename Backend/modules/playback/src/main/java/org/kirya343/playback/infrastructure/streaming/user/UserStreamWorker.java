@@ -77,6 +77,8 @@ public class UserStreamWorker
             throw new IllegalStateException("PlaybackContext is null");
         }
 
+        log.debug("Apply state to {}", userSub);
+
         streamLock.lock();
 
         try {
@@ -84,6 +86,8 @@ public class UserStreamWorker
             StreamContext previous = currentStream;
 
             currentStream = createStreamContext(context);
+
+            log.debug("Created context for {}", userSub);
 
             if (previous != null) {
                 previous.close();

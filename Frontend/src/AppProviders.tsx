@@ -1,14 +1,14 @@
 
 import { ReactNode } from "react";
 import { DataProvider } from "@common";
-import { RoomPlaybackProvider } from "@playback";
+import { PlaybackProvider } from "@playback";
 
 export const AppProviders = ({ children }: {children: ReactNode}) => {
     return (
         <DataProvider>
-            <RoomPlaybackProvider>
+            <PlaybackProvider>
                 {children}
-            </RoomPlaybackProvider>
+            </PlaybackProvider>
         </DataProvider>
     );
 };

@@ -77,6 +77,12 @@ services:
         depends_on:
             backend-db:
                 condition: service_healthy
+        
+        deploy:
+            resources:
+                limits:
+                    cpus: '6.0'
+                    memory: 8G
 
         stdin_open: true
         tty: true
@@ -101,6 +107,13 @@ services:
         depends_on:
             bot-db:
                 condition: service_healthy
+
+        deploy:
+            resources:
+                limits:
+                    cpus: '2.0'
+                    memory: 1G
+
         networks:
             - bot-network
             - backend-network

@@ -5,7 +5,7 @@ import { countPosition } from "@common";
 const TrackPositionTracker = () => {
 
     // controls from RoomPlaybackContext
-    const { audioRef } = usePlaybackAudio();
+    const { audioRef, position } = usePlaybackAudio();
     const { playingAudio } = usePlaybackPlaylist();
     const { seek } = usePlaybackControls();
 
@@ -13,6 +13,8 @@ const TrackPositionTracker = () => {
     const duration = playingAudio?.duration || 0
 
     const audio = audioRef.current;
+
+    const audioPosition = Math.max(audio?.currentTime || 0, position)
 
     const buffered = audio?.buffered;
 
@@ -42,14 +44,14 @@ const TrackPositionTracker = () => {
                     type="range"
                     min={0}
                     max={duration}
-                    value={audio.currentTime}
+                    value={audioPosition}
                     onChange={(e) => seek(Number(e.target.value))}
                     style={{
                         width: "100%",
                         background: `linear-gradient(
                             to right,
-                            #ffffff ${(audio.currentTime / duration) * 100}%,
-                            #00000000 ${(audio.currentTime / duration) * 100}%
+                            #ffffff ${(audioPosition / duration) * 100}%,
+                            #00000000 ${(audioPosition / duration) * 100}%
                         )`
                     }}
                 />
@@ -57,7 +59,7 @@ const TrackPositionTracker = () => {
 
             <div className={styles.positionMeta}>
                 <span className={styles.currentPosition}>
-                    {countPosition(audio.currentTime)}
+                    {countPosition(audioPosition)}
                 </span>
 
                 <span className={styles.duration}>

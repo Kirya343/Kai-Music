@@ -40,7 +40,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
     }, [playbackState, playbackMode]);
 
     const audioValue = useMemo(() => ({
-        audioRef
+        audioRef, position
     }), [audioRef, position]);
 
     const controlsValue = useMemo(() => ({

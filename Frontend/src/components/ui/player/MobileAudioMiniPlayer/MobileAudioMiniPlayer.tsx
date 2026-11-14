@@ -16,7 +16,7 @@ const MobileAudioMiniPlayer = () => {
 
     const { isMobile } = useGlobal();
 
-    const { audioRef } = usePlaybackAudio();
+    const { audioRef, position } = usePlaybackAudio();
     const { playbackState } = usePlaybackState();
     const { playingAudio } = usePlaybackPlaylist();
     const { setFullPlayerOpen } = usePlaybackUI();
@@ -45,6 +45,8 @@ const MobileAudioMiniPlayer = () => {
 
     const audio = audioRef.current;
 
+    const audioPosition = Math.max(audio?.currentTime || 0, position)
+
     const duration = playingAudio?.duration || 0
 
     return playingAudio && playbackState && audio && isMobile && (
@@ -60,8 +62,8 @@ const MobileAudioMiniPlayer = () => {
                 className={styles.trackPosition}
                 style={{ 
                     background: `
-                        linear-gradient(to right, #ffffff ${(audio?.currentTime / duration) * 100}%, 
-                        #444 ${(audio?.currentTime / duration) * 100}%)
+                        linear-gradient(to right, #ffffff ${(audioPosition / duration) * 100}%, 
+                        #444 ${(audioPosition / duration) * 100}%)
                     `
                 }}
             />

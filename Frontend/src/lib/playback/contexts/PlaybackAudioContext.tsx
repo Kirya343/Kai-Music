@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 
 interface PlaybackAudioContextType {
     audioRef: React.RefObject<HTMLAudioElement | null>;
+    position: number;
 }
 
 const PlaybackAudioContext = createContext<PlaybackAudioContextType | null>(null);

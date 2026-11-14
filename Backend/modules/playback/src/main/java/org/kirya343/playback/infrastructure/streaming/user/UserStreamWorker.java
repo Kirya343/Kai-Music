@@ -75,30 +75,42 @@ public class UserStreamWorker
     }
 
     public void applyState(PlaybackContext context) {
-
         if (context == null) {
             throw new IllegalStateException("PlaybackContext is null");
         }
 
-        log.debug("Apply state to {}", userSub);
+        replaceStream(context);
 
+        audioStreamService.initializeUser(currentStream);
+        tick(currentStream);
+    }
+
+    public void synchronizeState(PlaybackContext context) {
+        if (context == null) {
+            throw new IllegalStateException("PlaybackContext is null");
+        }
+
+        replaceStream(context);
+
+        audioStreamService.initializeUser(
+            currentStream,
+            context.getCurrentState()
+        );
+
+        tick(currentStream);
+    }
+
+    private void replaceStream(PlaybackContext context) {
         streamLock.lock();
 
         try {
-
             StreamContext previous = currentStream;
 
             currentStream = createStreamContext(context);
 
-            log.debug("Created context for {}", userSub);
-
             if (previous != null) {
                 previous.close();
             }
-
-            audioStreamService.initializeUser(currentStream);
-
-            tick(currentStream);
         } finally {
             streamLock.unlock();
         }

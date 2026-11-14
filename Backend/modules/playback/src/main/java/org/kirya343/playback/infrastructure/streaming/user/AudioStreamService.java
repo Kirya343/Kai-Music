@@ -34,6 +34,15 @@ public class AudioStreamService {
 
         PlaybackStateDTO state = context.getPlaybackContext().getState();
 
+        initializeUser(context, state);
+    }
+
+    public void initializeUser(StreamContext context, PlaybackStateDTO state) {
+
+        if (context.isClosed()) {
+            throw new IllegalStateException("Stream " + context.getStreamId() + " is closed");
+        }
+
         log.debug("initializing user {}", context.getUserSub());
 
         playbackWebsocketService.sendPlaybackState(

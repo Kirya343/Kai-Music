@@ -11,6 +11,7 @@ import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.playback.application.service.QueueService;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import io.github.kirya343.terminal.api.command.DiagnosticCommand;
 import io.github.kirya343.terminal.api.component.DiagnosticComponent;
+import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
 import io.github.kirya343.terminal.result.StreamMode;
 import io.github.kirya343.terminal.result.StreamingResult;
 import lombok.RequiredArgsConstructor;
@@ -45,38 +47,44 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
         return workers.size();
     }
 
+    public List<PlaybackStreamWorker> getAll() {
+        return workers.values()
+            .stream()
+            .flatMap(map -> map.values().stream())
+            .toList();
+    }
+
     public Set<Long> keySet(PlaybackTargetType type) {
         return workers.computeIfAbsent(type, key -> new ConcurrentHashMap<>()).keySet();
     }
 
-    public PlaybackStreamWorker get(PlaybackTargetType type, Long id) {
+    public PlaybackStreamWorker get(PlaybackTarget target) {
 
-        log.debug("Пытаемся получить {} воркер для {}", type, id);
+        log.debug("Пытаемся получить {} воркер для {}", target);
 
         PlaybackStreamWorker worker = workers
-            .computeIfAbsent(type, key -> new ConcurrentHashMap<>())
-            .computeIfAbsent(id, key -> createWorker(id, type));
+            .computeIfAbsent(target.type(), key -> new ConcurrentHashMap<>())
+            .computeIfAbsent(target.id(), key -> createWorker(target));
 
         if (worker == null) {
 
-            createWorker(id, type);
+            createWorker(target);
         }
 
         return worker;
     }
 
-    private PlaybackStreamWorker createWorker(Long id, PlaybackTargetType type) {
+    private PlaybackStreamWorker createWorker(PlaybackTarget target) {
 
-        log.debug("Создаём новый {} воркер {}", type, id);
+        log.debug("Создаём новый воркер {}", target);
 
         PlaybackState state = playbackStateRepository
-                .findByTargetIdAndTargetType(id, type)
+                .findByTargetIdAndTargetType(target.id(), target.type())
                 .orElse(null);
 
         try {
             PlaybackStreamWorker worker = new PlaybackStreamWorker(
-                id,
-                type,
+                target,
                 eventPublisher, 
                 PlaybackStateDTO.ofState(state),
                 queueService,
@@ -84,11 +92,11 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
                 audioQueryService
             );
 
-            log.debug("Успешно создан {} воркер {}", type, id);
+            log.debug("Успешно создан воркер {}", target);
 
             return worker;
         } catch (Exception e) {
-            log.error("Ошибка создания {} воркера {}", type, id, e);
+            log.error("Ошибка создания {} воркера {}", target, e);
             throw e;
         }
     }
@@ -107,7 +115,7 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
     // Diagnotsic
 
     public String getComponentId() {
-        return "stream-workers";
+        return "playbacks";
     }
 
     public List<DiagnosticCommand> getCommands() {
@@ -124,31 +132,90 @@ public class PlaybackStreamWorkerManager implements DiagnosticComponent {
             
             public StreamingResult execute(String[] args) {
 
-                if (args.length != 2) {
-                    throw new IllegalArgumentException(
-                        "Usage: stream-workers logs <type> <id>"
-                    );
-                }
-
-                PlaybackTargetType type;
-                Long id;
-
-                try {
-                    type = PlaybackTargetType.valueOf(args[0]);
-                    id = Long.parseLong(args[1]);
-                } catch (NumberFormatException exception) {
-                    throw new IllegalArgumentException(
-                        "Target ID must be a number: " + args[0]
-                    );
-                }
+                PlaybackTarget target = getTargetFromArgs(args);
 
                 return new StreamingResult(
-                    () -> get(type, id).getLogs().getContent(),
+                    () -> get(target).getFormattedLogs().getContent(),
                     StreamMode.REPLACE
                 );
             }
         };
 
-        return List.of(logsCommand);
+        DiagnosticCommand infoCommand = new DiagnosticCommand() {
+
+            public String getName() {
+                return "info";
+            }
+
+            public String getDescription() {
+                return "Shows playback worker info";
+            }
+            
+            public StreamingResult execute(String[] args) {
+
+                PlaybackTarget target = getTargetFromArgs(args);
+
+                return new StreamingResult(
+                    () -> get(target).getInfo().getContent(),
+                    StreamMode.REPLACE
+                );
+            }
+        };
+
+        DiagnosticCommand indexCommand = new DiagnosticCommand() {
+
+            public String getName() {
+                return "index";
+            }
+
+            public String getDescription() {
+                return "Shows all playback workers";
+            }
+            
+            public StreamingResult execute(String[] args) {
+
+                String param = "";
+
+                if (args.length == 1) {
+                    param = args[0];
+                }
+
+                String resolved = param;
+
+                return new StreamingResult(
+                    () -> {
+                        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Playbacks: ");
+
+                        getAll().forEach(playback -> {
+                            builder.addSection(playback.getInfo(resolved));
+                        });
+
+                        return builder.getContent();
+                    },
+                    StreamMode.REPLACE
+                );
+            }
+        };
+
+        return List.of(logsCommand, infoCommand, indexCommand);
+    }
+
+    private PlaybackTarget getTargetFromArgs(String[] args) {
+        if (args.length != 2) {
+            throw new IllegalArgumentException(
+                "Usage: stream-workers logs <type> <id>"
+            );
+        }
+
+        try {
+            PlaybackTargetType type = PlaybackTargetType.valueOf(args[0]);
+            Long id = Long.parseLong(args[1]);
+
+            return new PlaybackTarget(type, id);
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException(
+                "Target ID must be a number: " + args[0]
+            );
+        }
     }
 }

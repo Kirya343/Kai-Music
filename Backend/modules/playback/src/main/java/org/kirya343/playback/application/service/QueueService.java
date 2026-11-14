@@ -1,7 +1,7 @@
 package org.kirya343.playback.application.service;
 
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
-import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.datasource.model.QueueItem;
@@ -22,10 +22,10 @@ public class QueueService {
     private final PlaybackStateRepository playbackStateRepository;
     private final PlaylistRepository playlistRepository;
 
-    public QueueItem nextTrack(Long id, PlaybackTargetType type) {
+    public QueueItem nextTrack(PlaybackTarget target) {
 
         PlaybackState playbackState = playbackStateRepository
-            .findByTargetIdAndTargetType(id, type)
+            .findByTargetIdAndTargetType(target.id(), target.type())
             .orElseThrow();
 
         QueueItem queueItem = null;
@@ -87,10 +87,10 @@ public class QueueService {
         return queueItem;
     }
 
-    public QueueItem prevTrack(Long id, PlaybackTargetType type) {
+    public QueueItem prevTrack(PlaybackTarget target) {
 
         PlaybackState playbackState = playbackStateRepository
-            .findByTargetIdAndTargetType(id, type)
+            .findByTargetIdAndTargetType(target.id(), target.type())
             .orElseThrow();
 
         QueueItem queueItem = null;

@@ -6,7 +6,7 @@ import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.audio.services.util.Fmp4Chunker;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.dto.PlaybackContext;
-import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.QueueItem;
 
@@ -19,8 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor 
 public class PlaybackTrackManager {
 
-    private final Long targetId;
-    private final PlaybackTargetType targetType;
+    private final PlaybackTarget target;
 
     private final QueueService queueService;
     private final AudioStorageService audioStorageService;
@@ -57,7 +56,7 @@ public class PlaybackTrackManager {
     public void changeTrack(String initiator) {
 
         try {
-            QueueItem entry = queueService.nextTrack(targetId, targetType);
+            QueueItem entry = queueService.nextTrack(target);
 
             log.debug("Found next track: {}", entry.getId());
 

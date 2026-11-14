@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.hibernate.annotations.UpdateTimestamp;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
@@ -73,9 +74,9 @@ public class PlaybackState {
     @JoinColumn(nullable = false)
     private Playlist playlist = new Playlist(targetType + "-" + targetId + " state-playlist", PlaylistType.PLAYBACK_QUEUE);
 
-    public PlaybackState(Long targetId, PlaybackTargetType targetType, PlaybackStateDTO state) {
-        this.targetId = targetId;
-        this.targetType = targetType;
+    public PlaybackState(PlaybackTarget target, PlaybackStateDTO state) {
+        this.targetId = target.id();
+        this.targetType = target.type();
 
         if (state != null) {
             this.entryId = state.entryId();
@@ -84,7 +85,7 @@ public class PlaybackState {
             this.initiatorName = state.user();
         }
 
-        this.playlist = new Playlist(targetType + "-" + targetId + " state-playlist", PlaylistType.PLAYBACK_QUEUE);
+        this.playlist = new Playlist(target.toString() + " state-playlist", PlaylistType.PLAYBACK_QUEUE);
     }
 
     public double getCurrentPosition() {

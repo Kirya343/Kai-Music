@@ -12,6 +12,7 @@ import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
 import org.kirya343.playback.application.service.PlaybackService;
 import org.kirya343.playback.application.service.PlaybackSessionService;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
@@ -67,7 +68,7 @@ public class PlaybackController {
             return;
         }
 
-        PlaybackCommand cmd = new UpdatePlayback(state, authData, null, null);
+        PlaybackCommand cmd = new UpdatePlayback(state, authData, null);
 
         eventPublisher.publishEvent(cmd);
     }
@@ -83,7 +84,7 @@ public class PlaybackController {
             return;
         }
 
-        PlaybackCommand cmd = new ChangeTrack(changing, authData, null, null);
+        PlaybackCommand cmd = new ChangeTrack(changing, authData, null);
 
         eventPublisher.publishEvent(cmd);
     }
@@ -95,7 +96,10 @@ public class PlaybackController {
         @RequestParam Long targetId,
         @AuthUser UserAuthData authData
     ) {
-        playbackSessionService.subscribe(authData, targetType, targetId);
+        playbackSessionService.subscribe(
+            authData, 
+            new PlaybackTarget(targetType, targetId)
+        );
     }
 
     @PostMapping("/unsubscribe")

@@ -3,13 +3,14 @@ package org.kirya343.playback.infrastructure.streaming.playback;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.event.PlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.dto.PlaybackContext;
-import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.QueueItem;
@@ -26,10 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PlaybackStreamWorker extends DiagnosticLoggable {
 
     @Getter 
-    private final Long targetId;
-
-    @Getter 
-    private final PlaybackTargetType targetType;
+    private final PlaybackTarget target;
 
     private final ApplicationEventPublisher eventPublisher;
 
@@ -66,7 +64,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         subscriberManager.applyState(context);
 
         eventPublisher.publishEvent(
-            new PlaybackEvent(targetId, targetType, context.getState()));
+            new PlaybackEvent(target, context.getState()));
 
         tickScheduler.start(this::tickInternal);
     }
@@ -102,8 +100,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
             eventPublisher.publishEvent(new ChangeTrack(
                 "next", 
                 UserAuthData.server(), 
-                targetId, 
-                targetType
+                target
             ));
             return;
         }
@@ -112,8 +109,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
     }
 
     public PlaybackStreamWorker(
-        Long targetId,
-        PlaybackTargetType targetType,
+        PlaybackTarget target,
         ApplicationEventPublisher eventPublisher,
         PlaybackStateDTO currentState,
         QueueService queueService,
@@ -121,57 +117,64 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         AudioQueryService audioQueryService
     ) {
 
-        this.targetId = targetId;
-        this.targetType = targetType;
+        this.target = target;
         this.eventPublisher = eventPublisher;
 
         this.trackManager = new PlaybackTrackManager(
-            targetId, targetType, 
+            target, 
             queueService, 
             audioStorageService, 
             audioQueryService
         );
 
         this.subscriberManager = new PlaybackSubscriberManager(
-            targetId, 
-            targetType, 
+            target, 
             trackManager.getCurrentPlayback()
         );
 
-        this.tickScheduler = new PlaybackTickScheduler(targetType + "-" + targetId);
+        this.tickScheduler = new PlaybackTickScheduler(target.toString());
             
         if (currentState != null) {
-            log.debug("Created PlaybackStreamWorker {}-{}, with state: {}",
-                targetType,
-                targetId, 
+            log.debug("Created PlaybackStreamWorker {}, with state: {}",
+                target, 
                 currentState.toString()
             );            
 
             this.applyState(currentState);
         } else {
-            log.debug("Created PlaybackStreamWorker {}-{}", targetType, targetId);
+            log.debug("Created PlaybackStreamWorker {}", target);
         }
     }
 
     // Diadnostic commands
 
     public DiagnosticTextBuilder getInfo() {
+        return getInfo("");
+    }
+
+    public DiagnosticTextBuilder getInfo(String param) {
         
-        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Stream worker of " + targetId);
+        DiagnosticTextBuilder builder = new DiagnosticTextBuilder(target.toString() + "-streamer:");
 
         PlaybackContext context = trackManager.getCurrentPlayback();
 
+        builder.addRow("Status: ONLINE")
+            .addRow("Listeners: " + subscriberManager.getPresence()
+                    .getOnlineUsers()
+                    .stream()
+                    .map(ShortUserDTO::name)
+                    .toList()
+            );
+
         if (context == null) return builder;
 
-        PlaybackStateDTO state = context.getState();
+        AudioFile audio = context.getAudio();
 
-        DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
-            .addRow("position: " + state.position())
-            .addRow("entryId: " + state.entryId())
-            .addRow("pause: " + state.pause())
-            .addRow("user: " + state.user());
+        builder.addRow( "Playing Audio: " + (audio != null ? audio.getTitle() : null));
 
-        builder.addSection(stateSection);
+        if ("--with-streamers".equals(param)) {
+            builder.addSection(subscriberManager.getStreamersInfo());
+        }
 
         return builder;
     }

@@ -2,6 +2,7 @@ package org.kirya343.playback.presentation.websocket;
 
 import org.kirya343.audio.dto.AudioChunkFeedback;
 import org.kirya343.playback.application.service.PlaybackSessionService;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.SubscribePlaybackRequest;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
@@ -42,7 +43,9 @@ public class PlaybackWebSocketController {
         SubscribePlaybackRequest request,
         @AuthUser UserAuthData authData
     ) {
-        playbackSessionService.subscribe(authData, request.type(), request.id());
+        PlaybackTarget target = new PlaybackTarget(request.type(), request.id());
+        
+        playbackSessionService.subscribe(authData, target);
     }
 
     @MessageMapping("/audio.feedback")

@@ -3,6 +3,7 @@ package org.kirya343.playback.application.handler;
 import java.util.Optional;
 
 import org.kirya343.common.event.playback.QueueChangedEvent;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
@@ -37,7 +38,7 @@ public class QueuePlaybackEventHandler {
 
             log.debug("send playlist: ", event.playlistId());
 
-            playbackStreamWorkerManager.get(existing.getTargetType(), existing.getTargetId())
+            playbackStreamWorkerManager.get(PlaybackTarget.ofPlaybackState(existing))
                 .broadcast(userWorker -> userWorker.sendPlaylist(existing.getPlaylist()));
         }
     }

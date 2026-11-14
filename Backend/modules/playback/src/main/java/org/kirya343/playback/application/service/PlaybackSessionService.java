@@ -2,8 +2,7 @@ package org.kirya343.playback.application.service;
 
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
-
-import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
 import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
@@ -30,28 +29,26 @@ public class PlaybackSessionService {
     private final UserRepository userRepository;
     private final PlaybackStateRepository playbackStateRepository;
 
-    public void subscribe(UserAuthData authData, PlaybackTargetType targetType, Long targetId) {
+    public void subscribe(UserAuthData authData, PlaybackTarget uncheckedTarget) {
 
-        log.debug("Subscribing user to {} id: {}", targetType, targetId);
+        PlaybackTarget target = uncheckedTarget.validate(authData.id());
 
-        Long resolvedTargetId = targetType == PlaybackTargetType.USER
-            ? authData.id()
-            : targetId;
+        log.debug("Subscribing user to {}", target);
 
-        PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(targetType, resolvedTargetId);
+        PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(target);
         UserStreamWorker userWorker = audioStreamWorkerManager.get(authData.sub());
 
         User user = userRepository.findById(authData.id()).orElseThrow();
 
         userWorker.subscribe(playbackWorker, ShortUserDTO.ofUser(user));
 
-        userPlaybackRepository.save(new UserPlayback(authData.id(), resolvedTargetId, targetType));
+        userPlaybackRepository.save(new UserPlayback(authData.id(), target.id(), target.type()));
 
         // broadcasting
 
         PlaybackState state = playbackStateRepository
-            .findWithPlaylistByTargetIdAndTargetType(resolvedTargetId, targetType)
-            .orElseGet(() -> playbackStateRepository.save(new PlaybackState(resolvedTargetId, targetType, null)));
+            .findWithPlaylistByTargetIdAndTargetType(target.id(), target.type())
+            .orElseGet(() -> playbackStateRepository.save(new PlaybackState(target, null)));
         
         log.debug(
             "Отправляем плейлист пользователю {}: {} треков", 
@@ -71,6 +68,6 @@ public class PlaybackSessionService {
 
         UserPlayback userPlayback = userPlaybackRepository.findById(authData.id()).orElseThrow();
 
-        subscribe(authData, userPlayback.getTargetType(), userPlayback.getTargetId());
+        subscribe(authData, PlaybackTarget.ofUserPlayback(userPlayback));
     }
 }

@@ -2,6 +2,7 @@ package org.kirya343.playback.application.service;
 
 import java.util.List;
 
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
@@ -42,7 +43,7 @@ public class PlaybackService {
 
         playbackStateRepository.updatePlaybackMode(userPlayback.getTargetId(), userPlayback.getTargetType(), mode);
 
-        playbackStreamWorkerManager.get(userPlayback.getTargetType(), userPlayback.getTargetId())
+        playbackStreamWorkerManager.get(PlaybackTarget.ofUserPlayback(userPlayback))
             .broadcast(userWorker -> userWorker.sendPlaybackMode(mode));
     }
  
@@ -56,15 +57,15 @@ public class PlaybackService {
             targetId = room.getId();
         }
 
-        Long resolvedtargetId = targetId; 
+        PlaybackTarget target = new PlaybackTarget(targetType, targetId);
 
         PlaybackState playbackState = playbackStateRepository
             .findByTargetIdAndTargetType(targetId, targetType)
             .orElseGet(() -> playbackStateRepository.save(
-                new PlaybackState(resolvedtargetId, targetType, null)
+                new PlaybackState(target, null)
             ));
 
-        playbackSessionService.subscribe(authData, targetType, targetId);
+        playbackSessionService.subscribe(authData, target);
 
         Long queuePlaylistId = playbackState.getPlaylist().getId();
 
@@ -80,6 +81,6 @@ public class PlaybackService {
 
         QueueItem qi = queueItemRepository.findByPlaylistIdAndAudioId(queuePlaylistId, audioId).orElse(null);
 
-        playbackStreamWorkerManager.get(targetType, targetId).changeTrack(qi, authData.name());
+        playbackStreamWorkerManager.get(target).changeTrack(qi, authData.name());
     }
 }

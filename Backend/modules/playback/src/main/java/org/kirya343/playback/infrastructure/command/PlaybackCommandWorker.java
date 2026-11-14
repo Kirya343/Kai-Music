@@ -4,7 +4,7 @@ import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
 import org.kirya343.playback.application.service.QueueService;
-import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
 import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
@@ -35,8 +35,8 @@ public class PlaybackCommandWorker {
 
         PlaybackStreamWorker playbackWorker;
         
-        if (cmd.targetId() != null && cmd.targetType() != null) {
-            playbackWorker = playbackStreamWorkerManager.get(cmd.targetType(), cmd.targetId());
+        if (cmd.target() != null) {
+            playbackWorker = playbackStreamWorkerManager.get(cmd.target());
         } else {
             playbackWorker = audioStreamWorkerManager
                 .get(authData.sub())
@@ -52,9 +52,7 @@ public class PlaybackCommandWorker {
 
                 try {
                     QueueItem entry = getSuitableTrack(
-                        c, 
-                        playbackWorker.getTargetId(), 
-                        playbackWorker.getTargetType()
+                        c, playbackWorker.getTarget()
                     );
 
                     playbackWorker.changeTrack(entry, cmd.user().name());
@@ -71,8 +69,7 @@ public class PlaybackCommandWorker {
 
     private QueueItem getSuitableTrack(
         ChangeTrack cmd, 
-        Long id, 
-        PlaybackTargetType type
+        PlaybackTarget target
     ) throws IllegalStateException {
 
         QueueItem entry = null;
@@ -80,13 +77,13 @@ public class PlaybackCommandWorker {
         switch (cmd.changing()) {
             case "prev":
 
-                entry = queueService.prevTrack(id, type);
+                entry = queueService.prevTrack(target);
 
                 break;
 
             case "next":
 
-                entry = queueService.nextTrack(id, type);
+                entry = queueService.nextTrack(target);
                 
                 break;
         

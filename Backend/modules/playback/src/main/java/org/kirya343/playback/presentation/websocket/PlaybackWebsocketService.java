@@ -13,6 +13,7 @@ import org.kirya343.playlist.dto.PlaylistDTO;
 import org.kirya343.room.datasource.ListeningRoomRepository;
 import org.kirya343.room.dto.RoomDTO;
 import org.kirya343.user.dto.ShortUserDTO;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -95,16 +96,16 @@ public class PlaybackWebsocketService {
         );
     }
 
-    public void sendPlaybackData(String userSub, PlaybackTargetType type, Long id, List<ShortUserDTO> listeners) {
+    public void sendPlaybackData(String userSub, PlaybackTarget target, List<ShortUserDTO> listeners) {
 
         PlaybackData playbackData;
 
-        if (type.equals(PlaybackTargetType.ROOM)) {
+        if (target.type().equals(PlaybackTargetType.ROOM)) {
             playbackData = new PlaybackData(
-                RoomDTO.ofRoom(listeningRoomRepository.findById(id).orElse(null)), 
+                RoomDTO.ofRoom(listeningRoomRepository.findById(target.id()).orElse(null)), 
                 listeners
             );
-        } else if (type.equals(PlaybackTargetType.USER)) {
+        } else if (target.type().equals(PlaybackTargetType.USER)) {
             playbackData = new PlaybackData(
                 null,
                 null

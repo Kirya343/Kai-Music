@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import io.github.kirya343.terminal.api.command.DiagnosticCommand;
 import io.github.kirya343.terminal.api.component.DiagnosticComponent;
+import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
 import io.github.kirya343.terminal.result.CommandResult;
 import io.github.kirya343.terminal.result.StreamMode;
 import io.github.kirya343.terminal.result.StreamingResult;
@@ -74,7 +75,7 @@ public class UserStreamWorkerManager
     }
 
     public String getComponentId() {
-        return "audio-workers";
+        return "streamers";
     }
 
     public List<DiagnosticCommand> getCommands() {
@@ -86,18 +87,12 @@ public class UserStreamWorkerManager
             }
 
             public String getDescription() {
-                return "Shows stream worker logs";
+                return "Shows streamer logs";
             }
             
             public CommandResult execute(String[] args) {
 
-                if (args.length != 1) {
-                    throw new IllegalArgumentException(
-                        "Usage: audio-workers <userSub>"
-                    );
-                }
-
-                String userSub = args[0];
+                String userSub = getSubFromArgs(args);
 
                 UserStreamWorker worker = workers.get(userSub);
 
@@ -106,7 +101,7 @@ public class UserStreamWorkerManager
                 }
 
                 return new StreamingResult(
-                    () -> worker.getLogs().getContent(),
+                    () -> worker.getFormattedLogs().getContent(),
                     StreamMode.REPLACE
                 );
             }
@@ -119,23 +114,17 @@ public class UserStreamWorkerManager
             }
 
             public String getDescription() {
-                return "Shows stream worker info";
+                return "Shows streamer info";
             }
             
             public CommandResult execute(String[] args) {
 
-                if (args.length != 1) {
-                    throw new IllegalArgumentException(
-                        "Usage: room <roomId>"
-                    );
-                }
-
-                String userSub = args[0];
+                String userSub = getSubFromArgs(args);
 
                 UserStreamWorker worker = workers.get(userSub);
 
                 if (worker == null) {
-                    return new TextResult(String.format("Worker of user %s is offline", userSub));
+                    return new TextResult(String.format("Streamer %s is offline", userSub));
                 }
 
                 return new StreamingResult(
@@ -145,6 +134,43 @@ public class UserStreamWorkerManager
             }
         };
 
-        return List.of(logsCommand, infoCommand);
+        DiagnosticCommand indexCommand = new DiagnosticCommand() {
+
+            public String getName() {
+                return "index";
+            }
+
+            public String getDescription() {
+                return "Shows all streamers";
+            }
+            
+            public StreamingResult execute(String[] args) {
+
+                return new StreamingResult(
+                    () -> {
+                        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Streamers: ");
+
+                        workers.values().forEach(playback -> {
+                            builder.addSection(playback.getInfo());
+                        });
+
+                        return builder.getContent();
+                    },
+                    StreamMode.REPLACE
+                );
+            }
+        };
+
+        return List.of(logsCommand, infoCommand, indexCommand);
+    }
+
+    private String getSubFromArgs(String[] args) {
+        if (args.length != 1) {
+            throw new IllegalArgumentException(
+                "Usage: streamer <userSub>"
+            );
+        }
+
+        return args[0];
     }
 }

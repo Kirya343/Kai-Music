@@ -1,57 +1,56 @@
 package org.kirya343.playback.infrastructure.streaming.playback;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import org.kirya343.playback.domain.dto.PlaybackContext;
-import org.kirya343.playback.domain.enums.PlaybackTargetType;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.presence.playback.PlaybackPresence;
 import org.kirya343.user.dto.ShortUserDTO;
 
+import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j 
 public class PlaybackSubscriberManager {
 
-    private final Long targetId;
-    private final PlaybackTargetType targetType;
+    private final PlaybackTarget target;
 
     private volatile PlaybackContext currentPlayback;
 
-    private final Set<UserStreamWorker> userStreamWorkers =
-        ConcurrentHashMap.newKeySet();
+    private final Map<String, UserStreamWorker> userStreamWorkers =
+        new ConcurrentHashMap<>();
 
     @Getter 
     private final PlaybackPresence presence = new PlaybackPresence();
 
     public PlaybackSubscriberManager(
-        Long targetId,
-        PlaybackTargetType targetType,
+        PlaybackTarget target,
         PlaybackContext currentPlayback
 
     ) {
-        this.targetId = targetId;
-        this.targetType = targetType;
+        this.target = target;
         this.currentPlayback = currentPlayback;
     }
         
     public void broadcast(Consumer<UserStreamWorker> action) {
-        userStreamWorkers.forEach(action);
+        userStreamWorkers.values().forEach(action);
     }
 
     public void subscribe(UserStreamWorker worker, ShortUserDTO userDto) {
-        log.debug("Subscribing user {} to {}-{}", userDto.name(), targetType, targetId);
+        log.debug("Subscribing user {} to {}", userDto.name(), target.toString());
 
-        userStreamWorkers.add(worker);
+        userStreamWorkers.put(userDto.sub(), worker);
         presence.userConnected(userDto);
 
-        log.debug("Sending playbackData to user {}: {}-{}, {} listeners", userDto.name(), targetType, targetId, presence.countAll());
+        log.debug("Sending playbackData to user {}: {}, {} listeners", userDto.name(), target.toString(), presence.countAll());
 
-        broadcast(w -> w.sendPlaybackData(targetType, targetId, presence.getOnlineUsers()));
+        broadcast(w -> w.sendPlaybackData(target, presence.getOnlineUsers()));
 
         PlaybackContext context = currentPlayback;
 
@@ -71,7 +70,7 @@ public class PlaybackSubscriberManager {
         userStreamWorkers.remove(worker);
         presence.userDisconnected(worker.getUserSub());
         
-        broadcast(w -> w.sendPlaybackData(targetType, targetId, presence.getOnlineUsers()));
+        broadcast(w -> w.sendPlaybackData(target, presence.getOnlineUsers()));
     }
 
     public void applyState(PlaybackContext context) {
@@ -89,5 +88,15 @@ public class PlaybackSubscriberManager {
         );
 
         broadcast(w -> w.applyState(context));
+    }
+
+    public DiagnosticTextBuilder getStreamersInfo() {
+        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Streamers:");
+
+        userStreamWorkers.values().forEach(worker -> {
+            builder.addSection(worker.getInfo());
+        });
+
+        return builder;
     }
 }

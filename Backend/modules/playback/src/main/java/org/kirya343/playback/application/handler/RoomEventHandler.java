@@ -3,6 +3,7 @@ package org.kirya343.playback.application.handler;
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.application.event.PlaybackEvent;
 import org.kirya343.playback.application.service.PlaybackSessionService;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.room.dto.PlaybackSubscribeEvent;
@@ -24,10 +25,12 @@ public class RoomEventHandler {
     @EventListener
     @Transactional
     public void handlePlayback(PlaybackEvent event) {
+
+        PlaybackTarget target = event.target();
         
         PlaybackState state = playbackStateRepository
-            .findByTargetIdAndTargetType(event.targetId(), event.targetType())
-            .orElse(new PlaybackState(event.targetId(), event.targetType(), event.stateDTO()));
+            .findByTargetIdAndTargetType(target.id(), target.type())
+            .orElse(new PlaybackState(target, event.stateDTO()));
 
         state.setPosition(event.stateDTO().position());
         state.setEntryId(event.stateDTO().entryId());
@@ -40,6 +43,10 @@ public class RoomEventHandler {
     @Async
     @EventListener
     public void handlePlaybackSubscribe(PlaybackSubscribeEvent event) {
-        sessionService.subscribe(event.authData(), PlaybackTargetType.valueOf(event.type()), event.id());
+        PlaybackTarget target = new PlaybackTarget(
+            PlaybackTargetType.valueOf(event.type()), 
+            event.id()
+        );
+        sessionService.subscribe(event.authData(), target);
     }
 }

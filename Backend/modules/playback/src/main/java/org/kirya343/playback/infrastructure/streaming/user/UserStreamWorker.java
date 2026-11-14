@@ -1,15 +1,18 @@
 package org.kirya343.playback.infrastructure.streaming.user;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.kirya343.audio.dto.AudioChunkFeedback;
 import org.kirya343.playback.domain.dto.PlaybackContext;
+import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.dto.StreamContext;
+import org.kirya343.playback.domain.enums.ChunkDeliveryStatus;
 import org.kirya343.playback.domain.enums.PlaybackMode;
-import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
+import org.kirya343.playback.presentation.dto.ChunkDelivery;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playlist.datasource.model.Playlist;
@@ -62,10 +65,10 @@ public class UserStreamWorker
     public void unsubscribe() {
         if (subscribedWorker != null) {
             log.debug(
-                "Unubscribing user {} from {}-{}", 
+                "Unubscribing user {} from {}", 
                 userSub, 
-                subscribedWorker.getTargetType(), 
-                subscribedWorker.getTargetId());
+                subscribedWorker.getTarget()
+            );
 
             subscribedWorker.unsubscribe(this);
         }
@@ -147,8 +150,8 @@ public class UserStreamWorker
         playbackWebsocketService.sendPlaybackPlaylist(userSub, playlist);
     }
 
-    public void sendPlaybackData(PlaybackTargetType type, Long id, List<ShortUserDTO> listeners) {
-        playbackWebsocketService.sendPlaybackData(userSub, type, id, listeners);
+    public void sendPlaybackData(PlaybackTarget target, List<ShortUserDTO> listeners) {
+        playbackWebsocketService.sendPlaybackData(userSub, target, listeners);
     }
 
     public StreamContext createStreamContext(PlaybackContext playbackContext) {
@@ -163,9 +166,50 @@ public class UserStreamWorker
 
         StreamContext context = currentStream;
 
-        if (context == null) return builder;
+        if (context == null || context.getPlaybackContext() == null) return builder;
 
-        PlaybackStateDTO state = context.getPlaybackContext().getState();
+        int chunksCount = context.getPlaybackContext()
+            .getChunker()
+            .getChunkCount();
+
+        Map<Long, ChunkDelivery> deliveries = context.getDeliveries();
+
+        StringBuilder chunks = new StringBuilder();
+
+        for (long i = 0; i < chunksCount; i++) {
+            ChunkDelivery chunk = deliveries.get(i);
+
+            if (chunk == null) {
+                chunks.append("░");
+                continue;
+            }
+
+            ChunkDeliveryStatus status = chunk.status();
+
+            if (status == ChunkDeliveryStatus.SENT) {
+                chunks.append("▒");
+            } else if (status == ChunkDeliveryStatus.RECEIVED) {
+                chunks.append("█");
+            } else {
+                chunks.append("░");
+            }
+        }
+
+        builder.addRow("Chunks:   [" + chunks + "]");
+
+        PlaybackStateDTO state = context.getPlaybackContext().getCurrentState();
+
+        if (chunksCount > 0) {
+
+            int offset = (int) Math.ceil(state.position() / 5.0);
+            offset = Math.clamp(offset, 0, chunksCount - 1);
+
+            String position = " ".repeat(offset)
+                + "↑"
+                + " ".repeat(chunksCount - offset - 1);
+
+            builder.addRow("Position: [" + position + "]");
+        }
 
         DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
             .addRow("position: " + state.position())

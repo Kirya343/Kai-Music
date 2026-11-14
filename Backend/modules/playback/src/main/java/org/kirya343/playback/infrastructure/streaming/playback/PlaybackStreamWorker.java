@@ -77,8 +77,8 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         subscriberManager.subscribe(worker, userDto);
     }
 
-    public void unsubscribe(UserStreamWorker worker) {
-        subscriberManager.unsubscribe(worker);
+    public void unsubscribe(String userSub) {
+        subscriberManager.unsubscribe(userSub);
     }
 
     public void shutdown() {

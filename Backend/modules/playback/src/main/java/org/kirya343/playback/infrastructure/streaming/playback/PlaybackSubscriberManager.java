@@ -1,7 +1,6 @@
 package org.kirya343.playback.infrastructure.streaming.playback;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -66,9 +65,9 @@ public class PlaybackSubscriberManager {
         }
     }
 
-    public void unsubscribe(UserStreamWorker worker) {
-        userStreamWorkers.remove(worker);
-        presence.userDisconnected(worker.getUserSub());
+    public void unsubscribe(String userSub) {
+        userStreamWorkers.remove(userSub);
+        presence.userDisconnected(userSub);
         
         broadcast(w -> w.sendPlaybackData(target, presence.getOnlineUsers()));
     }

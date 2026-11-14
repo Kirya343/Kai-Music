@@ -70,7 +70,7 @@ public class UserStreamWorker
                 subscribedWorker.getTarget()
             );
 
-            subscribedWorker.unsubscribe(this);
+            subscribedWorker.unsubscribe(userSub);
         }
     }
 

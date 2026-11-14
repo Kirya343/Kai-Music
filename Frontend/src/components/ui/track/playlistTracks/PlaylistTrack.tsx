@@ -3,7 +3,7 @@ import { playlistService } from "@playlist"
 import { audioService, IAudio } from "@audio"
 import Track, { ITrackAction } from "../Track/Track"
 import { IQueueItem } from "@playback"
-import { HTMLAttributes } from "react"
+import { HTMLAttributes, useMemo } from "react"
 import { IKebabAction } from "../../KebabMenu/KebabMenu"
 
 /**
@@ -49,31 +49,50 @@ const PlaylistTrack = ({
     ...divProps
 }: PlaylistTrackProps) => {
 
-    const actions: ITrackAction[] = [];
+    console.log("render")
 
-    const extraActions: IKebabAction[] = [
-        {
-            icon: <PenIcon/>,
-            title: "Edit audio info",
-            func: () => openEditModal(queueItem.audio)
-        },
-        {
-            icon: <TrashIcon/>,
-            title: "Remove from playlist",
-            func: () => handleRemove(currentPlaylistId, queueItem)
+    const extraActions = useMemo<IKebabAction[]>(() => {
+        const actions: IKebabAction[] = [
+            {
+                icon: <PenIcon />,
+                title: "Edit audio info",
+                func: () => openEditModal(queueItem.audio)
+            },
+            {
+                icon: <TrashIcon />,
+                title: "Remove from playlist",
+                func: () => handleRemove(currentPlaylistId, queueItem)
+            }
+        ];
+
+        if (importPlaylistId && currentPlaylistId !== importPlaylistId) {
+            actions.push({
+                icon: isInPlaylist ? <CheckmarkIcon /> : <PlusIcon />,
+                title: "Add to Room",
+                func: () => playlistService.addToQueue(
+                    importPlaylistId,
+                    [{ audioId: queueItem.audio.id }]
+                )
+            });
         }
-    ]
 
-    if (importPlaylistId && currentPlaylistId !== importPlaylistId) {
-        const action = {
-            icon: isInPlaylist ? <CheckmarkIcon/> : <PlusIcon/>,
-            title: "Add to Room",
-            func: async () => await playlistService.addToQueue(importPlaylistId, [{audioId: queueItem.audio.id}])
+        return actions;
+    }, [
+        queueItem,
+        currentPlaylistId,
+        importPlaylistId,
+        isInPlaylist,
+        openEditModal,
+        handleRemove
+    ]);
+
+    const actions = useMemo<ITrackAction[]>(() => {
+        if (!importPlaylistId || currentPlaylistId === importPlaylistId) {
+            return [];
         }
 
-        extraActions.push(action)
-        actions.push(action)
-    }
+        return [extraActions[2] as ITrackAction];
+    }, [extraActions, importPlaylistId, currentPlaylistId]);
 
     return (
         <Track

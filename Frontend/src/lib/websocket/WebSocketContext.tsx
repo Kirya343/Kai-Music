@@ -23,6 +23,7 @@ export const useWebSocket = () => {
 }
 
 export const WebSocketProvider = ({ children }: { children: ReactNode }) => {
+
     const { client, connected, error, addOnConnectHandler } = useStompClient();
     const { isAuthenticated } = useAuth();
 

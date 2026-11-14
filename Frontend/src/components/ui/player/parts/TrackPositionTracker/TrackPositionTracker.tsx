@@ -5,19 +5,28 @@ import { countPosition } from "@common";
 const TrackPositionTracker = () => {
 
     // controls from RoomPlaybackContext
-    const { bufferedRanges } = usePlaybackAudio();
-    const { playbackState } = usePlaybackState();
+    const { audioRef } = usePlaybackAudio();
     const { playingAudio } = usePlaybackPlaylist();
     const { seek } = usePlaybackControls();
 
     // variables to control the scrolling title
     const duration = playingAudio?.duration || 0
 
-    return playbackState && (
+    const audio = audioRef.current;
+
+    const buffered = audio?.buffered;
+
+    return audio && (
         <div className={styles.tracker}>
             <div className={styles.progress}>
                 <div className={styles.buffered}>
-                    {bufferedRanges?.map((range, index) => (
+                    {buffered && duration > 0 && Array.from(
+                        { length: buffered.length },
+                        (_, index) => ({
+                            start: buffered.start(index),
+                            end: buffered.end(index)
+                        })
+                    ).map((range, index) => (
                         <div
                             key={index}
                             className={styles.bufferedRange}
@@ -26,21 +35,21 @@ const TrackPositionTracker = () => {
                                 width: `${((range.end - range.start) / duration) * 100}%`
                             }}
                         />
-                    ))}
+))}
                 </div>
 
                 <input
                     type="range"
                     min={0}
                     max={duration}
-                    value={playbackState.position}
+                    value={audio.currentTime}
                     onChange={(e) => seek(Number(e.target.value))}
                     style={{
                         width: "100%",
                         background: `linear-gradient(
                             to right,
-                            #ffffff ${(playbackState.position / duration) * 100}%,
-                            #00000000 ${(playbackState.position / duration) * 100}%
+                            #ffffff ${(audio.currentTime / duration) * 100}%,
+                            #00000000 ${(audio.currentTime / duration) * 100}%
                         )`
                     }}
                 />
@@ -48,7 +57,7 @@ const TrackPositionTracker = () => {
 
             <div className={styles.positionMeta}>
                 <span className={styles.currentPosition}>
-                    {countPosition(playbackState.position)}
+                    {countPosition(audio.currentTime)}
                 </span>
 
                 <span className={styles.duration}>

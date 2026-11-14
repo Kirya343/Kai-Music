@@ -1,8 +1,5 @@
-import { createContext, Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
-import { IAudio, TimeRange } from "@audio";
-import { PlaybackState, PlaybackMode, PlaybackData } from "@playback";
+import { useEffect, useMemo, useState } from "react";
 import { useAudioPlayer } from "./hooks";
-import { Playlist } from "@playlist";
 import { PlaybackStateProvider } from "./contexts/PlaybackStateContext";
 import { PlaybackAudioProvider } from "./contexts/PlaybackAudioContext";
 import { PlaybackControlsProvider } from "./contexts/PlaybackControlsContext";
@@ -14,8 +11,9 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
     const { 
         pausePlayback, 
-        audioRef, bufferedRanges,
+        audioRef,
 
+        position,
         playbackState, 
         playbackMode,
         playbackPlaylist,
@@ -31,6 +29,37 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
     // ui
     const [fullPlayerOpen, setFullPlayerOpen] = useState<boolean>(false);
+
+    const stateValue = useMemo(() => {
+        console.log("render stateValue", playbackState, playbackMode)
+
+        return {
+            playbackState,
+            playbackMode
+        }
+    }, [playbackState, playbackMode]);
+
+    const audioValue = useMemo(() => ({
+        audioRef
+    }), [audioRef, position]);
+
+    const controlsValue = useMemo(() => ({
+        togglePlay,
+        changeTrack,
+        pausePlayback,
+        seek
+    }), [togglePlay, changeTrack, pausePlayback, seek]);
+
+    const playlistValue = useMemo(() => ({
+        playingAudio,
+        playbackPlaylist
+    }), [playingAudio, playbackPlaylist]);
+
+    const uiValue = useMemo(() => ({
+        fullPlayerOpen,
+        setFullPlayerOpen,
+        updateMessage
+    }), [fullPlayerOpen, updateMessage]);
 
     useEffect(() => {
 
@@ -68,11 +97,11 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
-            seek(Math.max(0, playbackState?.position || 0 - 10));
+            seek(Math.max(0, audioRef.current?.currentTime || 0 - 10));
         });
 
         navigator.mediaSession.setActionHandler("seekforward", () => {
-            seek(playbackState?.position || 0 + 10);
+            seek(audioRef.current?.currentTime || 0 + 10);
         });
 
         navigator.mediaSession.setActionHandler("seekto", (details) => {
@@ -83,7 +112,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
         navigator.mediaSession.setPositionState({
             playbackRate: 1,
-            position: Math.min(playbackState?.position || 0, playingAudio.duration),
+            position: Math.min(audioRef.current?.currentTime || 0, playingAudio.duration),
             duration: playingAudio.duration
         })
 
@@ -105,30 +134,12 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
     ]);
     
     return (
-        <PlaybackStateProvider value={{
-            playbackState, 
-            playbackMode
-        }}>
-            <PlaybackAudioProvider value={{
-                audioRef,
-                bufferedRanges
-            }}>
-                <PlaybackControlsProvider value={{
-                    togglePlay,
-                    changeTrack,
-                    pausePlayback,
-                    seek
-                }}>
-                    <PlaybackPlaylistProvider value={{
-                        playingAudio,
-                        playbackPlaylist
-                    }}>
+        <PlaybackStateProvider value={stateValue}>
+            <PlaybackAudioProvider value={audioValue}>
+                <PlaybackControlsProvider value={controlsValue}>
+                    <PlaybackPlaylistProvider value={playlistValue}>
                         <PlaybackDataProvider value={playbackData}>
-                            <PlaybackUIProvider value={{
-                                fullPlayerOpen,
-                                setFullPlayerOpen,
-                                updateMessage
-                            }}>
+                            <PlaybackUIProvider value={uiValue}>
                                 {children}
                             </PlaybackUIProvider>
                         </PlaybackDataProvider>

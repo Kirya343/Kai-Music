@@ -1,4 +1,4 @@
-import { usePlaybackControls, usePlaybackPlaylist, usePlaybackState, usePlaybackUI } from "@playback";
+import { usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist, usePlaybackState, usePlaybackUI } from "@playback";
 
 import styles from "./MobileAudioMiniPlayer.module.scss"
 import { RightIcon, PlayIcon, PauseIcon, HeartIcon } from "@/assets/icons";
@@ -16,6 +16,7 @@ const MobileAudioMiniPlayer = () => {
 
     const { isMobile } = useGlobal();
 
+    const { audioRef } = usePlaybackAudio();
     const { playbackState } = usePlaybackState();
     const { playingAudio } = usePlaybackPlaylist();
     const { setFullPlayerOpen } = usePlaybackUI();
@@ -42,9 +43,11 @@ const MobileAudioMiniPlayer = () => {
         }
     };
 
+    const audio = audioRef.current;
+
     const duration = playingAudio?.duration || 0
 
-    return playingAudio && playbackState && isMobile && (
+    return playingAudio && playbackState && audio && isMobile && (
         <div 
             className={styles.miniPlayer} 
             data-testid="mini-player" 
@@ -57,8 +60,8 @@ const MobileAudioMiniPlayer = () => {
                 className={styles.trackPosition}
                 style={{ 
                     background: `
-                        linear-gradient(to right, #ffffff ${(playbackState.position / duration) * 100}%, 
-                        #444 ${(playbackState.position / duration) * 100}%)
+                        linear-gradient(to right, #ffffff ${(audio?.currentTime / duration) * 100}%, 
+                        #444 ${(audio?.currentTime / duration) * 100}%)
                     `
                 }}
             />

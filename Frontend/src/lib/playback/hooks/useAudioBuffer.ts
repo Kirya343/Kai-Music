@@ -1,6 +1,6 @@
 import { AudioChunk, AudioChunkFeedback, TimeRange } from "@audio";
 import { useWebSocket } from "@websocket";
-import { Children, RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { loggerFactory } from "@common";
 
 const logger = loggerFactory.getLogger("Audio.Buffer");
@@ -13,7 +13,6 @@ interface useAudioBufferProps {
 export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioBufferProps) {
 
     const sourceBufferRef = useRef<SourceBuffer | null>(null);
-    const [bufferedRanges, setBufferedRanges] = useState<TimeRange[]>([]);
     const onBufferUpdateRef = useRef<(() => void) | null>(null);
     const queueRef = useRef<AudioChunk[]>([]);
 
@@ -23,32 +22,6 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
         (callback: () => void) => {
             onBufferUpdateRef.current = callback;
         }, []);
-
-    /**
-     * Callback that updates bufferedRanges
-     * 
-     * @param entryId - ID of the current entry
-     */
-    const updateBufferedRanges = useCallback(() => {
-        const sourceBuffer = sourceBufferRef.current;
-
-        if (!sourceBuffer) {
-            return;
-        }
-
-        const ranges: TimeRange[] = [];
-
-        for (let i = 0; i < sourceBuffer.buffered.length; i++) {
-            ranges.push({
-                start: sourceBuffer.buffered.start(i),
-                end: sourceBuffer.buffered.end(i)
-            });
-        }
-
-        setBufferedRanges(ranges);
-
-        onBufferUpdateRef.current?.()
-    }, []);
 
     /**
      * Append chunks to the buffer
@@ -76,7 +49,7 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
 
         sourceBuffer.appendBuffer(buffer);
 
-        updateBufferedRanges();
+        onBufferUpdateRef.current?.();
 
         return true;
     }, []);
@@ -87,7 +60,6 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
     const resetBuffer = useCallback(() => {
         logger.info("Очищаем буфер")
         sourceBufferRef.current = null;
-        setBufferedRanges([])
     }, []);
 
     const processQueue = useCallback((streamId: string) => {
@@ -159,6 +131,7 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
      * Вызывается на каждый chunk от backend.
      */
     const handleAudioChunk = useCallback((chunk: AudioChunk) => {
+
         logger.debug(`Получен ${chunk.initialization ? "init" : "media"} chunk: ${chunk.sequence}`);
 
         queueRef.current.push(chunk);
@@ -206,11 +179,10 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
     }, [addOnConnectHandler]);
 
     return {
-        updateBufferedRanges, setBufferUpdateHandler,
-        bufferedRanges, onBufferUpdateRef,
+        setBufferUpdateHandler,
+        onBufferUpdateRef,
         sourceBufferRef,
         appendChunks,
-        setBufferedRanges,
         resetBuffer
     }
 }

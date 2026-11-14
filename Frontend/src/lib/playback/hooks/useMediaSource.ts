@@ -16,10 +16,8 @@ export const useMediaSource = () => {
 
     const { 
         sourceBufferRef, 
-        updateBufferedRanges, 
-        setBufferedRanges,
         setBufferUpdateHandler,
-        bufferedRanges, 
+        onBufferUpdateRef, 
         appendChunks,
         resetBuffer
     } = useAudioBuffer({ currentStreamIdRef, mediaSourceRef });
@@ -66,7 +64,7 @@ export const useMediaSource = () => {
                         return;
                     }
 
-                    updateBufferedRanges();
+                    onBufferUpdateRef.current?.();
                 });
 
                 sourceBuffer.addEventListener('error', event => {
@@ -124,9 +122,7 @@ export const useMediaSource = () => {
         cleanupMediaSource,
         currentStreamIdRef,
 
-        setBufferedRanges,
         setBufferUpdateHandler,
-        bufferedRanges, 
         appendChunks,
         resetBuffer
     };

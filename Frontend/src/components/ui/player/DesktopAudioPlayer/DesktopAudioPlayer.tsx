@@ -1,4 +1,4 @@
-import { usePlaybackAudio, usePlaybackPlaylist, usePlaybackState } from "@playback";
+import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 
 import styles from "./DesktopAudioPlayer.module.scss"
 import { useGlobal } from "@common";

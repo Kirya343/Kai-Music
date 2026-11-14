@@ -8,9 +8,9 @@ import { IKebabAction } from "../../KebabMenu/KebabMenu"
 import { loggerFactory } from "@common"
 
 /**
- * Props for the PlaylistTrack component
+ * Props for the UploadsPlaylistTrack component
  */
-interface PlaylistTrackProps extends HTMLAttributes<HTMLDivElement> {
+interface UploadsPlaylistTrackProps extends HTMLAttributes<HTMLDivElement> {
 
     /** Playlist queue item with audio metadata to display */
     queueItem: IQueueItem;
@@ -34,9 +34,9 @@ interface PlaylistTrackProps extends HTMLAttributes<HTMLDivElement> {
     openEditModal: (audio: IAudio) => void;
 }
 
-const logger = loggerFactory.getLogger("Components.PlaylistTrack")
+const logger = loggerFactory.getLogger("Components.UploadsPlaylistTrack")
 /** Displays audio track inside playlist with playlist update actions */
-const PlaylistTrack = ({
+const UploadsPlaylistTrack = ({
     queueItem, 
     trackNumber,
     playing,
@@ -45,7 +45,7 @@ const PlaylistTrack = ({
     importPlaylistId,
     openEditModal,
     ...divProps
-}: PlaylistTrackProps) => {
+}: UploadsPlaylistTrackProps) => {
 
     const actions: ITrackAction[] = [];
 
@@ -103,4 +103,4 @@ const PlaylistTrack = ({
     )
 }
 
-export default PlaylistTrack;
+export default UploadsPlaylistTrack;

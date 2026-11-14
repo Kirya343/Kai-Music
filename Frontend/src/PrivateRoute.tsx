@@ -5,6 +5,7 @@ import { loggerFactory } from "@common";
 const logger = loggerFactory.getLogger("Route.PrivateRoute");
 
 const PrivateRoute = () => {
+
     const { loading, isAuthenticated } = useAuth();
     const location = useLocation();
 

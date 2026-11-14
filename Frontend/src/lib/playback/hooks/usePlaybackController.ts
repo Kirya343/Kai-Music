@@ -44,6 +44,10 @@ export const usePlaybackController = ({
 
     // audio state
     const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
+
+    // state to increase the fastmutable position 
+    const [position, setPosition] = useState<number>(0);
+
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
     const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
@@ -242,15 +246,12 @@ export const usePlaybackController = ({
                     return;
                 }
 
-                setPlaybackState(prev => {
+                setPosition(prev => {
                     if (prev === null) {
                         return prev;
                     }
 
-                    return {
-                        ...prev,
-                        position: audio.currentTime
-                    };
+                    return audio.currentTime;
                 });
             };
 
@@ -314,6 +315,7 @@ export const usePlaybackController = ({
                 awaitingStateRef.current = false;
 
                 setPlaybackState(state);
+                setPosition(state.position)
                 unsyncedStateRef.current = state;
                 playIfBufferedRef.current();
             });
@@ -360,6 +362,7 @@ export const usePlaybackController = ({
     return {
         pausePlayback,
         resumePlayback,
+        position,
         playbackState,
         playbackMode,
         playbackPlaylist: playlist,

@@ -1,6 +1,5 @@
 import { createContext, useContext } from "react";
 import { Playlist } from "@playlist";
-import { PlaybackMode } from "@playback";
 import { IAudio } from "@audio";
 
 interface PlaybackPlaylistContextType {
@@ -27,6 +26,7 @@ export const PlaybackPlaylistProvider = ({
     children: React.ReactNode;
     value: PlaybackPlaylistContextType;
 }) => {
+
     return (
         <PlaybackPlaylistContext.Provider value={value}>
             {children}

@@ -14,6 +14,10 @@
     </parent>
 
     <artifactId>playback</artifactId>
+    
+    <properties>
+        <mockito.version>5.14.2</mockito.version>
+    </properties>
 
     <dependencies>
 
@@ -67,4 +71,19 @@
         </dependency>
         
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+                <configuration>
+                    <argLine>
+                        -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

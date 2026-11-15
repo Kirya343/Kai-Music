@@ -36,7 +36,7 @@ public class StreamContext {
         this.playbackContext = playbackContext;
         this.userSub = userSub;
 
-        Double position = playbackContext.getState().position();
+        Double position = playbackContext.getCurrentPosition();
         
         this.bufferedUntil = position;
 

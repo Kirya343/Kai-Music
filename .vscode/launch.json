@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TelegramAudioBotApplication",
+            "request": "launch",
+            "mainClass": "org.kirya343.TelegramAudioBotApplication",
+            "projectName": "Kai TelegramBot-TelegramBot-app"
+        },
+        {
+            "type": "java",
             "name": "Kai Terminal",
             "request": "launch",
             "mainClass": "org.kirya343.Main",

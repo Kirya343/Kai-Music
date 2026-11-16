@@ -4,6 +4,33 @@ import { loggerFactory } from "@common";
 
 const logger = loggerFactory.getLogger("Audio.MediaSource");
 
+const MIME_TYPE = 'audio/mp4; codecs="mp4a.40.2"';
+
+interface MediaSourceConstructor {
+    new (): MediaSource;
+    isTypeSupported(type: string): boolean;
+}
+
+const getMediaSourceConstructor = () => {
+    const managed = (
+        window as Window & {
+            ManagedMediaSource?: MediaSourceConstructor;
+        }
+    ).ManagedMediaSource;
+
+    if (managed?.isTypeSupported(MIME_TYPE)) {
+        return {
+            constructor: managed,
+            managed: true
+        };
+    }
+
+    return {
+        constructor: MediaSource,
+        managed: false
+    };
+};
+
 export const useMediaSource = () => {
 
     const currentStreamIdRef = useRef<string | null>(null)
@@ -32,10 +59,18 @@ export const useMediaSource = () => {
         currentStreamIdRef.current = streamId;
 
         const audio = new Audio();
-        const mediaSource = new MediaSource();
+        
+        const { constructor: MediaSourceConstructor, managed } =
+            getMediaSourceConstructor();
+
+        const mediaSource = new MediaSourceConstructor();
 
         audio.autoplay = false;
         audio.controls = false;
+
+        if (managed) {
+            audio.disableRemotePlayback = true;
+        }
 
         const objectUrl = URL.createObjectURL(mediaSource);
 

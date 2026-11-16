@@ -2,7 +2,7 @@ import { IPage } from "@/lib/common/types";
 import { IAudio, audioService } from "@audio";
 import { useSearch } from "@common";
 import { AxiosProgressEvent } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 interface IUploadingAudio {
     file: File;
@@ -27,20 +27,23 @@ export const useLibrary = () => {
     const [uploading, setUploading] = useState<IUploadingAudio[]>([]);
 
     const [searchQuery, setSearchQuery] = useState<string>("")
+    const [page, setPage] = useState<number>(0)
+    
+    const loadLibrary = useCallback(async (searchQuery: string, page: number) => {
+        try {
+            const res = await audioService.loadLibrary(searchQuery, page, 50);
+            
+            console.log(res.data)
+
+            setAudiosPage(res.data)
+        } finally {
+            setLoading(false)
+        }
+    }, [setLoading])
 
     useEffect(() => {
-        async function loadLibrary(searchQuery: string) {
-            try {
-                const res = await audioService.loadLibrary(searchQuery);
-
-                setAudiosPage(res.data)
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        loadLibrary(searchQuery);
-    }, [searchQuery])
+        loadLibrary(searchQuery, page)
+    }, [searchQuery, page])
 
     /** Uploads audios on server */
     const uploadAudios = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,6 +112,8 @@ export const useLibrary = () => {
     return { 
         setSearchQuery, searchQuery, 
         uploadAudios, uploading,
-        audiosPage, loading
+        audiosPage, loading,
+
+        page, setPage
     };
 }

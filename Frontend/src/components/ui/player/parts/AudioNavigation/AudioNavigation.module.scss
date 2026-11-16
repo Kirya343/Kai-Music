@@ -1,5 +1,7 @@
 .navigation {
-    display: flex;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
     align-items: center;
     gap: 0.5rem;
 

@@ -1,10 +1,10 @@
-import { HeartIcon, PenIcon, PlusIcon, ShazamIcon, TrashIcon } from "@/assets/icons";
+import { PenIcon, PlusIcon } from "@/assets/icons";
 import { playlistService } from "@playlist"
-import { audioService, IAudio } from "@audio"
+import { IAudio } from "@audio"
 import Track from "./Track/Track"
 import { HTMLAttributes, useMemo } from "react";
-import { useData } from "@common";
 import { IKebabAction } from "../KebabMenu/KebabMenu";
+import { usePlayTrackPersonally } from "@/lib/playback/services/playback.hooks";
 
 /**
  * Props for the LibraryTrack component
@@ -58,12 +58,15 @@ const LibraryTrack = ({
         ]
     }, [audio, importPlaylistId])
 
+    const playTrack = usePlayTrackPersonally()
+
     return (
         <Track
             audio={audio}
             trackNumber={trackNumber}
             extraActions={extraActions}
             playing={playing}
+            onClick={() => playTrack(audio.id)}
             {...divProps}
         />
     )

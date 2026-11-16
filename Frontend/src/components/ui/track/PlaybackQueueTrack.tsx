@@ -1,7 +1,7 @@
 import { playlistService } from "@playlist";
 import Track, { ITrackAction } from "./Track/Track";
 import { TrashIcon } from "@/assets/icons";
-import { IQueueItem, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
+import { IQueueItem, playbackService, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
 import { HTMLAttributes } from "react";
 
 /** Props for the PlaybackQueueTrack component */
@@ -23,7 +23,7 @@ const PlaybackQueueTrack = ({
 
     const { playbackState } = usePlaybackState();
     const { playbackPlaylist } = usePlaybackPlaylist();
-    const { changeTrack, togglePlay } = usePlaybackControls();
+    const { togglePlay } = usePlaybackControls();
 
     const handleTrackClick = async (qiId: number) => {
 
@@ -32,7 +32,7 @@ const PlaybackQueueTrack = ({
         if (playbackState?.entryId === qiId) {
             togglePlay()
         } else {
-            changeTrack(qiId)
+            playbackService.changeTrack(qiId)
         }
     }
 
@@ -42,7 +42,7 @@ const PlaybackQueueTrack = ({
         actions.push({
             icon: <TrashIcon/>,
             title: "deleteAudio",
-            func: async () => await playlistService.removeFromQueue(playbackPlaylist?.id, [queueItem.id])
+            func: () => playlistService.removeEntry(playbackPlaylist?.id, queueItem)
         })
     }
 
@@ -60,8 +60,6 @@ const PlaybackQueueTrack = ({
             }}
 
             playing={playing}
-
-            currentPlaylistId={null}
 
             {...props}
         />

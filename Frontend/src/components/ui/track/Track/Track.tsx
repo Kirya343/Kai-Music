@@ -4,7 +4,7 @@ import { HeartIcon, MusicNoteIcon, PlayingAudioIcon } from "@/assets/icons"
 import { countPosition, useData } from "@common"
 import { HTMLAttributes, ReactNode, useMemo } from "react"
 import clsx from "clsx"
-import { playbackService, usePlaybackData, usePlaybackState } from "@playback"
+import { usePlaybackData, usePlaybackState } from "@playback"
 import KebabMenu, { IKebabAction } from "@/components/ui/KebabMenu/KebabMenu"
 import { playlistService } from "@playlist"
 
@@ -72,8 +72,6 @@ interface TrackProps extends HTMLAttributes<HTMLDivElement> {
 
     /** Apply the playing style and display the playback indicator. */
     playing?: boolean;
-
-    currentPlaylistId?: number | null,
 }
 
 /**
@@ -98,53 +96,23 @@ const Track = ({
     playing = false,
     className,
 
-    currentPlaylistId,
-
     ...divProps
 }: TrackProps) => {
 
     const { playbackState } = usePlaybackState();
-    const playbackData = usePlaybackData();
     const { playlistsData } = useData();
     
     const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === audio.id)
-
-    const toggleLike = async () => {
-
-        try {
-            if (isLiked) {
-                console.log("Unlike", audio.id)
-                await playlistService.removeLiked([audio.id]);
-            } else {
-                console.log("Like", audio.id)
-                await playlistService.addLiked([{ audioId: audio.id }]);
-            }
-        } finally {
-
-        }
-    };
 
     const finalActions = useMemo<ITrackAction[]>(() => [
         ...(actions ?? []),
         {
             icon: <HeartIcon filled={isLiked} />,
             title: "Like",
-            func: toggleLike
+            func: () => playlistService.toggleLike(isLiked, audio.id)
         }
     ], [isLiked, actions]);
     
-    const handlePlay = () => {
-        if (currentPlaylistId === null) return;
-
-        if (playbackData.room) {
-            const success = confirm("You will leave your room, are you sure?")
-            
-            if (!success) return;
-        }
-
-        playbackService.playTrack("USER", audio.id, currentPlaylistId)
-    }
-
     return (
         <div 
             {...divProps}
@@ -155,7 +123,7 @@ const Track = ({
                 className
             )}
         >
-            <div className={styles.body} onClick={onClick ?? handlePlay}>
+            <div className={styles.body} onClick={onClick}>
 
                 <div className={styles.audioCover}>
                     <MusicNoteIcon/>

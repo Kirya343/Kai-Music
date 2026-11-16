@@ -6,6 +6,7 @@ import { PlaybackControlsProvider } from "./contexts/PlaybackControlsContext";
 import { PlaybackPlaylistProvider } from "./contexts/PlaybackPlaylistContext";
 import { PlaybackDataProvider } from "./contexts/PlaybackDataContext";
 import { PlaybackUIProvider } from "./contexts/PlaybackUIContext";
+import { playbackService } from "./services";
 
 export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 
@@ -23,8 +24,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         updateMessage,
 
         seek,
-        togglePlay,
-        changeTrack
+        togglePlay
     } = useAudioPlayer();
 
     // ui
@@ -45,10 +45,9 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
     const controlsValue = useMemo(() => ({
         togglePlay,
-        changeTrack,
         pausePlayback,
         seek
-    }), [togglePlay, changeTrack, pausePlayback, seek]);
+    }), [togglePlay, pausePlayback, seek]);
 
     const playlistValue = useMemo(() => ({
         playingAudio,
@@ -89,11 +88,11 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         });
 
         navigator.mediaSession.setActionHandler("nexttrack", async () => {
-            changeTrack("next");
+            playbackService.changeTrack("next");
         });
 
         navigator.mediaSession.setActionHandler("previoustrack", async () => {
-            changeTrack("prev");
+            playbackService.changeTrack("prev");
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
@@ -129,8 +128,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         playingAudio,
         playbackState,
         seek,
-        togglePlay,
-        changeTrack
+        togglePlay
     ]);
     
     return (

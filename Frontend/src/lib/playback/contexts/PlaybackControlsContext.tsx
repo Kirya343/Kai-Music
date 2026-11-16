@@ -2,7 +2,6 @@ import { createContext, useContext } from "react";
 
 interface PlaybackControlsContextType {
     togglePlay: () => void;
-    changeTrack: (changing: "prev" | "next" | number) => void;
     pausePlayback: () => void;
     seek: (position: number) => void;
 }

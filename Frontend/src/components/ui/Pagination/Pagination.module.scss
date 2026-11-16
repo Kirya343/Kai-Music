@@ -1,0 +1,48 @@
+@use "@/css/components/mixins/" as *;
+
+.pagination {
+    padding: 1.5rem;
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: auto;
+    bottom: 1.5rem;
+    z-index: 50;
+
+    @include mobile {
+        padding: .5rem;
+    }
+
+    button {
+        padding: 0.7rem 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        border-radius: 10px;
+        
+        @include glass(true);
+ 
+        &:disabled {
+            cursor:not-allowed;
+            opacity: 0.5;
+        }
+
+        &.pageNumber {
+            font-size: 1.1rem;
+            font-weight: 700;
+            aspect-ratio: 1;
+            padding: 0.5rem 1rem;
+
+            @include mobile {
+                padding: .3rem 1rem;
+            }
+
+            &.active {
+                @include dirty-glass-light(true);
+            }
+        }
+    }
+}

@@ -48,7 +48,7 @@ const TrackImportLibrary = ({ importPlaylist, onClose }: { importPlaylist: Playl
                     />
                 </div>
 
-                {searchQuery.length != 0 && <span>Found {audiosPage?.totalElements} audios</span>}
+                {searchQuery.length != 0 && <span>Found {audiosPage?.page.totalElements} audios</span>}
             </div>
 
             <Loader loadingActive={!loading && !audiosPage?.content}>

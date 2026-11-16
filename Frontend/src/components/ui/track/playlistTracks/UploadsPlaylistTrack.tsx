@@ -6,6 +6,7 @@ import { IQueueItem } from "@playback"
 import React, { HTMLAttributes } from "react"
 import { IKebabAction } from "../../KebabMenu/KebabMenu"
 import { loggerFactory } from "@common"
+import { usePlayTrackPersonally } from "@/lib/playback/services/playback.hooks"
 
 /**
  * Props for the UploadsPlaylistTrack component
@@ -90,6 +91,8 @@ const UploadsPlaylistTrack = ({
         actions.push(action)
     }
 
+    const playTrack = usePlayTrackPersonally()
+
     return (
         <Track
             audio={queueItem.audio}
@@ -97,7 +100,7 @@ const UploadsPlaylistTrack = ({
             actions={actions}
             extraActions={extraActions}
             playing={playing}
-            currentPlaylistId={currentPlaylistId}
+            onClick={() => playTrack(queueItem.audio.id, currentPlaylistId)}
             {...divProps}
         />
     )

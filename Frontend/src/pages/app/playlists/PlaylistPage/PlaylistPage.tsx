@@ -64,7 +64,7 @@ const PlaylistPage = ({}: {}) => {
                 data={Object.fromEntries(
                     filteredList
                         .slice()
-                        .sort((a, b) => a.id - b.id)
+                        .sort((a, b) => a.position - b.position)
                         .map((qi, idx) => [
                             qi.id,
                             playlist.type === PlaylistType.UPLOADED ? (
@@ -85,7 +85,6 @@ const PlaylistPage = ({}: {}) => {
                                     isInPlaylist={false}
                                     currentPlaylistId={playlist.id}
                                     openEditModal={setAudioFileView}
-                                    handleRemove={playlistsData.removeAudio}
                                     playing={playingAudioId === qi.audio.id}
                                 />
                             )
@@ -102,7 +101,7 @@ const PlaylistPage = ({}: {}) => {
 
                             if (audioIds.length === 0) return;
 
-                            playlistService.removeFromQueue(playlist.id, audioIds);
+                            playlistService.removeEntry(playlist.id, audioIds);
                         },
                         influence: "selected"
                     }

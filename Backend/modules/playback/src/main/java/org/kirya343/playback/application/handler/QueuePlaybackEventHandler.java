@@ -28,7 +28,7 @@ public class QueuePlaybackEventHandler {
     @Transactional (propagation = Propagation.REQUIRES_NEW)
     public void handleQueueChanged(QueueChangedEvent event) {
 
-        log.debug("handle queue changed: ", event.playlistId());
+        log.debug("Handle playlist changed: {}", event.playlistId());
 
         Optional<PlaybackState> playbackState = playbackStateRepository.findByPlaylistId(event.playlistId());
 
@@ -36,10 +36,18 @@ public class QueuePlaybackEventHandler {
 
             PlaybackState existing = playbackState.get();
 
-            log.debug("send playlist: ", event.playlistId());
+            PlaybackTarget target = PlaybackTarget.ofPlaybackState(existing);
+
+            log.debug(
+                "Broadcating {} playlist {}: {} audios", 
+                target, 
+                event.playlistId(), 
+                existing.getPlaylist().getQueue().size());
 
             playbackStreamWorkerManager.get(PlaybackTarget.ofPlaybackState(existing))
                 .broadcast(userWorker -> userWorker.sendPlaylist(existing.getPlaylist()));
+        } else {
+            log.debug("Playback state of playlist {} not found", event.playlistId());
         }
     }
 }

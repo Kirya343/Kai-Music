@@ -1,7 +1,19 @@
-import * as api from './playbackApi';
-import * as hooks from './playbackHooks';
+import {
+    updateTrackPosition,
+    setPlaylistPlaybackMode,
+    subscribe,
+    unsubscribe,
+    changeTrack,
+    getCurrentRoomState
+} from './playback.api';
+import * as hooks from './playback.hooks';
 
 export const playbackService = {
-    ...api,
+    updateTrackPosition,
+    setPlaylistPlaybackMode,
+    subscribe,
+    unsubscribe,
+    changeTrack,
+    getCurrentRoomState,
     ...hooks
 };

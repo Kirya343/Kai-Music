@@ -97,11 +97,6 @@ export const usePlaybackController = ({
         audio.pause();
     }, [audio]);
 
-    const changeTrack = useCallback(async (changing: "next" | "prev" | number) => {
-        console.log("переключаем трек на", changing)
-        await playbackService.changeTrack(changing)
-    }, [])
-
     /**
      * Resumes playing audio
      */
@@ -370,7 +365,6 @@ export const usePlaybackController = ({
         playingAudio,
         updateMessage,
         togglePlay,
-        seek,
-        changeTrack
+        seek
     }
 }

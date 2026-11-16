@@ -4,7 +4,6 @@ import styles from "./JoinRoomModal.module.scss"
 import Modal from "@/components/modals/Modal/Modal";
 import { useNavigate } from "react-router-dom";
 import { loggerFactory } from "@common";
-import { playbackService } from "@playback";
 
 const logger = loggerFactory.getLogger("Component.JoinRoomModal");
 

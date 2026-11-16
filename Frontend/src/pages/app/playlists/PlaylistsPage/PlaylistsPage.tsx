@@ -5,12 +5,10 @@ import PlaylistCreateModal from "@/components/modals/PlaylistCreateModal/Playlis
 import LibraryPlaylist from "@/components/ui/playlist/LibraryPlaylist";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData, useSearch } from "@common";
-import { usePlaybackPlaylist } from "@playback";
 
 const PlaylistsPage = () => {
 
     const { playlistsData } = useData();
-    const { playbackPlaylist } = usePlaybackPlaylist();
     
     const { filteredList, searchQuery, setSearchQuery} = useSearch(playlistsData.playlists);
 
@@ -29,12 +27,7 @@ const PlaylistsPage = () => {
         >
             <div className={styles.list}>
                 {filteredList.map((p) => (
-                    <LibraryPlaylist
-                        key={p.id}
-                        playlist={p}
-                        deletePlaylist={() => playlistsData.deletePlaylist(p)}
-                        importToRoom={() => playbackPlaylist && playlistsData.importToRoom(playbackPlaylist, p)}
-                    />
+                    <LibraryPlaylist key={p.id} playlist={p} />
                 ))}
             </div>
 

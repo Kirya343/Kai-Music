@@ -33,13 +33,6 @@ const RoomPage = () => {
 
     const [importOpen, setImportOpen] = useState<boolean>(false)
 
-    const deleteFromPlaylist = (ids: number[]) => {
-        
-        if (!playbackPlaylist?.id) return;
-
-        playlistService.removeFromQueue(playbackPlaylist.id, ids)
-    }
-
     const saveRoom = async () => {
         if (!room) return;
 
@@ -140,7 +133,7 @@ const RoomPage = () => {
                             extraActions={[
                                 {
                                     title: "Remove from queue",
-                                    func: async (ids) => await deleteFromPlaylist(ids),
+                                    func: (ids) => playlistService.removeEntry(playbackPlaylist?.id, ids),
                                     influence: "selected"
                                 }
                             ]}

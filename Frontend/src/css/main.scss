@@ -44,6 +44,10 @@ button {
     background-color: transparent;
     border: 0px solid transparent;
     color: var(--text-color);
+
+    transition: transform 0.2s ease, filter 0.2s ease;
+
+    @include click
 }
 
 a {

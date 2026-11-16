@@ -91,10 +91,6 @@ public class PlaylistQueueService {
             addToQueue(playlistId, authData.id(), list);
 
             log.debug("Added to queue");
-
-            eventPublisher.publishEvent(
-                new QueueChangedEvent(playlistId)
-            );
         } catch (Exception e) {
             log.debug("Adding rundom tracks is failed: {}", e);
         }

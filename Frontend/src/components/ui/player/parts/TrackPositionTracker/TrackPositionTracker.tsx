@@ -59,7 +59,7 @@ const TrackPositionTracker = () => {
 
             <div className={styles.positionMeta}>
                 <span className={styles.currentPosition}>
-                    {countPosition(audioPosition)}
+                    {countPosition(Math.min(audioPosition, duration))}
                 </span>
 
                 <span className={styles.duration}>

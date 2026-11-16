@@ -2,13 +2,14 @@ import { IAudio, useLibrary } from "@audio";
 import { useMemo, useState } from "react";
 import styles from "./LibraryPage.module.scss"
 import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
-import { CirclePlusIcon, CheckmarkIcon, CrossIcon } from "@/assets/icons";
+import { CirclePlusIcon, CheckmarkIcon, CrossIcon, ArrowIcon } from "@/assets/icons";
 import LibraryTrack from "@/components/ui/track/LibraryTrack";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { useData } from "@common";
 import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 import Loader from "@/components/ui/Loader/Loader";
+import Pagination from "@/components/ui/Pagination/Pagination";
 
 const LibraryPage = () => {
 
@@ -18,7 +19,8 @@ const LibraryPage = () => {
     const {
         setSearchQuery,
         searchQuery, uploadAudios,
-        uploading, audiosPage, loading
+        uploading, audiosPage, loading,
+        page, setPage
     } = useLibrary();
 
     const [audioFileView, setAudioFileView] = useState<IAudio | null>(null);
@@ -95,6 +97,10 @@ const LibraryPage = () => {
                 />
             </Loader>
 
+            {audiosPage && (
+                <Pagination page={page} totalPages={audiosPage.page.totalPages} onChange={(i) => setPage(i)} />
+            )}
+            
             <input 
                 type="file"
                 accept="audio/*"

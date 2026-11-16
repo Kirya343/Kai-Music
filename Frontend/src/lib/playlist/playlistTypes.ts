@@ -1,4 +1,4 @@
-import { IQueueItem, IQueueItemCreate } from "../playback/playbackTypes";
+import { IQueueItem, IQueueItemCreate } from "../playback/playback.types";
 
 export interface Playlist {
     id: number;

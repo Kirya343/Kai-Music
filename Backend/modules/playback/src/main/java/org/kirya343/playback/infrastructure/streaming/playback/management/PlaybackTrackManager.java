@@ -1,4 +1,4 @@
-package org.kirya343.playback.infrastructure.streaming.playback;
+package org.kirya343.playback.infrastructure.streaming.playback.management;
 
 import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.services.AudioQueryService;

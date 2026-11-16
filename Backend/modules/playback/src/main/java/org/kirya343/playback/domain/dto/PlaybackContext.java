@@ -32,7 +32,7 @@ public class PlaybackContext {
         playbackStartedAt = System.nanoTime();
     }
 
-    public PlaybackStateDTO getState() {
+    public PlaybackStateDTO getState() { 
         return state;
     }
 
@@ -55,13 +55,13 @@ public class PlaybackContext {
 
         double elapsed = (System.nanoTime() - playbackStartedAt) / 1_000_000_000.0;
 
-        return state.position() + elapsed;
+        return Math.max(state.position() + elapsed, audio.getDuration());
     }
 
     public boolean needChangeTrack() {
         Long audioDuration = audio.getDuration();
 
-        boolean needChange = audio != null && getCurrentPosition() > audioDuration;
+        boolean needChange = audio != null && getCurrentPosition() >= audioDuration;
 
         if (needChange) {
             log.debug("Sending NEXT event: becouse position({}) is after audioDuration({})",

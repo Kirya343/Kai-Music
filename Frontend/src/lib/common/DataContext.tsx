@@ -1,8 +1,6 @@
 import { createContext, useContext, useEffect } from "react";
-import { CreatePlaylist, Playlist, usePlaylistsData } from "@playlist";
+import { Playlist, usePlaylistsData } from "@playlist";
 import { IAudio, useAudioData } from "@audio";
-import { IQueueItem } from "@playback";
-import { IListeningRoom } from "@room";
 
 /**
  * Defines the acpplication data context.
@@ -24,18 +22,6 @@ interface IPlaylistsData {
 
     /** Synchronizes playlists with the server. */
     syncPlaylists: () => void;
-
-    /** Deletes a playlist. */
-    deletePlaylist: (playlist: Playlist) => void;
-
-    /** Creates a new playlist. */
-    createPlaylist: (playlist: CreatePlaylist) => void;
-
-    /** Imports tracks from one playlist into another. */
-    importToRoom: (importPlaylist: Playlist, targetPlaylist: Playlist) => void;
-
-    /** Removes a track from a playlist. */
-    removeAudio: (playlistId: number, queueItem: IQueueItem) => void;
 }
 
 /**

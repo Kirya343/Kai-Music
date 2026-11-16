@@ -1,32 +1,30 @@
-import { Playlist } from "@playlist";
+import { Playlist, playlistService } from "@playlist";
 import PlaylistCard from "./PlaylistCard/PlaylistCard";
 import { IKebabAction } from "../KebabMenu/KebabMenu";
 import { TrashIcon } from "@/assets/icons";
 import { useNavigate } from "react-router-dom";
+import { usePlaybackPlaylist } from "@playback";
 
 /**
  * LibraryPlaylist is modification of PlaylistCard, that displays on PlaylistsPage
  * 
  * @param playlist is playlist to display 
- * @param deletePlaylist is void to delete playlist
  * @param importToRoom is void to import playlist audios to currentRoom 
  */
 const LibraryPlaylist = ({
-    playlist,
-    deletePlaylist,
-    importToRoom
+    playlist
 }: {
-    playlist: Playlist;
-    deletePlaylist: () => void,
-    importToRoom: () => void
+    playlist: Playlist
 }) => {
+
+    const { playbackPlaylist } = usePlaybackPlaylist();
 
     const navigate = useNavigate();
 
     const actions = [
         {
             title: "Delete playlist",
-            func: deletePlaylist,
+            func: () => playlistService.deletePlaylist(playlist),
             icon: <TrashIcon />
         }
     ]
@@ -34,12 +32,12 @@ const LibraryPlaylist = ({
     const extraActions: IKebabAction[] = [
         {
             title: "Delete playlist",
-            func: deletePlaylist,
+            func: () => playlistService.deletePlaylist(playlist),
             icon: <TrashIcon />
         },
         {
             title: "Import to room",
-            func: importToRoom,
+            func: () => playlistService.importToRoom(playbackPlaylist, playlist),
         }
     ]
 

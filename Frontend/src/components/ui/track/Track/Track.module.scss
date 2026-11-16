@@ -121,7 +121,7 @@
         justify-content: center;
         padding: 5px;
 
-        @include glass(true);
+        @include glass(true, 10);
 
         svg {
             height: 20px;

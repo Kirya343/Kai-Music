@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CreatePlaylist, Playlist, PlaylistType } from "../playlistTypes";
+import { Playlist, PlaylistType } from "../playlistTypes";
 import { playlistService } from "../services";
 import { useWebSocket } from "@websocket";
-import { IQueueItem } from "@playback";
 import { loggerFactory } from "@common";
 
 const logger = loggerFactory.getLogger("Data.Playlist");
@@ -48,46 +47,6 @@ export const usePlaylistsData = () => {
         });
     }, [setPlaylists]);
 
-    const deletePlaylist = useCallback(async (playlist: Playlist) => {
-        const success = confirm(`Ary you sure deleting playlist ${playlist.title}`)
-
-        if (success) {
-            try {
-                await playlistService.deletePlaylist(playlist.id)
-            } catch (e) {
-                logger.error(e)
-            }
-        }
-    }, [])
-
-    const createPlaylist = useCallback(async (playlist: CreatePlaylist) => {
-        try {
-            await playlistService.createPlaylist(playlist)
-        } catch (e) {
-            logger.error(e)
-        }
-    }, [])
-
-    const importToRoom = useCallback(async (importPlaylist: Playlist, targetPlaylist: Playlist) => {
-
-        if (!targetPlaylist?.id) return;
-
-        const success = confirm(`Ary you sure replace playlist in room?`)
-
-        if (success) {
-            await playlistService.importToRoom(importPlaylist.id, targetPlaylist.id)
-        }
-    }, [])
-
-    const removeAudio = async (playlistId: number, queueItem: IQueueItem) => {
-        if (!playlistId) return;
-        try {
-            await playlistService.removeFromQueue(playlistId, [queueItem.audio.id])
-        } catch (e) {
-            logger.error(e)
-        }
-    }
-
     useEffect(() => {
         localStorage.setItem("playlists", JSON.stringify(playlists));
     }, [playlists]);
@@ -114,10 +73,6 @@ export const usePlaylistsData = () => {
     return { 
         playlists, 
         liked,
-        syncPlaylists,
-        deletePlaylist,
-        createPlaylist,
-        importToRoom,
-        removeAudio
+        syncPlaylists
     }
 }

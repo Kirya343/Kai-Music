@@ -1,4 +1,4 @@
-import { usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
+import { playbackService, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
 import { PlaybackModeToggle } from "../PlaybackModeToggle"
 import styles from "./AudioNavigation.module.scss"
 import { HeartIcon, LeftIcon, PauseIcon, PlayIcon, RightIcon } from "@/assets/icons";
@@ -9,34 +9,17 @@ const AudioNavigation = () => {
 
     const { playbackState } = usePlaybackState();
     const { playingAudio } = usePlaybackPlaylist();
-    const { togglePlay, changeTrack } = usePlaybackControls();
+    const { togglePlay } = usePlaybackControls();
     const { playlistsData } = useData()
 
     const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === playingAudio?.id)
-
-    const toggleLike = async () => {
-
-        if (!playingAudio) return;
-    
-        try {
-            if (isLiked) {
-                console.log("Unlike", playingAudio.id)
-                await playlistService.removeLiked([playingAudio.id]);
-            } else {
-                console.log("Like", playingAudio.id)
-                await playlistService.addLiked([{ audioId: playingAudio.id }]);
-            }
-        } finally {
-
-        }
-    };
 
     return playbackState && (
         <div className={styles.navigation}>
             <PlaybackModeToggle />
             <button 
                 aria-label="Play Prev Track"
-                onClick={() => changeTrack("prev")}
+                onClick={() => playbackService.changeTrack("prev")}
             >
                 <LeftIcon />
             </button>
@@ -48,10 +31,10 @@ const AudioNavigation = () => {
             </button>
             <button 
                 aria-label="Play Next Track"
-                onClick={() => changeTrack("next")}>
+                onClick={() => playbackService.changeTrack("next")}>
                 <RightIcon />
             </button>
-            <button onClick={toggleLike}>
+            <button onClick={() => playlistService.toggleLike(isLiked, playingAudio?.id)}>
                 <HeartIcon filled={isLiked} />
             </button>
         </div>

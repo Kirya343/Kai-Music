@@ -52,7 +52,7 @@ const TrackImportModal = ({
                     <button onClick={() => onClose()} className={styles.closeBtn}>
                         <ArrowIcon direction="left"/>
                     </button>
-                    <h2 className={styles.header}>Add tracks</h2>
+                    <h2>Add tracks</h2>
                 </div>
 
                 <div className={styles.menusList}>

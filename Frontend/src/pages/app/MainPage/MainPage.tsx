@@ -11,6 +11,8 @@ import JoinRoomModal from "@/components/modals/JoinRoomModal/JoinRoomModal";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "@/components/layout/PageLayout/PageLayout";
 import { loggerFactory, useData } from "@common";
+import { playbackService, usePlaybackControls } from "@playback";
+import { useWebSocket } from "@websocket";
 
 const logger = loggerFactory.getLogger("Pages.Main");
 
@@ -20,6 +22,8 @@ const MainPage = () => {
     const [isOpen, setOpen] = useState<boolean>(false);
     const [stat, setStat] = useState<{activeListners: number, activeRooms: number} | null>(null);
     const navigate = useNavigate()
+
+    const { client } = useWebSocket();
 
     useEffect(() => {
         async function loadPage() {
@@ -34,6 +38,8 @@ const MainPage = () => {
         loadPage()
     }, [])
 
+    const { autoPlay, setAutoPlay, resyncPlayback } = usePlaybackControls();
+
     const createRoom = async () => {
         try {
             await roomService.createRoom();
@@ -45,10 +51,13 @@ const MainPage = () => {
 
     const joinRoom = async (code: string) => {
         try {
+            if (!autoPlay) setAutoPlay(true)
             await roomService.joinRoom(code);
             navigate("/app/room");
         } catch (e) {
             logger.error(e);
+        } finally {
+            resyncPlayback(client, true)
         }
     }
 

@@ -52,7 +52,7 @@ public class PlaybackWebsocketService {
         
         Map<String, Object> headers = new HashMap<>();
 
-        log.debug(
+        log.trace(
             "Sending {} chunk to {}: chunk={}, entry={}, stream={}", 
             chunk.initialization() ? "initialization" : "media", 
             userSub, 
@@ -121,6 +121,15 @@ public class PlaybackWebsocketService {
             userSub,
             "/queue/playback.data",
             playbackData
+        );
+    }
+
+    public void sendPlaybackEvent(String userSub, org.kirya343.playback.presentation.dto.PlaybackEvent event) {
+
+        messagingTemplate.convertAndSendToUser(
+            userSub,
+            "/queue/playback.event",
+            event
         );
     }
 }

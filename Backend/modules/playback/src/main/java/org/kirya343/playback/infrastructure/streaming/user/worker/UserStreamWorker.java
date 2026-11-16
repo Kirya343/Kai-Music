@@ -1,4 +1,4 @@
-package org.kirya343.playback.infrastructure.streaming.user;
+package org.kirya343.playback.infrastructure.streaming.user.worker;
 
 import java.util.List;
 import java.util.Map;
@@ -10,9 +10,12 @@ import org.kirya343.playback.domain.dto.PlaybackContext;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.dto.StreamContext;
 import org.kirya343.playback.domain.enums.ChunkDeliveryStatus;
+import org.kirya343.playback.domain.enums.PlaybackEventType;
 import org.kirya343.playback.domain.enums.PlaybackMode;
-import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.user.AudioStreamService;
 import org.kirya343.playback.presentation.dto.ChunkDelivery;
+import org.kirya343.playback.presentation.dto.PlaybackEvent;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playlist.datasource.model.Playlist;
@@ -74,6 +77,13 @@ public class UserStreamWorker
         }
     }
 
+    public void finishStream() {
+        playbackWebsocketService.sendPlaybackEvent(
+            userSub, 
+            new PlaybackEvent(PlaybackEventType.UNSUBSCRIBED)
+        );
+    }
+
     public void applyState(PlaybackContext context) {
         if (context == null) {
             throw new IllegalStateException("PlaybackContext is null");
@@ -82,20 +92,6 @@ public class UserStreamWorker
         replaceStream(context);
 
         audioStreamService.initializeUser(currentStream);
-        tick(currentStream);
-    }
-
-    public void synchronizeState(PlaybackContext context) {
-        if (context == null) {
-            throw new IllegalStateException("PlaybackContext is null");
-        }
-
-        replaceStream(context);
-
-        audioStreamService.initializeUser(
-            currentStream,
-            context.getCurrentState()
-        );
 
         tick(currentStream);
     }
@@ -133,7 +129,7 @@ public class UserStreamWorker
     }
 
     private void tick(StreamContext context) {
-        log.debug("Tick to user {}, stream: {}", userSub, context.getStreamId());
+        log.trace("Tick to user {}, stream: {}", userSub, context.getStreamId());
         
         audioStreamService.fillBuffer(context);
     }

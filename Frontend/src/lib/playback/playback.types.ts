@@ -45,6 +45,10 @@ export interface PlaybackState {
     pause: boolean;
 }
 
+export enum PlaybackEventType {
+    UNSUBSCRIBED = "UNSUBSCRIBED"
+}
+
 export interface PlaybackSyncState {
     server: PlaybackState | null;
     desired: PlaybackState | null;

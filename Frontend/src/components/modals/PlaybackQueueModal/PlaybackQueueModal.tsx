@@ -30,7 +30,7 @@ const PlaybackQueueModal = ({
             
         if (!playbackPlaylist?.id) return;
 
-        playlistService.removeFromQueue(playbackPlaylist.id, ids)
+        playlistService.removeEntry(playbackPlaylist.id, ids)
     }
 
     return (
@@ -47,7 +47,7 @@ const PlaybackQueueModal = ({
                             .slice()
                             .sort((a, b) => a.position - b.position)
                             .map(qi => [
-                                qi.id,
+                                qi.audio.id,
                                 <PlaybackQueueTrack
                                     key={qi.id}
                                     queueItem={qi}
@@ -58,7 +58,7 @@ const PlaybackQueueModal = ({
                     extraActions={[
                         {
                             title: "Remove from queue",
-                            func: (ids) => deleteFromPlaylist(ids),
+                            func: (ids) => playlistService.removeEntry(playbackPlaylist?.id, ids),
                             influence: "selected"
                         }
                     ]}

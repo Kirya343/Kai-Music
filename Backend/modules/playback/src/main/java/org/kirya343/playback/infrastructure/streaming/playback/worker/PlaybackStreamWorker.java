@@ -1,4 +1,4 @@
-package org.kirya343.playback.infrastructure.streaming.playback;
+package org.kirya343.playback.infrastructure.streaming.playback.worker;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -7,11 +7,14 @@ import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.playback.application.command.ChangeTrack;
-import org.kirya343.playback.application.event.PlaybackEvent;
+import org.kirya343.playback.application.event.UpdatePlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.dto.PlaybackContext;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
-import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.management.PlaybackSubscriberManager;
+import org.kirya343.playback.infrastructure.streaming.playback.management.PlaybackTickScheduler;
+import org.kirya343.playback.infrastructure.streaming.playback.management.PlaybackTrackManager;
+import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.QueueItem;
 import org.kirya343.security.core.dto.UserAuthData;
@@ -64,7 +67,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         subscriberManager.applyState(context);
 
         eventPublisher.publishEvent(
-            new PlaybackEvent(target, context.getState()));
+            new UpdatePlaybackEvent(target, context.getState()));
 
         tickScheduler.start(this::tickInternal);
     }
@@ -75,6 +78,10 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
 
     public void subscribe(UserStreamWorker worker, ShortUserDTO userDto) {
         subscriberManager.subscribe(worker, userDto);
+    }
+
+    public void resync(UserStreamWorker worker) {
+        subscriberManager.resync(worker);
     }
 
     public void unsubscribe(String userSub) {

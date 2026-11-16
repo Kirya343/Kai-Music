@@ -1,4 +1,4 @@
-import { usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist, usePlaybackState, usePlaybackUI } from "@playback";
+import { playbackService, usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist, usePlaybackState, usePlaybackUI } from "@playback";
 
 import styles from "./MobileAudioMiniPlayer.module.scss"
 import { RightIcon, PlayIcon, PauseIcon, HeartIcon } from "@/assets/icons";
@@ -20,28 +20,11 @@ const MobileAudioMiniPlayer = () => {
     const { playbackState } = usePlaybackState();
     const { playingAudio } = usePlaybackPlaylist();
     const { setFullPlayerOpen } = usePlaybackUI();
-    const { togglePlay, changeTrack } = usePlaybackControls();
+    const { togglePlay } = usePlaybackControls();
 
     const { playlistsData } = useData();
 
     const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === playingAudio?.id)
-
-    const toggleLike = async () => {
-    
-        if (!playingAudio) return;
-    
-        try {
-            if (isLiked) {
-                console.log("Unlike", playingAudio.id)
-                await playlistService.removeLiked([playingAudio.id]);
-            } else {
-                console.log("Like", playingAudio.id)
-                await playlistService.addLiked([{ audioId: playingAudio.id }]);
-            }
-        } finally {
-
-        }
-    };
 
     const audio = audioRef.current;
 
@@ -70,7 +53,7 @@ const MobileAudioMiniPlayer = () => {
             
             <div className={styles.navigation} onClick={(e) => e.stopPropagation()}>
 
-                <button onClick={toggleLike}>
+                <button onClick={() => playlistService.toggleLike(isLiked, playingAudio.id)}>
                     <HeartIcon filled={isLiked} />
                 </button>
 
@@ -83,7 +66,7 @@ const MobileAudioMiniPlayer = () => {
 
                 <button 
                     aria-label="Play Next Track"
-                    onClick={() => changeTrack("next")}
+                    onClick={() => playbackService.changeTrack("next")}
                 >
                     <RightIcon />
                 </button>

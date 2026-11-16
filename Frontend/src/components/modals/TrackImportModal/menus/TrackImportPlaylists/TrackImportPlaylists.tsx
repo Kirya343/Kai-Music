@@ -1,7 +1,7 @@
 import SelectPlaylist from "@/components/ui/playlist/SelectPlaylist";
 import styles from "./TrackImportPlaylists.module.scss"
 import { SearchInput } from "@/components/ui/SearchInput/SearchInput";
-import { Playlist } from "@playlist";
+import { Playlist, playlistService } from "@playlist";
 import { useData, useSearch} from "@common";
 
 interface TrackImportPlaylistsProps { 
@@ -42,7 +42,7 @@ const TrackImportPlaylists = ({
                         <SelectPlaylist
                             key={playlist.id}
                             playlist={playlist}
-                            importToRoom={() => playlistsData.importToRoom(importPlaylist, playlist)}
+                            importToRoom={() => playlistService.importToRoom(importPlaylist, playlist)}
                             onClick={() => seePlaylist(playlist.id)}
                         />
                     ))}

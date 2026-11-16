@@ -1,4 +1,4 @@
-package org.kirya343.playback.infrastructure.streaming.playback;
+package org.kirya343.playback.infrastructure.streaming.playback.worker;
 
 import java.util.List;
 import java.util.Map;

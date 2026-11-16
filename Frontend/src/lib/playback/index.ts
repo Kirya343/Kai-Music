@@ -1,5 +1,5 @@
 export * from "./PlaybackProvider";
 export * from "./hooks"
-export * from "./playbackTypes"
+export * from "./playback.types"
 export * from "./services"
 export * from "./contexts"

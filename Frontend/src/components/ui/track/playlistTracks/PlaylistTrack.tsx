@@ -5,6 +5,7 @@ import Track, { ITrackAction } from "../Track/Track"
 import { IQueueItem } from "@playback"
 import { HTMLAttributes, useMemo } from "react"
 import { IKebabAction } from "../../KebabMenu/KebabMenu"
+import { usePlayTrackPersonally } from "@/lib/playback/services/playback.hooks"
 
 /**
  * Props for the PlaylistTrack component
@@ -31,9 +32,6 @@ interface PlaylistTrackProps extends HTMLAttributes<HTMLDivElement> {
   
     /** Opens the audio editing modal. */
     openEditModal: (audio: IAudio) => void;
-
-    /** Removes current audio from current playlist */
-    handleRemove: (playlistId: number, queueItem: IQueueItem) => void;
 }
 
 /** Displays audio track inside playlist with playlist update actions */
@@ -45,7 +43,6 @@ const PlaylistTrack = ({
     currentPlaylistId,
     importPlaylistId,
     openEditModal,
-    handleRemove,
     ...divProps
 }: PlaylistTrackProps) => {
 
@@ -61,7 +58,7 @@ const PlaylistTrack = ({
             {
                 icon: <TrashIcon />,
                 title: "Remove from playlist",
-                func: () => handleRemove(currentPlaylistId, queueItem)
+                func: () => playlistService.removeEntry(currentPlaylistId, queueItem)
             }
         ];
 
@@ -82,8 +79,7 @@ const PlaylistTrack = ({
         currentPlaylistId,
         importPlaylistId,
         isInPlaylist,
-        openEditModal,
-        handleRemove
+        openEditModal
     ]);
 
     const actions = useMemo<ITrackAction[]>(() => {
@@ -94,6 +90,8 @@ const PlaylistTrack = ({
         return [extraActions[2] as ITrackAction];
     }, [extraActions, importPlaylistId, currentPlaylistId]);
 
+    const playTrack = usePlayTrackPersonally()
+
     return (
         <Track
             audio={queueItem.audio}
@@ -101,7 +99,7 @@ const PlaylistTrack = ({
             actions={actions}
             extraActions={extraActions}
             playing={playing}
-            currentPlaylistId={currentPlaylistId}
+            onClick={() => playTrack(queueItem.audio.id, currentPlaylistId)}
             {...divProps}
         />
     )

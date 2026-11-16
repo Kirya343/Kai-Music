@@ -3,7 +3,7 @@ package org.kirya343.playback.presentation.websocket;
 import org.kirya343.audio.dto.AudioChunkFeedback;
 import org.kirya343.playback.application.service.PlaybackSessionService;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
-import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.SubscribePlaybackRequest;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
@@ -35,6 +35,16 @@ public class PlaybackWebSocketController {
         }
 
         playbackSessionService.restoreSession(authData);
+    }
+
+    @MessageMapping("/playback.resync")
+    @Authenticated
+    public void resync(
+        @AuthUser UserAuthData authData
+    ) {
+        log.debug("Ресинхронизация сессии пользователя {}", authData.name());
+
+        playbackSessionService.resync(authData);
     }
 
     @MessageMapping("/playback.subscribe")

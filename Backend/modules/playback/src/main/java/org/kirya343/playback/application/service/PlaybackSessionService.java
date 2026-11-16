@@ -5,10 +5,10 @@ import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
-import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
-import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorkerManager;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.user.datasource.User;
 import org.kirya343.user.datasource.UserRepository;
@@ -60,7 +60,13 @@ public class PlaybackSessionService {
     }
 
     public void unsubscribe(UserAuthData authData) {
+        UserStreamWorker worker = audioStreamWorkerManager.get(authData.sub());
+
+        worker.finishStream();
+
         audioStreamWorkerManager.unregister(authData.sub());
+
+        userPlaybackRepository.save(new UserPlayback(authData.id(), null, null));
     }
 
     public void restoreSession(UserAuthData authData) {
@@ -68,6 +74,23 @@ public class PlaybackSessionService {
 
         UserPlayback userPlayback = userPlaybackRepository.findById(authData.id()).orElseThrow();
 
-        subscribe(authData, PlaybackTarget.ofUserPlayback(userPlayback));
+        try {
+            PlaybackTarget target = PlaybackTarget.ofUserPlayback(userPlayback);
+
+            subscribe(authData, target);
+        } catch (NullPointerException e) {
+            log.warn("User didn't have saved playback");
+        }
+    }
+
+    public void resync(UserAuthData authData) {
+        PlaybackTarget target = userPlaybackRepository.findById(authData.id())
+            .map(PlaybackTarget::ofUserPlayback)
+            .orElseThrow();
+
+        PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(target);
+        UserStreamWorker userWorker = audioStreamWorkerManager.get(authData.sub());
+
+        playbackWorker.resync(userWorker);
     }
 }

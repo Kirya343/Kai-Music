@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.kirya343.playback.infrastructure.streaming.playback.PlaybackTickScheduler;
+import org.kirya343.playback.infrastructure.streaming.playback.management.PlaybackTickScheduler;
 
 class PlaybackTickSchedulerTest {
 

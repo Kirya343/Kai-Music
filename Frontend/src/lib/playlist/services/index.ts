@@ -1,7 +1,15 @@
-import * as api from './playlistApi';
-// import * as hooks from './hooks';
+import {
+    loadPlaylists,
+    loadPlaylistById,
+    addToQueue,
+    addRandomTracks
+} from './playlist.api';
+import * as service from './playlist.service';
 
 export const playlistService = {
-    ...api,
-    // ...hooks
+    loadPlaylists,
+    loadPlaylistById,
+    addToQueue,
+    addRandomTracks,
+    ...service
 };

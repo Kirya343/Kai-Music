@@ -1,9 +1,10 @@
-package org.kirya343.playback.infrastructure.streaming.user;
+package org.kirya343.playback.infrastructure.streaming.user.worker;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.kirya343.playback.infrastructure.streaming.user.AudioStreamService;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +60,7 @@ public class UserStreamWorkerManager
         workers.put(worker.getUserSub(), worker);
     }
 
-    public void unregister(String userSub) {
+    public UserStreamWorker unregister(String userSub) {
         UserStreamWorker worker = workers.remove(userSub);
 
         log.debug("Удаляем воркер {}", userSub);
@@ -68,6 +69,8 @@ public class UserStreamWorkerManager
             worker.unsubscribe();
             worker.cancelTask();
         }
+
+        return worker;
     }
 
     public long countAll() {

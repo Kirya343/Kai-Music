@@ -6,6 +6,7 @@ import { PlaybackControlsProvider } from "./contexts/PlaybackControlsContext";
 import { PlaybackPlaylistProvider } from "./contexts/PlaybackPlaylistContext";
 import { PlaybackDataProvider } from "./contexts/PlaybackDataContext";
 import { PlaybackUIProvider } from "./contexts/PlaybackUIContext";
+import { playbackService } from "./services";
 
 export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 
@@ -24,14 +25,16 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
         seek,
         togglePlay,
-        changeTrack
+        reconnectPlayback,
+        resyncPlayback,
+        autoPlay,
+        setAutoPlay
     } = useAudioPlayer();
 
     // ui
     const [fullPlayerOpen, setFullPlayerOpen] = useState<boolean>(false);
 
     const stateValue = useMemo(() => {
-        console.log("render stateValue", playbackState, playbackMode)
 
         return {
             playbackState,
@@ -45,10 +48,21 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
     const controlsValue = useMemo(() => ({
         togglePlay,
-        changeTrack,
         pausePlayback,
-        seek
-    }), [togglePlay, changeTrack, pausePlayback, seek]);
+        seek,
+        reconnectPlayback,
+        resyncPlayback,
+        autoPlay,
+        setAutoPlay
+    }), [
+        togglePlay, 
+        pausePlayback, 
+        seek, 
+        reconnectPlayback, 
+        resyncPlayback,
+        autoPlay,
+        setAutoPlay
+    ]);
 
     const playlistValue = useMemo(() => ({
         playingAudio,
@@ -89,11 +103,11 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         });
 
         navigator.mediaSession.setActionHandler("nexttrack", async () => {
-            changeTrack("next");
+            playbackService.changeTrack("next");
         });
 
         navigator.mediaSession.setActionHandler("previoustrack", async () => {
-            changeTrack("prev");
+            playbackService.changeTrack("prev");
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
@@ -129,8 +143,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         playingAudio,
         playbackState,
         seek,
-        togglePlay,
-        changeTrack
+        togglePlay
     ]);
     
     return (

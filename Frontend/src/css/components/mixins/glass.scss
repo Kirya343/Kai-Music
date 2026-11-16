@@ -1,6 +1,7 @@
 @use "./breakpoints" as *;
+@use "./misc.scss" as *;
 
-@mixin glass($hover: false) {
+@mixin glass($hover: false, $size: 1) {
     position: relative;
 
     background-color: var(--glass-background);
@@ -20,12 +21,7 @@
     }
 
     &:is(button):active {
-        transition: transform 0.2s ease, filter 0.2s ease;
-
-        &:active {
-            transform: scale(0.96);
-            filter: brightness(0.8);
-        }
+        @include click($size);
     }
 
     @include mobile {

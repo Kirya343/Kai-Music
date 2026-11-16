@@ -1,7 +1,7 @@
 package org.kirya343.playback.application.handler;
 
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
-import org.kirya343.playback.application.event.PlaybackEvent;
+import org.kirya343.playback.application.event.UpdatePlaybackEvent;
 import org.kirya343.playback.application.service.PlaybackSessionService;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
@@ -24,7 +24,7 @@ public class RoomEventHandler {
     @Async
     @EventListener
     @Transactional
-    public void handlePlayback(PlaybackEvent event) {
+    public void handlePlayback(UpdatePlaybackEvent event) {
 
         PlaybackTarget target = event.target();
         

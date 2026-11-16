@@ -3,8 +3,8 @@ package org.kirya343.diagnostics.commands;
 
 import java.lang.management.ManagementFactory;
 
-import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorkerManager;
-import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorkerManager;
 import org.kirya343.presence.global.services.PresenceService;
 import org.springframework.stereotype.Component;
 

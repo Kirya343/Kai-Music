@@ -1,6 +1,6 @@
 package org.kirya343.playback.application.handler;
 
-import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorkerManager;
+import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorkerManager;
 import org.kirya343.user.dto.event.UserDisconnectedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;

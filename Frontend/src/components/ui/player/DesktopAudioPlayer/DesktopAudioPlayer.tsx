@@ -1,4 +1,4 @@
-import { usePlaybackPlaylist, usePlaybackState } from "@playback";
+import { playbackService, usePlaybackControls, usePlaybackData, usePlaybackPlaylist, usePlaybackState } from "@playback";
 
 import styles from "./DesktopAudioPlayer.module.scss"
 import { useGlobal } from "@common";
@@ -9,6 +9,8 @@ import VolumeSlider from "../parts/VolumeSlider/VolumeSlider";
 import { useState } from "react";
 import PlaybackQueueModal from "@/components/modals/PlaybackQueueModal/PlaybackQueueModal";
 import { PlaylistIcon } from "@/assets/icons";
+import { useStompClient } from "@websocket";
+import { roomService } from "@room";
 
 /**
  * Component that display on bottom of pages and displays
@@ -19,17 +21,34 @@ import { PlaylistIcon } from "@/assets/icons";
 const DesktopAudioPlayer = () => {
 
     const [isOpen, setOpen] = useState(false);
+
+    const { client } = useStompClient()
  
     const { isMobile } = useGlobal();
 
+    const { resyncPlayback, autoPlay } = usePlaybackControls();
     const { playbackState } = usePlaybackState();
     const { playingAudio } = usePlaybackPlaylist();
+    const playbackData = usePlaybackData();
 
     return playingAudio && playbackState && !isMobile && (
         <div 
             className={styles.player} 
             data-testid="desctop-player" 
         >
+            {!autoPlay && playbackData.room && !playbackState.pause && (
+                <div className={styles.overlay}>
+                    You're in the room. Start listening?
+
+                    <button onClick={() => resyncPlayback(client, true)}>
+                        Continue
+                    </button>
+                    <button onClick={playbackService.unsubscribe}>
+                        Leave room
+                    </button>
+                </div>
+            )}
+
             <div className={styles.info}>
                 <ScrollableTitle title={playingAudio?.title ?? playingAudio?.name} />
             </div>

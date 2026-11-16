@@ -34,8 +34,7 @@ export const usePlaybackController = ({
         return saved ? JSON.parse(saved) : null;
     });
 
-    const { started } = useGlobal();
-    const { addOnConnectHandler, client } = useWebSocket();
+    const { addOnConnectHandler } = useWebSocket();
 
     const unsyncedStateRef = useRef<PlaybackState | null>(null);
     const debounceTimeoutRef = useRef<number | null>(null);
@@ -47,6 +46,7 @@ export const usePlaybackController = ({
 
     // state to increase the fastmutable position 
     const [position, setPosition] = useState<number>(0);
+    const [autoPlay, setAutoPlay] = useState<boolean>(false);
 
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
@@ -108,6 +108,9 @@ export const usePlaybackController = ({
 
         try {
             await audio.play();
+
+            setAutoPlay(true);
+
         } catch (error) {
             if (
                 error instanceof DOMException &&
@@ -130,6 +133,8 @@ export const usePlaybackController = ({
 
         const newPaused = !playbackState?.pause
 
+        setAutoPlay(true);
+
         if (newPaused) {
             pausePlayback()
         }
@@ -142,6 +147,7 @@ export const usePlaybackController = ({
         if (!playbackState?.entryId) return;
 
         awaitingStateRef.current = true;
+        setAutoPlay(true);
 
         try {
             pausePlayback();
@@ -171,9 +177,10 @@ export const usePlaybackController = ({
      * audio is loaded on current position
      */
     const playIfBuffered = useCallback(() => {
-        logger.debug("попытка начать воспроизведение", started)
 
-        if (!started || awaitingStateRef.current) return;
+        logger.debug("попытка начать воспроизведение", autoPlay)
+
+        if (!autoPlay || awaitingStateRef.current) return;
 
         const state = unsyncedStateRef.current;
 
@@ -209,11 +216,11 @@ export const usePlaybackController = ({
             setPlaybackState(prev => ({ ...prev!, pause: false }));
             resumePlayback();
         }
-    }, [audio, started, setPlaybackState, resumePlayback]);
+    }, [audio, autoPlay, setPlaybackState, resumePlayback]);
 
     useEffect(() => {
         playIfBuffered();
-    }, [started, playIfBuffered]);
+    }, [playIfBuffered]);
 
     const playIfBufferedRef = useRef(playIfBuffered);
 
@@ -278,20 +285,33 @@ export const usePlaybackController = ({
         initMediaSource(streamId);
     }, [cleanupMediaSource, initMediaSource]);
 
-    const reconnect = useCallback((stompClient: Client) => {
+    const reconnect = (stompClient: Client | null) => {
 
-        let c: Client | null = stompClient || client
-
-        if (!c) return;
+        if (!stompClient) return;
 
         logger.debug("переподключаемся к комнате")
 
-        c?.publish({
+        stompClient.publish({
             destination: "/app/playback.reconnect",
             body: ""
         });
-    }, [client])
+    }
 
+    const resync = (stompClient: Client | null, autoPlay: boolean) => {
+
+        if (!stompClient) return;
+
+        logger.debug("перезагружаем состояние")
+
+        awaitingStateRef.current = true;
+
+        setAutoPlay(autoPlay)
+
+        stompClient.publish({
+            destination: "/app/playback.resync",
+            body: ""
+        });
+    }
 
     useEffect(() => {
         const unsubscribe = addOnConnectHandler((client) => {
@@ -365,6 +385,10 @@ export const usePlaybackController = ({
         playingAudio,
         updateMessage,
         togglePlay,
-        seek
+        seek,
+        reconnectPlayback: reconnect,
+        resyncPlayback: resync,
+        autoPlay,
+        setAutoPlay
     }
 }

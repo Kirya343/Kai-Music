@@ -70,4 +70,15 @@ public class PlaybackSessionService {
 
         subscribe(authData, PlaybackTarget.ofUserPlayback(userPlayback));
     }
+
+    public void resync(UserAuthData authData) {
+        PlaybackTarget target = userPlaybackRepository.findById(authData.id())
+            .map(PlaybackTarget::ofUserPlayback)
+            .orElseThrow();
+
+        PlaybackStreamWorker playbackWorker = playbackStreamWorkerManager.get(target);
+        UserStreamWorker userWorker = audioStreamWorkerManager.get(authData.sub());
+
+        playbackWorker.resync(userWorker);
+    }
 }

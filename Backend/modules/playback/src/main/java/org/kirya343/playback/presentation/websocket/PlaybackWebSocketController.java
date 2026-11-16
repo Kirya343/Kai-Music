@@ -37,6 +37,16 @@ public class PlaybackWebSocketController {
         playbackSessionService.restoreSession(authData);
     }
 
+    @MessageMapping("/playback.resync")
+    @Authenticated
+    public void resync(
+        @AuthUser UserAuthData authData
+    ) {
+        log.debug("Ресинхронизация сессии пользователя {}", authData.name());
+
+        playbackSessionService.resync(authData);
+    }
+
     @MessageMapping("/playback.subscribe")
     @Authenticated
     public void subscribe(

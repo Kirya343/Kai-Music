@@ -1,9 +1,14 @@
-import { createContext, useContext } from "react";
+import { Client } from "@stomp/stompjs";
+import { createContext, Dispatch, SetStateAction, useContext } from "react";
 
 interface PlaybackControlsContextType {
     togglePlay: () => void;
     pausePlayback: () => void;
     seek: (position: number) => void;
+    reconnectPlayback: (client: Client) => void;
+    resyncPlayback: (client: Client | null, autoPlay: boolean) => void;
+    autoPlay: boolean;
+    setAutoPlay: Dispatch<SetStateAction<boolean>>;
 }
 
 const PlaybackControlsContext = createContext<PlaybackControlsContextType | null>(null);

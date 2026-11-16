@@ -24,7 +24,11 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         updateMessage,
 
         seek,
-        togglePlay
+        togglePlay,
+        reconnectPlayback,
+        resyncPlayback,
+        autoPlay,
+        setAutoPlay
     } = useAudioPlayer();
 
     // ui
@@ -46,8 +50,20 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
     const controlsValue = useMemo(() => ({
         togglePlay,
         pausePlayback,
-        seek
-    }), [togglePlay, pausePlayback, seek]);
+        seek,
+        reconnectPlayback,
+        resyncPlayback,
+        autoPlay,
+        setAutoPlay
+    }), [
+        togglePlay, 
+        pausePlayback, 
+        seek, 
+        reconnectPlayback, 
+        resyncPlayback,
+        autoPlay,
+        setAutoPlay
+    ]);
 
     const playlistValue = useMemo(() => ({
         playingAudio,

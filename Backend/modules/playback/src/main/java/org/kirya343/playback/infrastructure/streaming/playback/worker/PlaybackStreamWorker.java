@@ -80,6 +80,10 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         subscriberManager.subscribe(worker, userDto);
     }
 
+    public void resync(UserStreamWorker worker) {
+        subscriberManager.resync(worker);
+    }
+
     public void unsubscribe(String userSub) {
         subscriberManager.unsubscribe(userSub);
     }

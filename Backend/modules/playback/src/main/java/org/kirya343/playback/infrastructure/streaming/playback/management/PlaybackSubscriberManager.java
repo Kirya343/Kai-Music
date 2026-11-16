@@ -51,6 +51,10 @@ public class PlaybackSubscriberManager {
 
         broadcast(w -> w.sendPlaybackData(target, presence.getOnlineUsers()));
 
+        resync(worker);
+    }
+
+    public void resync(UserStreamWorker worker) {
         PlaybackContext context = currentPlayback;
 
         if (context != null) {

@@ -32,7 +32,7 @@ public class PlaybackContext {
         playbackStartedAt = System.nanoTime();
     }
 
-    public PlaybackStateDTO getState() {
+    public PlaybackStateDTO getState() { 
         return state;
     }
 

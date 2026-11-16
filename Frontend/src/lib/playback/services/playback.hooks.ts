@@ -1,4 +1,4 @@
-import { usePlaybackData } from "../contexts";
+import { usePlaybackControls, usePlaybackData } from "../contexts";
 import * as api from './playback.api';
 
 /**
@@ -6,6 +6,7 @@ import * as api from './playback.api';
  */
 export const usePlayTrackPersonally = () => {
     const { room } = usePlaybackData();
+    const { setAutoPlay } = usePlaybackControls();
 
     return async (audioId: number, playlistId?: number | null) => {
         if (!audioId || playlistId === null) return;
@@ -17,6 +18,8 @@ export const usePlayTrackPersonally = () => {
 
             if (!success) return;
         }
+
+        setAutoPlay(true)
 
         await api.playTrack("USER", audioId, playlistId);
     };

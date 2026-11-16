@@ -5,7 +5,7 @@ import { countPosition } from "@common";
 const TrackPositionTracker = () => {
 
     // controls from RoomPlaybackContext
-    const { audioRef, position } = usePlaybackAudio();
+    const { audioRef, currentPlaybackState } = usePlaybackAudio();
     const { playingAudio } = usePlaybackPlaylist();
     const { seek } = usePlaybackControls();
 
@@ -14,11 +14,9 @@ const TrackPositionTracker = () => {
 
     const audio = audioRef.current;
 
-    const audioPosition = Math.max(audio?.currentTime || 0, position)
-
     const buffered = audio?.buffered;
 
-    return audio && (
+    return currentPlaybackState && (
         <div className={styles.tracker}>
             <div className={styles.progress}>
                 <div className={styles.buffered}>
@@ -37,21 +35,21 @@ const TrackPositionTracker = () => {
                                 width: `${((range.end - range.start) / duration) * 100}%`
                             }}
                         />
-))}
+                    ))}
                 </div>
 
                 <input
                     type="range"
                     min={0}
                     max={duration}
-                    value={audioPosition}
+                    value={currentPlaybackState?.position}
                     onChange={(e) => seek(Number(e.target.value))}
                     style={{
                         width: "100%",
                         background: `linear-gradient(
                             to right,
-                            #ffffff ${(audioPosition / duration) * 100}%,
-                            #00000000 ${(audioPosition / duration) * 100}%
+                            #ffffff ${(currentPlaybackState.position / duration) * 100}%,
+                            #00000000 ${(currentPlaybackState.position / duration) * 100}%
                         )`
                     }}
                 />
@@ -59,7 +57,7 @@ const TrackPositionTracker = () => {
 
             <div className={styles.positionMeta}>
                 <span className={styles.currentPosition}>
-                    {countPosition(Math.min(audioPosition, duration))}
+                    {countPosition(Math.min(currentPlaybackState.position, duration))}
                 </span>
 
                 <span className={styles.duration}>

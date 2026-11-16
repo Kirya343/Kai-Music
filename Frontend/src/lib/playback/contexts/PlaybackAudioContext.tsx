@@ -1,8 +1,9 @@
 import { createContext, useContext } from "react";
+import { PlaybackState } from "../playback.types";
 
 interface PlaybackAudioContextType {
     audioRef: React.RefObject<HTMLAudioElement | null>;
-    position: number;
+    currentPlaybackState: PlaybackState | null;
 }
 
 const PlaybackAudioContext = createContext<PlaybackAudioContextType | null>(null);

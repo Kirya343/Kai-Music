@@ -49,6 +49,13 @@ export const usePlaybackController = ({
     const [position, setPosition] = useState<number>(0);
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
 
+    const currentPlaybackState: PlaybackState | null = playbackState ? 
+        { 
+            ...playbackState, 
+            pause: playbackState?.pause || !autoPlay, 
+            position: Math.max(audio?.currentTime || 0, position)
+        } : null;
+
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
     const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
@@ -130,11 +137,11 @@ export const usePlaybackController = ({
     }, [audio]);
 
     // Play / Pause кнопка
-    const togglePlay = useCallback(async () => {
+    const togglePlay = useCallback(async (newPaused?: boolean) => {
 
         if (!playbackState) return;
 
-        const newPaused = !playbackState?.pause
+        if (newPaused === undefined) newPaused = !playbackState?.pause
 
         setAutoPlay(true);
 
@@ -408,7 +415,7 @@ export const usePlaybackController = ({
     return {
         pausePlayback,
         resumePlayback,
-        position,
+        currentPlaybackState,
         playbackState,
         playbackMode,
         playbackPlaylist,

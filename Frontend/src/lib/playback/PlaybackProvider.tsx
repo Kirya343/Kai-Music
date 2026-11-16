@@ -14,7 +14,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         pausePlayback, 
         audioRef,
 
-        position,
+        currentPlaybackState,
         playbackState, 
         playbackMode,
         playbackPlaylist,
@@ -43,8 +43,8 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
     }, [playbackState, playbackMode]);
 
     const audioValue = useMemo(() => ({
-        audioRef, position
-    }), [audioRef, position]);
+        audioRef, currentPlaybackState
+    }), [audioRef, currentPlaybackState]);
 
     const controlsValue = useMemo(() => ({
         togglePlay,

@@ -1,4 +1,4 @@
-import { playbackService, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
+import { playbackService, usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
 import { PlaybackModeToggle } from "../PlaybackModeToggle"
 import styles from "./AudioNavigation.module.scss"
 import { HeartIcon, LeftIcon, PauseIcon, PlayIcon, RightIcon } from "@/assets/icons";
@@ -7,14 +7,14 @@ import { playlistService } from "@playlist";
 
 const AudioNavigation = () => {
 
-    const { playbackState } = usePlaybackState();
+    const { currentPlaybackState } = usePlaybackAudio();
     const { playingAudio } = usePlaybackPlaylist();
     const { togglePlay } = usePlaybackControls();
     const { playlistsData } = useData()
 
     const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === playingAudio?.id)
 
-    return playbackState && (
+    return currentPlaybackState && playingAudio && (
         <div className={styles.navigation}>
             <PlaybackModeToggle />
             <button 
@@ -24,10 +24,10 @@ const AudioNavigation = () => {
                 <LeftIcon />
             </button>
             <button
-                aria-label={playbackState.pause ? "Resume Track" : "Pause Track"}
-                onClick={togglePlay}
+                aria-label={currentPlaybackState.pause ? "Resume Track" : "Pause Track"}
+                onClick={() => togglePlay(!currentPlaybackState.pause)}
             >
-                {playbackState.pause ? <PlayIcon /> : <PauseIcon />}
+                {currentPlaybackState.pause ? <PlayIcon /> : <PauseIcon />}
             </button>
             <button 
                 aria-label="Play Next Track"

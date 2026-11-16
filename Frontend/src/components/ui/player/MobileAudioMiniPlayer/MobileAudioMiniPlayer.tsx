@@ -16,8 +16,7 @@ const MobileAudioMiniPlayer = () => {
 
     const { isMobile } = useGlobal();
 
-    const { audioRef, position } = usePlaybackAudio();
-    const { playbackState } = usePlaybackState();
+    const { currentPlaybackState } = usePlaybackAudio();
     const { playingAudio } = usePlaybackPlaylist();
     const { setFullPlayerOpen } = usePlaybackUI();
     const { togglePlay } = usePlaybackControls();
@@ -26,13 +25,9 @@ const MobileAudioMiniPlayer = () => {
 
     const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === playingAudio?.id)
 
-    const audio = audioRef.current;
-
-    const audioPosition = Math.max(audio?.currentTime || 0, position)
-
     const duration = playingAudio?.duration || 0
 
-    return playingAudio && playbackState && audio && isMobile && (
+    return playingAudio && currentPlaybackState && isMobile && (
         <div 
             className={styles.miniPlayer} 
             data-testid="mini-player" 
@@ -45,8 +40,8 @@ const MobileAudioMiniPlayer = () => {
                 className={styles.trackPosition}
                 style={{ 
                     background: `
-                        linear-gradient(to right, #ffffff ${(audioPosition / duration) * 100}%, 
-                        #444 ${(audioPosition / duration) * 100}%)
+                        linear-gradient(to right, #ffffff ${(currentPlaybackState.position / duration) * 100}%, 
+                        #444 ${(currentPlaybackState.position / duration) * 100}%)
                     `
                 }}
             />
@@ -58,10 +53,10 @@ const MobileAudioMiniPlayer = () => {
                 </button>
 
                 <button
-                    aria-label={playbackState.pause ? "Resume Track" : "Pause Track"}
-                    onClick={togglePlay}
+                    aria-label={currentPlaybackState.pause ? "Resume Track" : "Pause Track"}
+                    onClick={() => togglePlay}
                 >
-                    {playbackState.pause ? <PlayIcon /> : <PauseIcon />}
+                    {currentPlaybackState.pause ? <PlayIcon /> : <PauseIcon />}
                 </button>
 
                 <button 

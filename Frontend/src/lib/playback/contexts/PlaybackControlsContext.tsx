@@ -2,7 +2,7 @@ import { Client } from "@stomp/stompjs";
 import { createContext, Dispatch, SetStateAction, useContext } from "react";
 
 interface PlaybackControlsContextType {
-    togglePlay: () => void;
+    togglePlay: (newPaused?: boolean) => void;
     pausePlayback: () => void;
     seek: (position: number) => void;
     reconnectPlayback: (client: Client) => void;

@@ -1,6 +1,6 @@
 import { countPosition, useGlobal } from "@common";
 import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { PlaybackState, PlaybackMode, PlaybackData } from "../playbackTypes";
+import { PlaybackState, PlaybackMode, PlaybackData, PlaybackEventType } from "../playback.types";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
 import { loggerFactory } from "@common";
@@ -28,7 +28,7 @@ export const usePlaybackController = ({
     setBufferUpdateHandler
 }: usePlaybackProps) => {
 
-    const [playlist, setPlaylist] = useState<Playlist | null>(() => {
+    const [playbackPlaylist, setPlaybackPlaylist] = useState<Playlist | null>(() => {
         const saved = localStorage.getItem("playback.playlist");
 
         return saved ? JSON.parse(saved) : null;
@@ -53,14 +53,14 @@ export const usePlaybackController = ({
     const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
 
     useEffect(() => {
-        const audio = playlist?.queue.find(
+        const audio = playbackPlaylist?.queue.find(
             qi => qi.id === playbackState?.entryId
         )?.audio;
 
         if (audio) {
             setPlayingAudio(audio);
         }
-    }, [playlist, playbackState]);
+    }, [playbackPlaylist, playbackState]);
 
     // info
     const updateMessage = useMemo<string>(() => {
@@ -313,6 +313,23 @@ export const usePlaybackController = ({
         });
     }
 
+    const handleEvent = useCallback((event: PlaybackEventType) => {
+        switch (event) {
+            case "UNSUBSCRIBED":
+                
+                pausePlayback()
+
+                setPlaybackData({})
+                setPlaybackState(null)
+                setPlaybackPlaylist(null)
+                setPlayingAudio(null)
+                break;
+        
+            default:
+                break;
+        }
+    }, [pausePlayback])
+
     useEffect(() => {
         const unsubscribe = addOnConnectHandler((client) => {
 
@@ -348,7 +365,7 @@ export const usePlaybackController = ({
 
                 logger.debug("Пришло обновление playback.playlist: ", playlist)
 
-                setPlaylist(playlist);
+                setPlaybackPlaylist(playlist);
             });
 
             const playbackDataSub = client.subscribe(`/user/queue/playback.data`, (message) => {
@@ -359,7 +376,15 @@ export const usePlaybackController = ({
                 setPlaybackData(playbackData);
             });
 
-            logger.debug("Подписались на /user/queue/playback .mode, .playlist, .state")
+            const playbackEventSub = client.subscribe(`/user/queue/playback.event`, (message) => {
+                const playbackEvent = JSON.parse(message.body);
+
+                logger.debug("Пришло обновление playback.event: ", playbackEvent.type)
+
+                handleEvent(playbackEvent.type)
+            });
+
+            logger.debug("Подписались на /user/queue/playback .mode, .playlist, .state, .data, .event")
 
             reconnect(client);
 
@@ -368,6 +393,7 @@ export const usePlaybackController = ({
                 playbackModeSub.unsubscribe();
                 playbackSub.unsubscribe();
                 playbackDataSub.unsubscribe();
+                playbackEventSub.unsubscribe();
             }
         });
 
@@ -380,7 +406,7 @@ export const usePlaybackController = ({
         position,
         playbackState,
         playbackMode,
-        playbackPlaylist: playlist,
+        playbackPlaylist,
         playbackData,
         playingAudio,
         updateMessage,

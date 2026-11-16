@@ -7,7 +7,7 @@ import org.kirya343.audio.datasource.AudioFile;
 import org.kirya343.audio.services.AudioQueryService;
 import org.kirya343.audio.services.storage.AudioStorageService;
 import org.kirya343.playback.application.command.ChangeTrack;
-import org.kirya343.playback.application.event.PlaybackEvent;
+import org.kirya343.playback.application.event.UpdatePlaybackEvent;
 import org.kirya343.playback.application.service.QueueService;
 import org.kirya343.playback.domain.dto.PlaybackContext;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
@@ -67,7 +67,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         subscriberManager.applyState(context);
 
         eventPublisher.publishEvent(
-            new PlaybackEvent(target, context.getState()));
+            new UpdatePlaybackEvent(target, context.getState()));
 
         tickScheduler.start(this::tickInternal);
     }

@@ -123,4 +123,13 @@ public class PlaybackWebsocketService {
             playbackData
         );
     }
+
+    public void sendPlaybackEvent(String userSub, org.kirya343.playback.presentation.dto.PlaybackEvent event) {
+
+        messagingTemplate.convertAndSendToUser(
+            userSub,
+            "/queue/playback.event",
+            event
+        );
+    }
 }

@@ -10,10 +10,12 @@ import org.kirya343.playback.domain.dto.PlaybackContext;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.dto.StreamContext;
 import org.kirya343.playback.domain.enums.ChunkDeliveryStatus;
+import org.kirya343.playback.domain.enums.PlaybackEventType;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorker;
 import org.kirya343.playback.infrastructure.streaming.user.AudioStreamService;
 import org.kirya343.playback.presentation.dto.ChunkDelivery;
+import org.kirya343.playback.presentation.dto.PlaybackEvent;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playlist.datasource.model.Playlist;
@@ -73,6 +75,13 @@ public class UserStreamWorker
 
             subscribedWorker.unsubscribe(userSub);
         }
+    }
+
+    public void finishStream() {
+        playbackWebsocketService.sendPlaybackEvent(
+            userSub, 
+            new PlaybackEvent(PlaybackEventType.UNSUBSCRIBED)
+        );
     }
 
     public void applyState(PlaybackContext context) {

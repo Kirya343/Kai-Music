@@ -29,28 +29,6 @@ public class StreamContext {
 
     private static final int MAX_IN_FLIGHT_CHUNKS = 2;
 
-    public StreamContext(
-        PlaybackContext playbackContext,
-        String userSub
-    ) {
-        this.playbackContext = playbackContext;
-        this.userSub = userSub;
-
-        Double position = playbackContext.getCurrentPosition();
-        
-        this.bufferedUntil = position;
-
-        this.nextSequence = playbackContext
-            .getChunker()
-            .getSequenceByPosition(position);
-
-        seek(position);
-
-        streamId = UUID.randomUUID();
-
-        log.debug("Creating new StreamContext: {}, bufferedUntil", streamId, bufferedUntil);
-    }
-
     public void setBufferedUntil(double value) {
         this.bufferedUntil = value;
     }
@@ -103,5 +81,27 @@ public class StreamContext {
 
     public void close() {
         isClosed = true;
+    }
+
+    public StreamContext(
+        PlaybackContext playbackContext,
+        String userSub
+    ) {
+        this.playbackContext = playbackContext;
+        this.userSub = userSub;
+
+        Double position = playbackContext.getCurrentPosition();
+        
+        this.bufferedUntil = position;
+
+        this.nextSequence = playbackContext
+            .getChunker()
+            .getSequenceByPosition(position);
+
+        seek(position);
+
+        streamId = UUID.randomUUID();
+
+        log.debug("Creating new StreamContext: {}, bufferedUntil", streamId, bufferedUntil);
     }
 }

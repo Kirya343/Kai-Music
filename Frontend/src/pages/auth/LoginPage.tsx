@@ -1,7 +1,6 @@
 import { api } from "@common"
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import clsx from "clsx";
+import { useState } from "react";
 import AuthLayout from "@/components/layout/AuthLayout/AuthLayout";
 
 const LoginPage = () => {

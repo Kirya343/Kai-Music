@@ -1,6 +1,5 @@
 package org.kirya343.playback.infrastructure.streaming.user.worker;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,21 +7,13 @@ import org.kirya343.playback.infrastructure.streaming.user.AudioStreamService;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
 
-import io.github.kirya343.terminal.api.command.DiagnosticCommand;
-import io.github.kirya343.terminal.api.component.DiagnosticComponent;
-import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
-import io.github.kirya343.terminal.result.CommandResult;
-import io.github.kirya343.terminal.result.StreamMode;
-import io.github.kirya343.terminal.result.StreamingResult;
-import io.github.kirya343.terminal.result.TextResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component 
 @Slf4j 
 @RequiredArgsConstructor 
-public class UserStreamWorkerManager 
-    implements DiagnosticComponent {
+public class UserStreamWorkerManager {
 
     private final PlaybackWebsocketService playbackWebsocketService;
     private final AudioStreamService audioStreamService;
@@ -32,6 +23,10 @@ public class UserStreamWorkerManager
 
     public boolean exist(String userSub) {
         return workers.containsKey(userSub);
+    }
+
+    public Map<String, UserStreamWorker> workers() {
+        return workers;
     }
 
     public UserStreamWorker get(String userSub) {
@@ -75,105 +70,5 @@ public class UserStreamWorkerManager
 
     public long countAll() {
         return workers.size();
-    }
-
-    public String getComponentId() {
-        return "streamers";
-    }
-
-    public List<DiagnosticCommand> getCommands() {
-
-        DiagnosticCommand logsCommand = new DiagnosticCommand() {
-
-            public String getName() {
-                return "logs";
-            }
-
-            public String getDescription() {
-                return "Shows streamer logs";
-            }
-            
-            public CommandResult execute(String[] args) {
-
-                String userSub = getSubFromArgs(args);
-
-                UserStreamWorker worker = workers.get(userSub);
-
-                if (worker == null) {
-                    return new TextResult(String.format("Worker of user %s is offline", userSub));
-                }
-
-                return new StreamingResult(
-                    () -> worker.getFormattedLogs().getContent(),
-                    StreamMode.REPLACE
-                );
-            }
-        };
-
-        DiagnosticCommand infoCommand = new DiagnosticCommand() {
-
-            public String getName() {
-                return "info";
-            }
-
-            public String getDescription() {
-                return "Shows streamer info";
-            }
-            
-            public CommandResult execute(String[] args) {
-
-                String userSub = getSubFromArgs(args);
-
-                UserStreamWorker worker = workers.get(userSub);
-
-                if (worker == null) {
-                    return new TextResult(String.format("Streamer %s is offline", userSub));
-                }
-
-                return new StreamingResult(
-                    () -> worker.getInfo().getContent(),
-                    StreamMode.REPLACE
-                );
-            }
-        };
-
-        DiagnosticCommand indexCommand = new DiagnosticCommand() {
-
-            public String getName() {
-                return "index";
-            }
-
-            public String getDescription() {
-                return "Shows all streamers";
-            }
-            
-            public StreamingResult execute(String[] args) {
-
-                return new StreamingResult(
-                    () -> {
-                        DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Streamers: ");
-
-                        workers.values().forEach(playback -> {
-                            builder.addSection(playback.getInfo());
-                        });
-
-                        return builder.getContent();
-                    },
-                    StreamMode.REPLACE
-                );
-            }
-        };
-
-        return List.of(logsCommand, infoCommand, indexCommand);
-    }
-
-    private String getSubFromArgs(String[] args) {
-        if (args.length != 1) {
-            throw new IllegalArgumentException(
-                "Usage: streamer <userSub>"
-            );
-        }
-
-        return args[0];
     }
 }

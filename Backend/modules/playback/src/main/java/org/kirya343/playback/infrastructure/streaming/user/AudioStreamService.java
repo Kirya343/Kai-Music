@@ -73,7 +73,7 @@ public class AudioStreamService {
         }
 
         if (context.getPlaybackContext().getState().pause()) {
-            log.debug("Playback is paused, do not send chunks");
+            log.trace("Playback is paused, do not send chunks");
             return;
         }
 

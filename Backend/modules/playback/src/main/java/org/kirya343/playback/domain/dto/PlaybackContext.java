@@ -59,13 +59,19 @@ public class PlaybackContext {
     }
 
     public boolean needChangeTrack() {
-        Long audioDuration = audio.getDuration();
 
-        boolean needChange = audio != null && getCurrentPosition() >= audioDuration;
+        if (audio == null || audio.getDuration() == null) {
+            return false;
+        }
+
+        double position = getCurrentPosition();
+        long audioDuration = audio.getDuration();
+
+        boolean needChange = audioDuration > 0 && position >= audioDuration;
 
         if (needChange) {
             log.debug("Sending NEXT event: becouse position({}) is after audioDuration({})",
-                getCurrentPosition(),
+                position,
                 audioDuration
             );
         }

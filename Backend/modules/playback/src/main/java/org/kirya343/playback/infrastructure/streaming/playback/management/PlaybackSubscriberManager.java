@@ -1,4 +1,4 @@
-package org.kirya343.playback.infrastructure.streaming.playback;
+package org.kirya343.playback.infrastructure.streaming.playback.management;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 import org.kirya343.playback.domain.dto.PlaybackContext;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
-import org.kirya343.playback.infrastructure.streaming.user.UserStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.presence.playback.PlaybackPresence;
 import org.kirya343.user.dto.ShortUserDTO;

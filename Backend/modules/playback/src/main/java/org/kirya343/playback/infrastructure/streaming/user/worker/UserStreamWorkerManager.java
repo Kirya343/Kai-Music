@@ -1,9 +1,10 @@
-package org.kirya343.playback.infrastructure.streaming.user;
+package org.kirya343.playback.infrastructure.streaming.user.worker;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.kirya343.playback.infrastructure.streaming.user.AudioStreamService;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.springframework.stereotype.Component;
 

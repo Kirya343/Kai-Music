@@ -1,4 +1,4 @@
-package org.kirya343.playback.infrastructure.streaming.user;
+package org.kirya343.playback.infrastructure.streaming.user.worker;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +11,8 @@ import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.dto.StreamContext;
 import org.kirya343.playback.domain.enums.ChunkDeliveryStatus;
 import org.kirya343.playback.domain.enums.PlaybackMode;
-import org.kirya343.playback.infrastructure.streaming.playback.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.user.AudioStreamService;
 import org.kirya343.playback.presentation.dto.ChunkDelivery;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;

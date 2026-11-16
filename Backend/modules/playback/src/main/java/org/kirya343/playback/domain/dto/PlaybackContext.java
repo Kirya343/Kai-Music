@@ -55,7 +55,7 @@ public class PlaybackContext {
 
         double elapsed = (System.nanoTime() - playbackStartedAt) / 1_000_000_000.0;
 
-        return Math.max(state.position() + elapsed, audio.getDuration());
+        return Math.min(state.position() + elapsed, audio.getDuration());
     }
 
     public boolean needChangeTrack() {

@@ -35,7 +35,6 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
     const [fullPlayerOpen, setFullPlayerOpen] = useState<boolean>(false);
 
     const stateValue = useMemo(() => {
-        console.log("render stateValue", playbackState, playbackMode)
 
         return {
             playbackState,

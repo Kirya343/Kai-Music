@@ -61,7 +61,7 @@ public class PlaybackSubscriberManager {
             log.error("Appling state to: ", worker.getUserSub());
 
             try {
-                worker.synchronizeState(context);
+                worker.applyState(context);
             } catch (Exception e) {
                 log.error("Appling state exception: ", e);
                 throw e;

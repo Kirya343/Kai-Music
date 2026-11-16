@@ -92,20 +92,6 @@ public class UserStreamWorker
         replaceStream(context);
 
         audioStreamService.initializeUser(currentStream);
-        tick(currentStream);
-    }
-
-    public void synchronizeState(PlaybackContext context) {
-        if (context == null) {
-            throw new IllegalStateException("PlaybackContext is null");
-        }
-
-        replaceStream(context);
-
-        audioStreamService.initializeUser(
-            currentStream,
-            context.getCurrentState()
-        );
 
         tick(currentStream);
     }
@@ -143,7 +129,7 @@ public class UserStreamWorker
     }
 
     private void tick(StreamContext context) {
-        log.debug("Tick to user {}, stream: {}", userSub, context.getStreamId());
+        log.trace("Tick to user {}, stream: {}", userSub, context.getStreamId());
         
         audioStreamService.fillBuffer(context);
     }

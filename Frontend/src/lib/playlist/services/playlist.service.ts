@@ -1,5 +1,4 @@
 import { IQueueItem } from "@playback";
-import { playlistService } from ".";
 import { loggerFactory } from "@common";
 import { CreatePlaylist, Playlist } from "../playlistTypes";
 import * as api from "./playlist.api";
@@ -16,8 +15,10 @@ export const removeEntry = async (
     const items = Array.isArray(input) ? input : [input];
 
     const ids = items.map(item =>
-        typeof item === "number" ? item : item.id
+        typeof item === "number" ? item : item.audio.id
     );
+
+    console.log(ids)
 
     try {
         await api.removeFromQueue(playlistId, ids);

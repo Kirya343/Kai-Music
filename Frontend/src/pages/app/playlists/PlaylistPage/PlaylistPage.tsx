@@ -66,7 +66,7 @@ const PlaylistPage = ({}: {}) => {
                         .slice()
                         .sort((a, b) => a.position - b.position)
                         .map((qi, idx) => [
-                            qi.id,
+                            qi.audio.id,
                             playlist.type === PlaylistType.UPLOADED ? (
                                 <UploadsPlaylistTrack
                                     key={idx}
@@ -94,15 +94,7 @@ const PlaylistPage = ({}: {}) => {
                     {
                         icon: <TrashIcon />,
                         title: "Remove from playlist",
-                        func: (ids) => {
-                            const audioIds = filteredList
-                                .filter(qi => ids.some(id => Number(qi.id) === Number(id)))
-                                .map(qi => qi.audio.id);
-
-                            if (audioIds.length === 0) return;
-
-                            playlistService.removeEntry(playlist.id, audioIds);
-                        },
+                        func: (ids) => playlistService.removeEntry(playlist.id, ids),
                         influence: "selected"
                     }
                 ]}

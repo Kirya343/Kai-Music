@@ -52,7 +52,7 @@ public class PlaybackWebsocketService {
         
         Map<String, Object> headers = new HashMap<>();
 
-        log.debug(
+        log.trace(
             "Sending {} chunk to {}: chunk={}, entry={}, stream={}", 
             chunk.initialization() ? "initialization" : "media", 
             userSub, 

@@ -60,7 +60,13 @@ public class PlaybackSessionService {
     }
 
     public void unsubscribe(UserAuthData authData) {
+        UserStreamWorker worker = audioStreamWorkerManager.get(authData.sub());
+
+        worker.finishStream();
+
         audioStreamWorkerManager.unregister(authData.sub());
+
+        userPlaybackRepository.save(new UserPlayback(authData.id(), null, null));
     }
 
     public void restoreSession(UserAuthData authData) {
@@ -68,7 +74,13 @@ public class PlaybackSessionService {
 
         UserPlayback userPlayback = userPlaybackRepository.findById(authData.id()).orElseThrow();
 
-        subscribe(authData, PlaybackTarget.ofUserPlayback(userPlayback));
+        try {
+            PlaybackTarget target = PlaybackTarget.ofUserPlayback(userPlayback);
+
+            subscribe(authData, target);
+        } catch (NullPointerException e) {
+            log.warn("User didn't have saved playback");
+        }
     }
 
     public void resync(UserAuthData authData) {

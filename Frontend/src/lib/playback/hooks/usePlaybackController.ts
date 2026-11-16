@@ -7,6 +7,7 @@ import { loggerFactory } from "@common";
 import { Playlist } from "@playlist";
 import { Client } from "@stomp/stompjs";
 import { IAudio } from "@audio";
+import { useNavigate } from "react-router-dom";
 
 const logger = loggerFactory.getLogger("Audio.Playback");
 
@@ -51,6 +52,8 @@ export const usePlaybackController = ({
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
     const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const audio = playbackPlaylist?.queue.find(
@@ -139,8 +142,8 @@ export const usePlaybackController = ({
             pausePlayback()
         }
 
-        await playbackService.updateTrackPosition({...playbackState, pause: newPaused});
-    }, [playbackState]);
+        await playbackService.updateTrackPosition({...playbackState, position, pause: newPaused, });
+    }, [playbackState, position]);
 
     const seek = useCallback((position: number) => {
 
@@ -177,8 +180,6 @@ export const usePlaybackController = ({
      * audio is loaded on current position
      */
     const playIfBuffered = useCallback(() => {
-
-        logger.debug("попытка начать воспроизведение", autoPlay)
 
         if (!autoPlay || awaitingStateRef.current) return;
 
@@ -323,6 +324,10 @@ export const usePlaybackController = ({
                 setPlaybackState(null)
                 setPlaybackPlaylist(null)
                 setPlayingAudio(null)
+
+                if (window.location.pathname == "/app/room"){
+                    navigate("/app")
+                }
                 break;
         
             default:

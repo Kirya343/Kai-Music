@@ -152,7 +152,6 @@ const Track = ({
                 {finalActions.map(act => (
                     <button 
                         onClick={(event) => {
-                            console.log("BUTTON CLICK", audio.id);
                             event.stopPropagation();
                             act.func();
                         }}

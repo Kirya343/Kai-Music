@@ -60,7 +60,7 @@ public class UserStreamWorkerManager
         workers.put(worker.getUserSub(), worker);
     }
 
-    public void unregister(String userSub) {
+    public UserStreamWorker unregister(String userSub) {
         UserStreamWorker worker = workers.remove(userSub);
 
         log.debug("Удаляем воркер {}", userSub);
@@ -69,6 +69,8 @@ public class UserStreamWorkerManager
             worker.unsubscribe();
             worker.cancelTask();
         }
+
+        return worker;
     }
 
     public long countAll() {

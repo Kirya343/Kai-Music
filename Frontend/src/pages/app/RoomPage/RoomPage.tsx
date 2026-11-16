@@ -122,7 +122,7 @@ const RoomPage = () => {
                                     .slice()
                                     .sort((a, b) => a.position - b.position)
                                     .map(qi => [
-                                        qi.id,
+                                        qi.audio.id,
                                         <PlaybackQueueTrack
                                             key={qi.id}
                                             queueItem={qi}

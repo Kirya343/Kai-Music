@@ -72,6 +72,11 @@ public class AudioStreamService {
             throw new IllegalStateException("Stream " + context.getStreamId() + " is closed");
         }
 
+        if (context.getPlaybackContext().getState().pause()) {
+            log.debug("Playback is paused, do not send chunks");
+            return;
+        }
+
         Fmp4Chunker chunker = context.getPlaybackContext().getChunker();
 
         try {
@@ -101,7 +106,7 @@ public class AudioStreamService {
             }
 
             if (chunks.size() > 0) {
-                log.debug("fillBuffer to user {} {} -> {}: {}", 
+                log.trace("fillBuffer to user {} {} -> {}: {}", 
                     context.getUserSub(), 
                     context.getBufferedUntil(), 
                     buffered, 

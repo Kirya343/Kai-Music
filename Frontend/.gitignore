@@ -5,3 +5,5 @@ dist.zip
 /android
 .yarn/install-state.gz
 stats.html
+
+/test-results

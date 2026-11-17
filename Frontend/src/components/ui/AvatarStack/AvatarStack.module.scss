@@ -17,12 +17,18 @@
         font-weight: 700;
         white-space: nowrap;
 
-        &:last-child {
-            font-size: 10px;
-        }
-
         &:first-child {
             margin-left: 0;
+        }
+
+        .counter {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            font-weight: 500;
+            font-size: 9px;
+            white-space: nowrap;
         }
     }
 }

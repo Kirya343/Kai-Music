@@ -41,6 +41,7 @@ export default function AvatarStack({ users }: { users: User[]}) {
 
             {users.length > 5 && (
                 <span
+                    className={styles.counter}
                     style={{ backgroundColor: "#212121" }} 
                     title={`${users.length} listeners`}
                 >

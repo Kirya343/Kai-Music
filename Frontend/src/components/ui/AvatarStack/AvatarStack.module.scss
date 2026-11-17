@@ -15,6 +15,11 @@
         color: white;
         font-size: 12px;
         font-weight: 700;
+        white-space: nowrap;
+
+        &:last-child {
+            font-size: 10px;
+        }
 
         &:first-child {
             margin-left: 0;

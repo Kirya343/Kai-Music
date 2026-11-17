@@ -10,7 +10,9 @@ interface ColoredUser extends User {
     color?: string;
 }
 
-export default function AvatarStack({ users }: { users: User[]}) {
+export default function AvatarStack(/* { users }: { users: User[]} */) {
+
+    const users = [{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" }]
 
     const colors = useRef<Map<string, string>>(new Map());
 
@@ -29,7 +31,7 @@ export default function AvatarStack({ users }: { users: User[]}) {
 
     return (
         <div className={styles.avatarStack}>
-            {colored?.map((listener, idx) => (
+            {colored?.slice(0, 5).map((listener, idx) => (
                 <span 
                     key={idx} 
                     style={{ backgroundColor: listener.color }} 
@@ -38,6 +40,15 @@ export default function AvatarStack({ users }: { users: User[]}) {
                     {listener.name.charAt(0)}
                 </span>
             ))}
+
+            {users.length > 5 && (
+                <span
+                    style={{ backgroundColor: "#212121" }} 
+                    title={`${users.length} listeners`}
+                >
+                    + {users.length - 5}
+                </span>
+            )}
         </div>
     )
 }

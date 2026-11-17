@@ -10,9 +10,7 @@ interface ColoredUser extends User {
     color?: string;
 }
 
-export default function AvatarStack(/* { users }: { users: User[]} */) {
-
-    const users = [{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" },{ name: "d" }]
+export default function AvatarStack({ users }: { users: User[]}) {
 
     const colors = useRef<Map<string, string>>(new Map());
 

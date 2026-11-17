@@ -58,7 +58,8 @@ const KebabMenu = ({ actions, className }: KebabMenuProps) => {
                 <DropdownMenu.Content
                     className={styles.list}
                     sideOffset={4}
-                    align="start"
+                    side="bottom"
+                    align="center"
                 >
                     {filtered.map((action) => (
                         <DropdownMenu.Item

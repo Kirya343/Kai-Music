@@ -1,4 +1,4 @@
-import { IPage } from "@/lib/common/types";
+import { IPage } from "@/lib/common/common.types";
 import { IAudio, audioService } from "@audio";
 import { useSearch } from "@common";
 import { AxiosProgressEvent } from "axios";
@@ -31,7 +31,7 @@ export const useLibrary = () => {
     
     const loadLibrary = useCallback(async (searchQuery: string, page: number) => {
         try {
-            const res = await audioService.loadLibrary(searchQuery, page, 50);
+            const res = await audioService.loadLibrary(searchQuery, page, 2);
             
             console.log(res.data)
 

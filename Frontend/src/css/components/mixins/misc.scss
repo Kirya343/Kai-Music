@@ -1,12 +1,30 @@
 @use "sass:math";
 
 @mixin click($size: 1) {
-    $scale: 0.96 - math.div($size, 100);
+    $scale: 0.97 - math.div($size, 100);
 
-    transition: transform 0.08s ease-out, filter 0.08s ease-out;
+    box-shadow:
+        0 2px 4px #00000020,
+        0 1px 2px #00000010;
+
+    transition:
+        transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1),
+        filter 160ms ease,
+        box-shadow 160ms ease;
+
+    transform: scale(1);
+    transform-origin: center;
 
     &:active {
         transform: scale($scale);
-        filter: brightness(0.8);
+        filter: brightness(0.88);
+        box-shadow:
+            0 1px 2px #00000020,
+            inset 0 1px 2px #00000010;
+        transition-duration: 70ms;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        transition: none;
     }
 }

@@ -14,8 +14,8 @@ export const removeEntry = async (
 
     const items = Array.isArray(input) ? input : [input];
 
-    const ids = items.map(item =>
-        typeof item === "number" ? item : item.audio.id
+    const ids = items.map(item => 
+        typeof item === "number" ? item : item.audio?.id
     );
 
     console.log(ids)

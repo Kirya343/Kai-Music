@@ -1,8 +1,6 @@
 import { AxiosProgressEvent } from "axios";
-import { createApi } from "@common";
+import { createApi, IPage } from "@common";
 import { IAudio, IAudioUpdate } from "@audio";
-import { IPage } from "../common/types";
-
 
 const audioApi = createApi('/audio')
 

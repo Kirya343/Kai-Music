@@ -150,7 +150,7 @@ export const usePlaybackController = ({
         }
 
         await playbackService.updateTrackPosition({...playbackState, position, pause: newPaused, });
-    }, [playbackState, position]);
+    }, [playbackState, position, pausePlayback]);
 
     const seek = useCallback((position: number) => {
 

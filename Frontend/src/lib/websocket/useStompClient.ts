@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { Client, Frame } from "@stomp/stompjs";
 
 import { API_BASE } from "@/config";
@@ -32,6 +32,8 @@ export function useStompClient(): UseStompClientResult {
     const handlers = useRef(new Set<OnConnectHandler>());
     const cleanups = useRef(new Map<OnConnectHandler, Cleanup>());
 
+    const userSub = user?.sub
+
     const cleanupClient = useCallback(() => {
         if (!clientRef.current) return;
 
@@ -47,7 +49,7 @@ export function useStompClient(): UseStompClientResult {
     }, []);
 
     const connect = useCallback(async () => {
-        if (!user) return;
+        if (!userSub) return;
         if (!API_BASE) return;
         if (clientRef.current?.active) return;
 
@@ -75,6 +77,8 @@ export function useStompClient(): UseStompClientResult {
 
             logger.debug("Подключение")
 
+            logger.debug("Восстановление подписок: ", handlers.current.size)
+
             for (const handler of handlers.current) {
                 cleanups.current.get(handler)?.();
 
@@ -89,6 +93,7 @@ export function useStompClient(): UseStompClientResult {
         };
 
         stompClient.onDisconnect = () => {
+            logger.info("Disconnected")
             setConnected(false);
         };
 
@@ -125,15 +130,18 @@ export function useStompClient(): UseStompClientResult {
         };
 
         stompClient.onWebSocketClose = () => {
+            logger.info("Closed")
             setConnected(false);
         };
 
         stompClient.activate();
-    }, [user, cleanupClient]);
+    }, [userSub, cleanupClient]);
 
     const addOnConnectHandler = useCallback(
         (handler: OnConnectHandler): Cleanup => {
             handlers.current.add(handler);
+
+            logger.debug("Handler registered:", handlers.current.size);
 
             if (clientRef.current?.connected) {
                 const cleanup = handler(
@@ -150,22 +158,30 @@ export function useStompClient(): UseStompClientResult {
                 cleanups.current.get(handler)?.();
                 cleanups.current.delete(handler);
                 handlers.current.delete(handler);
+
+                logger.debug("Handler removed:", handlers.current.size);
             };
         },
         []
     );
 
+    const instanceId = useId();
+
     useEffect(() => {
 
-        logger.debug("Пользователь: ", user)
-        if (!user) return;
+        logger.debug("STOMP effect start:", instanceId);
+
+        logger.debug("Пользователь: ", userSub)
+        if (!userSub) return;
 
         connect();
 
         return () => {
             cleanupClient();
+
+            logger.debug("STOMP effect cleanup:", instanceId);
         };
-    }, [user, connect, cleanupClient]);
+    }, [userSub, connect, cleanupClient]);
 
     return {
         client,

@@ -1,7 +1,7 @@
 import { IRole } from "@permission";
 
 export interface IShortUser {
-    openId: string;
+    sub: string;
     name: string;
     avatarUrl?: string;
 }

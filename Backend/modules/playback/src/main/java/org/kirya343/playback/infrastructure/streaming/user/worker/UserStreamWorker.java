@@ -85,13 +85,21 @@ public class UserStreamWorker
     }
 
     public void applyState(PlaybackContext context) {
+        applyState(context, null);
+    }
+
+    public void applyState(PlaybackContext context, PlaybackStateDTO state) {
         if (context == null) {
             throw new IllegalStateException("PlaybackContext is null");
         }
 
         replaceStream(context);
 
-        audioStreamService.initializeUser(currentStream);
+        if (state != null) {
+            audioStreamService.initializeUser(currentStream, state);
+        } else {
+            audioStreamService.initializeUser(currentStream);
+        }
 
         tick(currentStream);
     }

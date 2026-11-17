@@ -38,9 +38,15 @@ public class PlaybackCommandWorker {
         if (cmd.target() != null) {
             playbackWorker = playbackStreamWorkerManager.get(cmd.target());
         } else {
+            log.debug("UserName", authData.name());
             playbackWorker = audioStreamWorkerManager
                 .get(authData.sub())
                 .getSubscribedWorker();
+        }
+
+        if (playbackWorker == null) {
+            log.debug("PlaybackWorker is null, cannot apply command");
+            return;
         }
 
         switch (cmd) {

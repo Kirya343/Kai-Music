@@ -11,7 +11,7 @@ const config: LoggerConfig = {
             MediaSource: "INFO",
             Playback: "DEBUG",
         },
-        WebSocket: "ERROR",
+        WebSocket: "DEBUG",
         GlobalContext: "INFO",
 
         HTTP: "NONE",

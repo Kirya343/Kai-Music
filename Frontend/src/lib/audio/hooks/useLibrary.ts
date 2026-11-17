@@ -31,7 +31,7 @@ export const useLibrary = () => {
     
     const loadLibrary = useCallback(async (searchQuery: string, page: number) => {
         try {
-            const res = await audioService.loadLibrary(searchQuery, page, 2);
+            const res = await audioService.loadLibrary(searchQuery, page, 50);
             
             console.log(res.data)
 

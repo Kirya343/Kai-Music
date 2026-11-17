@@ -13,6 +13,7 @@ const logger = loggerFactory.getLogger("Audio.Playback");
 
 interface usePlaybackProps {
     audio: HTMLAudioElement | null,
+    audioRef: RefObject<HTMLAudioElement | null>,
     createMediaSource: (entryId: string) => HTMLAudioElement | null,
     cleanupMediaSource: () => void,
     currentStreamIdRef: RefObject<string | null>
@@ -22,6 +23,7 @@ interface usePlaybackProps {
 
 export const usePlaybackController = ({
     audio, 
+    audioRef,
     createMediaSource, 
     cleanupMediaSource, 
     currentStreamIdRef,

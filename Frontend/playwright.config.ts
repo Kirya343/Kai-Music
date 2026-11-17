@@ -15,5 +15,8 @@ export default defineConfig({
         },
     ],
 
+    workers: 50,
+    fullyParallel: true,
+
     reporter: "list",
 });

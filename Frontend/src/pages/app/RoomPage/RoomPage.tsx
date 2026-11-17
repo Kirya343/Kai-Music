@@ -117,19 +117,18 @@ const RoomPage = () => {
 
                         <SelectableList
                             className={styles.trackList}
-                            data={Object.fromEntries(
-                                (playbackPlaylist?.queue ?? [])
-                                    .slice()
-                                    .sort((a, b) => a.position - b.position)
-                                    .map(qi => [
-                                        qi.audio.id,
+                            data={(playbackPlaylist?.queue ?? [])
+                                .toSorted((a, b) => a.position - b.position)
+                                .map(qi => ({
+                                    id: qi.audio.id,
+                                    node: (
                                         <PlaybackQueueTrack
                                             key={qi.id}
                                             queueItem={qi}
                                             playing={playbackState?.entryId === qi.id}
                                         />
-                                    ])
-                            )}
+                                    )
+                                }))}
                             extraActions={[
                                 {
                                     title: "Remove from queue",

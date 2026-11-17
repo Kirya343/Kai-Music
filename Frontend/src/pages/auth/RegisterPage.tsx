@@ -101,29 +101,37 @@ const RegisterPage = () => {
                 <>
                     <input 
                         type="text"
+                        data-testid="name"
                         placeholder="Your name" 
                         value={name} 
                         onChange={(e) => setName(e.target.value)}
                     />
                     <input 
                         type="text"
+                        data-testid="email"
                         placeholder="Email" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <input 
                         type="password" 
+                        data-testid="password"
                         placeholder="Password" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
                     <input 
-                        type="password" 
+                        type="password"
+                        data-testid="repeat-password" 
                         placeholder="Repeat password" 
                         value={passwordConfirm}
                         onChange={(e) => setPasswordConfirm(e.target.value)}
                     />
-                    <button className="btn" onClick={register}>Sign Up</button>
+                    <button 
+                        className="btn" 
+                        onClick={register}
+                        data-testid="register-button"
+                    >Sign Up</button>
                 </>
             )}
             links={(<Link to="/login">Sign In</Link>)}

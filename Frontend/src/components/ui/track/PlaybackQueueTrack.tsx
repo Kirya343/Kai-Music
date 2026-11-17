@@ -55,6 +55,7 @@ const PlaybackQueueTrack = ({
             noBorder
             actions={actions}
             visualProps={{
+                id: true,
                 title: true,
                 artist: true
             }}

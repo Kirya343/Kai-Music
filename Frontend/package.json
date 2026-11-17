@@ -39,7 +39,7 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.0",
     "@types/debug": "^4",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react": "^5.0.2",

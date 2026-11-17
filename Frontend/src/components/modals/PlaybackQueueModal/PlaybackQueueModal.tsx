@@ -22,16 +22,10 @@ const PlaybackQueueModal = ({
 
     const [importOpen, setImportOpen] = useState<boolean>(false)
     const [selectMode, setSelectMode] = useState<boolean>(false);
+
     const { playbackState } = usePlaybackState();
 
     const { playbackPlaylist } = usePlaybackPlaylist();
-
-    const deleteFromPlaylist = (ids: number[]) => {
-            
-        if (!playbackPlaylist?.id) return;
-
-        playlistService.removeEntry(playbackPlaylist.id, ids)
-    }
 
     return (
         <Modal
@@ -42,19 +36,19 @@ const PlaybackQueueModal = ({
             <div className={styles.body}>
                 <SelectableList
                     className={styles.trackList}
-                    data={Object.fromEntries(
-                        (playbackPlaylist?.queue ?? [])
-                            .slice()
-                            .sort((a, b) => a.position - b.position)
-                            .map(qi => [
-                                qi.audio.id,
+                    data={(playbackPlaylist?.queue ?? [])
+                        .toSorted((a, b) => a.position - b.position)
+                        .map(qi => ({
+                            id: qi.audio.id,
+                            node: (
                                 <PlaybackQueueTrack
                                     key={qi.id}
                                     queueItem={qi}
                                     playing={playbackState?.entryId === qi.id}
                                 />
-                            ])
-                    )}
+                            )
+                        }))
+                    }
                     extraActions={[
                         {
                             title: "Remove from queue",

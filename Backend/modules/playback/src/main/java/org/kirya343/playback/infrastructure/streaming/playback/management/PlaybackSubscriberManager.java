@@ -97,7 +97,7 @@ public class PlaybackSubscriberManager {
         DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Streamers:");
 
         userStreamWorkers.values().forEach(worker -> {
-            builder.addSection(worker.getInfo());
+            builder.addSection(worker.getInfo(true));
         });
 
         return builder;

@@ -74,7 +74,7 @@ public class UserStreamWorkerDiagnostics
                 }
 
                 return new StreamingResult(
-                    () -> worker.getInfo().getContent(),
+                    () -> worker.getInfo(false).getContent(),
                     StreamMode.REPLACE
                 );
             }
@@ -97,7 +97,7 @@ public class UserStreamWorkerDiagnostics
                         DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Streamers: ");
 
                         userStreamWorkerManager.workers().values().forEach(playback -> {
-                            builder.addSection(playback.getInfo());
+                            builder.addSection(playback.getInfo(false));
                         });
 
                         return builder.getContent();

@@ -70,12 +70,11 @@ const LibraryPage = () => {
             <Loader loadingActive={!loading && !audiosPage?.content}>
                 <SelectableList
                     className={styles.trackList}
-                    data={audiosPage ? Object.fromEntries(
-                        audiosPage?.content
-                            .slice()
-                            .sort((a, b) => a.id - b.id)
-                            .map((audio, idx) => [
-                                audio.id,
+                    data={(audiosPage?.content ?? [])
+                        .toSorted((a, b) => a.id - b.id)
+                        .map((audio, idx) => ({
+                            id: audio.id,
+                            node: (
                                 <LibraryTrack
                                     key={idx}
                                     audio={audio}
@@ -84,8 +83,8 @@ const LibraryPage = () => {
                                     openEditModal={setAudioFileView}
                                     playing={playingAudioId === audio.id}
                                 />
-                            ])
-                    ) : {}}
+                            )
+                        }))}
                     extraActions={[]}
                     selectMode={selectMode}
                     setSelectMode={setSelectMode}

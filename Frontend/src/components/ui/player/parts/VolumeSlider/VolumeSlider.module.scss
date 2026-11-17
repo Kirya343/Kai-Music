@@ -1,4 +1,115 @@
 .volumeSlider {
+    --track-height: 4px;
+    --thumb-size: 12px;
+
+    appearance: none;
+    -webkit-appearance: none;
     width: 100px;
     padding: 10px;
+
+    background: transparent;
+    cursor: pointer;
+
+    // Chrome, Edge, Safari
+    &::-webkit-slider-runnable-track {
+        height: var(--track-height);
+        border-radius: 10px;
+
+        background: linear-gradient(
+            to right,
+            #ffa348 0%,
+            #ffa348 var(--progress),
+            #ffffff30 var(--progress),
+            #ffffff30 100%
+        );
+    }
+
+    &::-webkit-slider-thumb {
+        appearance: none;
+        -webkit-appearance: none;
+
+        width: var(--thumb-size);
+        height: var(--thumb-size);
+        margin-top: calc((var(--track-height) - var(--thumb-size)) / 2);
+
+        border: 2px solid #ffa348;
+        border-radius: 50%;
+
+        background: #fff;
+
+        box-shadow: 0 1px 5px #00000030;
+
+        transition:
+            transform 140ms ease,
+            box-shadow 140ms ease;
+    }
+
+    &:hover::-webkit-slider-thumb {
+        transform: scale(1.2);
+        box-shadow: 0 0 0 4px #ffa34825;
+    }
+
+    &:active::-webkit-slider-thumb {
+        transform: scale(1.35);
+        box-shadow: 0 0 0 5px #ffa34830;
+    }
+
+    // Firefox
+    &::-moz-range-track {
+        height: var(--track-height);
+        border-radius: 10px;
+        background: #ffffff30;
+    }
+
+    &::-moz-range-progress {
+        height: var(--track-height);
+        border-radius: 10px;
+        background: #ffa348;
+    }
+
+    &::-moz-range-thumb {
+        width: var(--thumb-size);
+        height: var(--thumb-size);
+
+        border: 2px solid #ffa348;
+        border-radius: 50%;
+
+        background: #fff;
+
+        box-shadow: 0 1px 5px #00000030;
+
+        transition:
+            transform 140ms ease,
+            box-shadow 140ms ease;
+    }
+
+    &:hover::-moz-range-thumb {
+        transform: scale(1.2);
+        box-shadow: 0 0 0 4px #ffa34825;
+    }
+
+    &:active::-moz-range-thumb {
+        transform: scale(1.35);
+        box-shadow: 0 0 0 5px #ffa34830;
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+
+    &:focus-visible::-webkit-slider-thumb {
+        box-shadow: 0 0 0 4px #ffa34840;
+    }
+
+    &:focus-visible::-moz-range-thumb {
+        box-shadow: 0 0 0 4px #ffa34840;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        &,
+        &::-webkit-slider-thumb,
+        &::-moz-range-thumb {
+            transition: none;
+        }
+    }
 }

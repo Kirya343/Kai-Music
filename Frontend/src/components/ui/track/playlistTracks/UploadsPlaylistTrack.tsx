@@ -99,6 +99,12 @@ const UploadsPlaylistTrack = ({
             trackNumber={trackNumber}
             actions={actions}
             extraActions={extraActions}
+            visualProps={{
+                title: true,
+                album: true,
+                duration: true,
+                artist: true
+            }}
             playing={playing}
             onClick={() => playTrack(queueItem.audio.id, currentPlaylistId)}
             {...divProps}

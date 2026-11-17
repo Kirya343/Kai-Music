@@ -176,7 +176,7 @@ public class UserStreamWorker
 
     // Diadnostic voids
 
-    public DiagnosticTextBuilder getInfo() {
+    public DiagnosticTextBuilder getInfo(boolean isShort) {
         
         DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Stream worker of " + userSub);
 
@@ -226,6 +226,8 @@ public class UserStreamWorker
 
             builder.addRow("Position: [" + position + "]");
         }
+
+        if (isShort) return builder;
 
         DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
             .addRow("position: " + state.position())

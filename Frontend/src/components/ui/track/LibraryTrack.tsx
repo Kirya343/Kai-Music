@@ -61,6 +61,11 @@ const LibraryTrack = ({
             audio={audio}
             trackNumber={trackNumber}
             extraActions={extraActions}
+            visualProps={{
+                title: true,
+                artist: true,
+                album: true
+            }}
             playing={playing}
             onClick={() => playTrack(audio.id)}
             {...divProps}

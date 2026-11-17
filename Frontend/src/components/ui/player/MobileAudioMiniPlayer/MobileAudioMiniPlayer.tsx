@@ -54,7 +54,7 @@ const MobileAudioMiniPlayer = () => {
 
                 <button
                     aria-label={currentPlaybackState.pause ? "Resume Track" : "Pause Track"}
-                    onClick={() => togglePlay}
+                    onClick={() => togglePlay()}
                 >
                     {currentPlaybackState.pause ? <PlayIcon /> : <PauseIcon />}
                 </button>

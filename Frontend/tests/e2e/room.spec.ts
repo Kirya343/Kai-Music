@@ -60,7 +60,7 @@ for (const [index, user] of users.slice(0, 50).entries()) {
         try {
             log(index, "Opening login page");
 
-            await page.goto("http://localhost:30000/login");
+            await page.goto("https://kaimusic.app/login");
 
             log(index, `Entering credentials ${user.email}: ${user.password}`);
 
@@ -75,7 +75,7 @@ for (const [index, user] of users.slice(0, 50).entries()) {
 
             log(index, "Authenticated");
 
-            await page.goto("http://localhost:30000/app");
+            await page.goto("https://kaimusic.app/app");
 
             await page.reload();
 
@@ -83,7 +83,7 @@ for (const [index, user] of users.slice(0, 50).entries()) {
 
             log(index, "Waiting for room");
 
-            const room = page.getByTestId("Kirya-room");
+            const room = page.getByTestId("kirya's room");
 
             await room.waitFor({ state: "visible" });
             await room.click();

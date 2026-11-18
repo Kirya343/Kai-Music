@@ -8,8 +8,8 @@ import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWork
 import org.kirya343.presence.global.services.PresenceService;
 import org.springframework.stereotype.Component;
 
-import io.github.kirya343.terminal.api.command.DiagnosticCommand;
-import io.github.kirya343.terminal.api.command.TerminalCommand;
+import io.github.kirya343.terminal.api.annotations.Command;
+import io.github.kirya343.terminal.api.annotations.CommandGroup;
 import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
 import io.github.kirya343.terminal.result.StreamMode;
 import io.github.kirya343.terminal.result.StreamingResult;
@@ -17,22 +17,15 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor 
-@TerminalCommand 
-public class StatsCommand implements DiagnosticCommand {
+@CommandGroup("stats")
+public class StatsCommands {
 
     private final PresenceService presenceService;
     private final PlaybackStreamWorkerManager playbackworkers;
     private final UserStreamWorkerManager audioWorkers;
 
-    public String getName() {
-        return "stats";
-    }
-    
-    public String getDescription() {
-        return "Shows application live stats";
-    }
-
-    public StreamingResult execute(String[] args) {
+    @Command(description = "Shows application live stats")
+    public StreamingResult liveStats() {
 
         return new StreamingResult(
             () -> {

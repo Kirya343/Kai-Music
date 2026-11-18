@@ -21,7 +21,7 @@ import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.user.dto.ShortUserDTO;
 import org.springframework.context.ApplicationEventPublisher;
 
-import io.github.kirya343.terminal.api.component.DiagnosticLoggable;
+import io.github.kirya343.terminal.api.components.DiagnosticLoggable;
 import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -156,10 +156,10 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
     // Diadnostic commands
 
     public DiagnosticTextBuilder getInfo() {
-        return getInfo("");
+        return getInfo(false);
     }
 
-    public DiagnosticTextBuilder getInfo(String param) {
+    public DiagnosticTextBuilder getInfo(boolean withStreamers) {
         
         DiagnosticTextBuilder builder = new DiagnosticTextBuilder(target.toString() + "-streamer:");
 
@@ -179,7 +179,7 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
 
         builder.addRow( "Playing Audio: " + (audio != null ? audio.getTitle() : null));
 
-        if ("--with-streamers".equals(param)) {
+        if (withStreamers) {
             builder.addSection(subscriberManager.getStreamersInfo());
         }
 

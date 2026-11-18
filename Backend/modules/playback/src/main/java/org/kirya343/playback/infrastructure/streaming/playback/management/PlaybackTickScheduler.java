@@ -1,23 +1,14 @@
 package org.kirya343.playback.infrastructure.streaming.playback.management;
 
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import io.github.kirya343.terminal.api.command.DiagnosticCommand;
-import io.github.kirya343.terminal.api.component.DiagnosticComponent;
-import io.github.kirya343.terminal.api.provider.StreamingDataProvider;
-import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
-import io.github.kirya343.terminal.result.StreamMode;
-import io.github.kirya343.terminal.result.StreamingResult;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j 
-public class PlaybackTickScheduler
-    implements DiagnosticComponent {
+public class PlaybackTickScheduler {
 
     private static final long TICK_INTERVAL_SECONDS = 2;
 
@@ -92,40 +83,42 @@ public class PlaybackTickScheduler
 
     // Diadnostic commands
 
-    public String getComponentId() {
-        return "tick-executor " + name;
-    }
+    //TODO сделать команду
 
-    public List<DiagnosticCommand> getCommands() {
+    // public String getComponentId() {
+    //     return "tick-executor " + name;
+    // }
+
+    // public List<DiagnosticCommand> getCommands() {
         
-        return List.of(new DiagnosticCommand() {
-            public String getName() {
-                return "queue";
-            }
+    //     return List.of(new DiagnosticCommand() {
+    //         public String getName() {
+    //             return "queue";
+    //         }
 
-            public String getDescription() {
-                return "Shows sheduler queue";
-            }
+    //         public String getDescription() {
+    //             return "Shows sheduler queue";
+    //         }
 
-            public StreamingResult execute(String[] args) {
-                return new StreamingResult(getData(), StreamMode.REPLACE);
-            }
+    //         public StreamingResult execute(String[] args) {
+    //             return new StreamingResult(getData(), StreamMode.REPLACE);
+    //         }
 
-            private StreamingDataProvider getData() {
-                return () -> {
-                    DiagnosticTextBuilder builder = new DiagnosticTextBuilder("TickExecuror queue");
+    //         private StreamingDataProvider getData() {
+    //             return () -> {
+    //                 DiagnosticTextBuilder builder = new DiagnosticTextBuilder("TickExecuror queue");
                     
-                    BlockingQueue<Runnable> queue = scheduler.getQueue();
+    //                 BlockingQueue<Runnable> queue = scheduler.getQueue();
 
-                    log.debug("Queue size: {}", queue.size());
+    //                 log.debug("Queue size: {}", queue.size());
 
-                    for (Runnable task : queue) {
-                        builder.addRow("Scheduled task: " + task);
-                    }
+    //                 for (Runnable task : queue) {
+    //                     builder.addRow("Scheduled task: " + task);
+    //                 }
 
-                    return builder.toString();
-                };
-            }
-        });
-    }
+    //                 return builder.toString();
+    //             };
+    //         }
+    //     });
+    // }
 }

@@ -21,7 +21,7 @@ import org.kirya343.playback.presentation.websocket.PlaybackWebsocketService;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.user.dto.ShortUserDTO;
 
-import io.github.kirya343.terminal.api.component.DiagnosticLoggable;
+import io.github.kirya343.terminal.api.components.DiagnosticLoggable;
 import io.github.kirya343.terminal.formatting.DiagnosticTextBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

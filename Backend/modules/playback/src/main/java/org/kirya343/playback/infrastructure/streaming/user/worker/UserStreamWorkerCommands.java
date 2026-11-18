@@ -27,7 +27,7 @@ public class UserStreamWorkerCommands {
                 DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Streamers: ");
 
                 userStreamWorkerManager.workers().values().forEach(playback -> {
-                    builder.addSection(playback.getInfo());
+                    builder.addSection(playback.getInfo(false));
                 });
 
                 return builder.getContent();
@@ -64,7 +64,7 @@ public class UserStreamWorkerCommands {
             }
 
             return new StreamingResult(
-                () -> worker.getInfo().getContent(),
+                () -> worker.getInfo(false).getContent(),
                 StreamMode.REPLACE
             );
         }

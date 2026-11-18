@@ -2,10 +2,9 @@ import { IAudio, useLibrary } from "@audio";
 import { useMemo, useState } from "react";
 import styles from "./LibraryPage.module.scss"
 import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
-import { CirclePlusIcon, CheckmarkIcon, CrossIcon, ArrowIcon } from "@/assets/icons";
+import { CirclePlusIcon, CheckmarkIcon, CrossIcon } from "@/assets/icons";
 import LibraryTrack from "@/components/ui/track/LibraryTrack";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
-import { useData } from "@common";
 import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 import Loader from "@/components/ui/Loader/Loader";
@@ -13,7 +12,6 @@ import Pagination from "@/components/ui/Pagination/Pagination";
 
 const LibraryPage = () => {
 
-    const { audiosData } = useData();
     const [selectMode, setSelectMode] = useState<boolean>(false);
 
     const {
@@ -72,23 +70,21 @@ const LibraryPage = () => {
             <Loader loadingActive={!loading && !audiosPage?.content}>
                 <SelectableList
                     className={styles.trackList}
-                    data={audiosPage ? Object.fromEntries(
-                        audiosPage?.content
-                            .slice()
-                            .sort((a, b) => a.id - b.id)
-                            .map((audio, idx) => [
-                                audio.id,
+                    data={(audiosPage?.content ?? [])
+                        .toSorted((a, b) => a.id - b.id)
+                        .map((audio, idx) => ({
+                            id: audio.id,
+                            node: (
                                 <LibraryTrack
                                     key={idx}
                                     audio={audio}
                                     trackNumber={idx + 1}
                                     importPlaylistId={playbackPlaylist?.id}
                                     openEditModal={setAudioFileView}
-                                    handleDelete={audiosData.deleteAudio}
                                     playing={playingAudioId === audio.id}
                                 />
-                            ])
-                    ) : {}}
+                            )
+                        }))}
                     extraActions={[]}
                     selectMode={selectMode}
                     setSelectMode={setSelectMode}

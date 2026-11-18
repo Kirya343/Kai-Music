@@ -122,26 +122,3 @@ input.uploadAudio {
         @include glass(true);
     }
 }
-
-.pagination {
-    display: flex;
-    gap: 1rem;
-    width: 100%;
-    justify-content: center;
-
-    button {
-        padding: 0.7rem 1rem;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-        border-radius: 10px;
-        
-        @include glass(true);
-
-        &:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    }
-}

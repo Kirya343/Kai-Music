@@ -1,13 +1,11 @@
 import { createContext, useContext, useEffect } from "react";
 import { Playlist, usePlaylistsData } from "@playlist";
-import { IAudio, useAudioData } from "@audio";
 
 /**
  * Defines the acpplication data context.
  */
 interface DataContextType {
     playlistsData: IPlaylistsData;
-    audiosData: IAudiosData;
 }
 
 
@@ -22,23 +20,6 @@ interface IPlaylistsData {
 
     /** Synchronizes playlists with the server. */
     syncPlaylists: () => void;
-}
-
-/**
- * Defines the audio data and available operations.
- */
-interface IAudiosData {
-    /** List of available audio tracks. */
-    data: IAudio[];
-
-    /** Synchronizes audio tracks with the server. */
-    syncAudios: () => void;
-
-    /** Deletes audio */
-    deleteAudio: (audio: IAudio) => void;
-
-    /** Updates audio metadata */
-    updateAudio: (audio: IAudio) => void;
 }
 
 /**
@@ -67,18 +48,14 @@ export const useData = () => {
  * Initializes audio and playlist synchronization when mounted.
  */
 export const DataProvider = ({ children }: { children?: React.ReactNode }) => {
-
-    const audiosData = useAudioData();
     const playlistsData = usePlaylistsData();
 
     useEffect(() => {
         playlistsData.syncPlaylists();
-        audiosData.syncAudios();
-    }, [playlistsData.syncPlaylists, audiosData.syncAudios]);
+    }, [playlistsData.syncPlaylists]);
 
     return (
         <DataContext.Provider value={{
-            audiosData,
             playlistsData
          }}>
             {children}

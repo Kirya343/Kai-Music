@@ -61,35 +61,31 @@ const PlaylistPage = ({}: {}) => {
 
             <SelectableList
                 className={styles.trackList}
-                data={Object.fromEntries(
-                    filteredList
-                        .slice()
-                        .sort((a, b) => a.position - b.position)
-                        .map((qi, idx) => [
-                            qi.audio.id,
-                            playlist.type === PlaylistType.UPLOADED ? (
-                                <UploadsPlaylistTrack
-                                    key={idx}
-                                    queueItem={qi}
-                                    trackNumber={idx + 1}
-                                    isInPlaylist={false}
-                                    currentPlaylistId={playlist.id}
-                                    openEditModal={setAudioFileView}
-                                    playing={playingAudioId === qi.audio.id}
-                                />
-                            ) : (
-                                <PlaylistTrack
-                                    key={idx}
-                                    queueItem={qi}
-                                    trackNumber={idx + 1}
-                                    isInPlaylist={false}
-                                    currentPlaylistId={playlist.id}
-                                    openEditModal={setAudioFileView}
-                                    playing={playingAudioId === qi.audio.id}
-                                />
-                            )
-                        ])
-                )}
+                data={filteredList
+                    .toSorted((a, b) => a.position - b.position)
+                    .map((qi, idx) => ({
+                        id: qi.audio.id,
+                        node: playlist.type === PlaylistType.UPLOADED ? (
+                            <UploadsPlaylistTrack
+                                key={idx}
+                                queueItem={qi}
+                                trackNumber={idx + 1}
+                                isInPlaylist={false}
+                                currentPlaylistId={playlist.id}
+                                openEditModal={setAudioFileView}
+                                playing={playingAudioId === qi.audio.id}
+                            />
+                        ) : (
+                            <PlaylistTrack
+                                key={idx}
+                                queueItem={qi}
+                                trackNumber={idx + 1}
+                                isInPlaylist={false}
+                                currentPlaylistId={playlist.id}
+                                openEditModal={setAudioFileView}
+                                playing={playingAudioId === qi.audio.id}
+                            />
+                        )}))}
                 extraActions={[
                     {
                         icon: <TrashIcon />,

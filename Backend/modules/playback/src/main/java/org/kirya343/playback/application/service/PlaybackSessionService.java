@@ -2,6 +2,9 @@ package org.kirya343.playback.application.service;
 
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.infrastructure.persistence.entity.UserPlayback;
+
+import java.util.NoSuchElementException;
+
 import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
 import org.kirya343.playback.infrastructure.persistence.repository.UserPlaybackRepository;
@@ -72,13 +75,13 @@ public class PlaybackSessionService {
     public void restoreSession(UserAuthData authData) {
         log.debug("Пользователь {} восстанавливает сессию", authData.sub());
 
-        UserPlayback userPlayback = userPlaybackRepository.findById(authData.id()).orElseThrow();
-
         try {
+            UserPlayback userPlayback = userPlaybackRepository.findById(authData.id()).orElseThrow();
+
             PlaybackTarget target = PlaybackTarget.ofUserPlayback(userPlayback);
 
             subscribe(authData, target);
-        } catch (NullPointerException e) {
+        } catch (NullPointerException | NoSuchElementException e) {
             log.warn("User didn't have saved playback");
         }
     }

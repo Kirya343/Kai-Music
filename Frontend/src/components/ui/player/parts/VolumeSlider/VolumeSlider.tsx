@@ -15,11 +15,14 @@ export default function VolumeSlider({ visible = true }: { visible?: boolean }) 
 
     // on init gets state from localstorage
     const [volume, setVolume] = useState(() => {
-
         if (isMobile) return 1;
 
         const saved = localStorage.getItem("audioVolume");
-        return saved ? Number(saved) : 0.5;
+        const parsed = saved === null ? 0.5 : Number(saved);
+
+        return Number.isFinite(parsed)
+            ? Math.min(1, Math.max(0, parsed))
+            : 0.5;
     });
 
     // on change volume, it also changes in audio
@@ -37,6 +40,8 @@ export default function VolumeSlider({ visible = true }: { visible?: boolean }) 
         localStorage.setItem("audioVolume", String(v));
     };
 
+    const progress = `${volume * 100}%`;
+
     // input is visible only if state id "true", if not, conponent just controls the volume
     return visible && (
         <input
@@ -47,6 +52,8 @@ export default function VolumeSlider({ visible = true }: { visible?: boolean }) 
             step="0.01"
             value={volume}
             onChange={handleChange}
+            style={{ "--progress": progress } as React.CSSProperties}
+            aria-label="Volume"
         />
     );
 }

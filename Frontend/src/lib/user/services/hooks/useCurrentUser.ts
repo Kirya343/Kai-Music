@@ -21,7 +21,7 @@ export function useCurrentUser() {
 
     const shortUser = useMemo<IShortUser | null>(() => {
         if (!isAuthenticated || !user) return null;
-        return { openId: user.openId, name: user.name, avatarUrl: user.avatarUrl ?? "" }
+        return { sub: user.sub, name: user.name, avatarUrl: user.avatarUrl ?? "" }
     }, [isAuthenticated, user])
 
     const loadUser = useCallback(async (cancelled?: boolean) => {

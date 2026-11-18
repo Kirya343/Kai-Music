@@ -1,4 +1,4 @@
-import { IPage } from "@/lib/common/types";
+import { IPage } from "@/lib/common/common.types";
 import { IAudio, audioService } from "@audio";
 import { useSearch } from "@common";
 import { AxiosProgressEvent } from "axios";

@@ -62,18 +62,24 @@ const LoginPage = () => {
             inputs={(
                 <>
                     <input 
+                        data-testid="email"
                         type="text"
                         placeholder="Email" 
                         value={email} 
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <input 
+                        data-testid="password"
                         type="password" 
                         placeholder="Password" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <button className="btn" onClick={handleLogin}>Sign In</button>
+                    <button 
+                        className="btn" 
+                        onClick={handleLogin}
+                        data-testid="login-button"
+                    >Sign In</button>
                 </>
             )}
             links={(<Link to="/register">Sign up</Link>)}

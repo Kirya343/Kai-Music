@@ -10,6 +10,11 @@
     padding: 3px;
 
     transition: background-color 0.2s ease-in;
+    
+    transform: none !important;
+    &:active {
+        transform: none !important;
+    }
 
     .icon {
         height: 20px;

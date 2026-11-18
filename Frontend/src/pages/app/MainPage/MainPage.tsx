@@ -103,10 +103,15 @@ const MainPage = () => {
                     <section className={styles.publicRooms}>
                         <h3>Public rooms to join</h3>
 
-                        <div className={styles.roomsList}>
+                        <div className={styles.roomsList} data-testid="rooms-list">
 
                             {rooms?.map(r => (
-                                <div className={styles.room} key={r.id} onClick={() => joinRoom(r.code)}>
+                                <div 
+                                    data-testid={r.title}
+                                    className={styles.room} 
+                                    key={r.id} 
+                                    onClick={() => joinRoom(r.code)}
+                                >
                                     
                                     <span className={styles.roomName}>{r.title}</span>
                                 </div>

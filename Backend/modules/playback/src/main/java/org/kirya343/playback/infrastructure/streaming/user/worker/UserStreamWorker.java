@@ -85,13 +85,21 @@ public class UserStreamWorker
     }
 
     public void applyState(PlaybackContext context) {
+        applyState(context, null);
+    }
+
+    public void applyState(PlaybackContext context, PlaybackStateDTO state) {
         if (context == null) {
             throw new IllegalStateException("PlaybackContext is null");
         }
 
         replaceStream(context);
 
-        audioStreamService.initializeUser(currentStream);
+        if (state != null) {
+            audioStreamService.initializeUser(currentStream, state);
+        } else {
+            audioStreamService.initializeUser(currentStream);
+        }
 
         tick(currentStream);
     }
@@ -168,7 +176,7 @@ public class UserStreamWorker
 
     // Diadnostic voids
 
-    public DiagnosticTextBuilder getInfo() {
+    public DiagnosticTextBuilder getInfo(boolean isShort) {
         
         DiagnosticTextBuilder builder = new DiagnosticTextBuilder("Stream worker of " + userSub);
 
@@ -218,6 +226,8 @@ public class UserStreamWorker
 
             builder.addRow("Position: [" + position + "]");
         }
+
+        if (isShort) return builder;
 
         DiagnosticTextBuilder stateSection = new DiagnosticTextBuilder("Playback state: ")
             .addRow("position: " + state.position())

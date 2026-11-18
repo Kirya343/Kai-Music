@@ -15,9 +15,21 @@
         color: white;
         font-size: 12px;
         font-weight: 700;
+        white-space: nowrap;
 
         &:first-child {
             margin-left: 0;
+        }
+
+        .counter {
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+            font-weight: 400;
+            color: rgb(161, 161, 161);
+            font-size: 9px;
+            white-space: nowrap;
         }
     }
 }

@@ -24,9 +24,6 @@ interface LibraryTrackProps extends HTMLAttributes<HTMLDivElement> {
 
     /** Opens the audio editing modal. */
     openEditModal: (audio: IAudio) => void;
-
-    /** Deletes current audio from library */
-    handleDelete: (audio: IAudio) => void;
 }
 
 /** Displays an audio track with control actions. */
@@ -36,7 +33,6 @@ const LibraryTrack = ({
     playing,
     importPlaylistId,
     openEditModal,
-    handleDelete,
     ...divProps
 }: LibraryTrackProps) => {
 
@@ -65,6 +61,11 @@ const LibraryTrack = ({
             audio={audio}
             trackNumber={trackNumber}
             extraActions={extraActions}
+            visualProps={{
+                title: true,
+                artist: true,
+                album: true
+            }}
             playing={playing}
             onClick={() => playTrack(audio.id)}
             {...divProps}

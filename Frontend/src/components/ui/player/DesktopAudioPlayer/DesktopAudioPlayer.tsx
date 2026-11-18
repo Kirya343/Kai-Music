@@ -9,8 +9,7 @@ import VolumeSlider from "../parts/VolumeSlider/VolumeSlider";
 import { useState } from "react";
 import PlaybackQueueModal from "@/components/modals/PlaybackQueueModal/PlaybackQueueModal";
 import { PlaylistIcon } from "@/assets/icons";
-import { useStompClient } from "@websocket";
-import { roomService } from "@room";
+import { useWebSocket } from "@websocket";
 
 /**
  * Component that display on bottom of pages and displays
@@ -22,7 +21,7 @@ const DesktopAudioPlayer = () => {
 
     const [isOpen, setOpen] = useState(false);
 
-    const { client } = useStompClient()
+    const { client } = useWebSocket()
  
     const { isMobile } = useGlobal();
 
@@ -59,6 +58,9 @@ const DesktopAudioPlayer = () => {
             </div>
             
             <div className={styles.controls}>
+                {/* <button onClick={() => client?.webSocket?.close()}>
+                    Disconnect WebSocket
+                </button> */}
                 <button onClick={() => setOpen(true)} className={styles.action}>
                     <PlaylistIcon/>
                 </button>

@@ -7,6 +7,7 @@ export const useAudioPlayer = () => {
 
     const playbackController = usePlaybackController({
         audio: mediaResource.audio,
+        audioRef: mediaResource.audioRef,
         createMediaSource: mediaResource.createMediaSource,
         cleanupMediaSource: mediaResource.cleanupMediaSource,
         currentStreamIdRef: mediaResource.currentStreamIdRef,

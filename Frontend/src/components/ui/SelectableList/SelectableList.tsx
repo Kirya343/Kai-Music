@@ -5,7 +5,10 @@ import clsx from "clsx";
 import KebabMenu from "../KebabMenu/KebabMenu";
 
 interface SelectableListProps<T extends ItemKey> extends HTMLAttributes<HTMLDivElement> {
-    data: Record<T, ReactNode>;
+    data: {
+        id: T;
+        node: ReactNode;
+    }[];
     extraActions: ListAction<T>[];
     selectMode: boolean;
     setSelectMode: Dispatch<SetStateAction<boolean>>;
@@ -41,7 +44,12 @@ export default function SelectableList<T extends ItemKey>({
     ...props
 }: SelectableListProps<T>) {
 
-    const allItems = useMemo(() => Object.keys(data) as T[], [data]);
+    const allItems = useMemo(() => data.map(item => item.id), [data]);
+
+    const itemsMap = useMemo(
+        () => new Map(data.map(item => [item.id, item.node])),
+        [data]
+    );
 
     // SELECT feature
     const [selectedItems, setSelectedItems] = useState<T[]>([]);
@@ -156,7 +164,7 @@ export default function SelectableList<T extends ItemKey>({
                             itemRefs.current[String(id)] = el;
                         }}
                     >
-                        {data[id]}
+                        {itemsMap.get(id)}
                     </SelectableItem>
                 ))}
 

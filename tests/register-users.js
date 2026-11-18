@@ -33,8 +33,8 @@ export const options = {
     scenarios: {
         registration: {
             executor: 'shared-iterations',
-            vus: 10,
-            iterations: users.length,
+            vus: 50,
+            iterations: 50,
             maxDuration: '10m',
         },
     },
@@ -58,7 +58,7 @@ export default function () {
     );
 
     if (response.status === 200 || response.status === 201) {
-        console.log(`Registered: ${user.email}`);
+        console.log(`Registered: ${user.email} ${user.password}`);
     } else {
         console.error(
             `Registration failed: ${user.email}, status=${response.status}, body=${response.body}`

@@ -97,6 +97,12 @@ const PlaylistTrack = ({
             audio={queueItem.audio}
             trackNumber={trackNumber}
             actions={actions}
+            visualProps={{
+                title: true,
+                album: true,
+                duration: true,
+                artist: true
+            }}
             extraActions={extraActions}
             playing={playing}
             onClick={() => playTrack(queueItem.audio.id, currentPlaylistId)}

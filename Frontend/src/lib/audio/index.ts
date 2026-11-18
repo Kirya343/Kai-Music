@@ -1,3 +1,3 @@
-export * from "./audioService";
-export * from "./audioTypes"
+export * from "./service/audio.service";
+export * from "./audio.types"
 export * from "./hooks"

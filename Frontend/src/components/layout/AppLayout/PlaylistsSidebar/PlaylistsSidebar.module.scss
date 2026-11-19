@@ -1,0 +1,297 @@
+@use "@/css/components/mixins/" as *;
+
+.sidebar {
+    width: 270px;
+    flex-shrink: 0;
+    border-radius: 1.15rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: width 0.2s ease;
+
+    @include glass;
+
+    &.collapsed {
+        width: 74px;
+
+        .header {
+            justify-content: center;
+            padding: 0.9rem 0.5rem;
+        }
+
+        .list {
+            padding: 0.5rem;
+            align-items: center;
+        }
+
+        .playlistItem {
+            justify-content: center;
+            padding: 0.45rem;
+        }
+    }
+
+    @include mobile {
+        display: none; // на мобилке обычно уходит в нижнюю вкладку Playlists
+    }
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.95rem 1rem 0.75rem;
+}
+
+.collapseBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.25rem;
+    cursor: pointer;
+    transition: color 0.15s ease;
+
+    &:hover {
+        color: #ffffff;
+    }
+}
+
+// Минималистичная иконка "стопки/полки" плейлистов в едином стиле
+.libraryIcon {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 18px;
+    padding: 1px 2px;
+
+    span {
+        width: 3px;
+        height: 100%;
+        border-radius: 2px;
+        background-color: currentColor;
+
+        &:nth-child(3) {
+            height: 85%;
+            transform: rotate(-10deg) translateX(1px);
+        }
+    }
+}
+
+.headerTitle {
+    font-size: 0.96rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.createBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 0 0.85rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.filterPill {
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 500;
+    white-space: nowrap;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.11);
+        color: #ffffff;
+    }
+
+    &.activePill {
+        background: rgba(255, 255, 255, 0.88);
+        color: #09090b;
+        border-color: transparent;
+        font-weight: 600;
+    }
+}
+
+.searchBox {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 0.45rem 1.75rem 0.45rem 0.65rem;
+    border-radius: 0.6rem;
+    font-size: 0.8rem;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.26);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    &::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.28);
+    }
+}
+
+.clearBtn {
+    position: absolute;
+    right: 0.45rem;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 1rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+        color: #ffffff;
+    }
+}
+
+.list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.6rem 0.65rem 0.85rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    // Аккуратный тонкий скроллбар
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+
+    &::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+    }
+}
+
+.playlistItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 0.7rem;
+    text-align: left;
+    color: inherit;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color 0.14s ease, border-color 0.14s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    &.activeItem {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.14);
+
+        .title {
+            color: #4ade80;
+        }
+    }
+}
+
+.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+    flex: 1;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.title {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pinDot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #22c55e;
+    flex-shrink: 0;
+}
+
+.subtitle {
+    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.emptyState {
+    padding: 1.25rem 0.5rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+}

@@ -46,8 +46,11 @@ public class RoomController {
 
     @PostMapping
     @Authenticated
-    public void createRoom(@AuthUser UserAuthData authData) {
-        roomCommandService.createRoom(authData);
+    public void createRoom(
+        @AuthUser UserAuthData authData, 
+        @RequestParam(required = false) String vibe
+    ) {
+        roomCommandService.createRoom(authData, vibe);
     }
 
     @GetMapping("/list/page")

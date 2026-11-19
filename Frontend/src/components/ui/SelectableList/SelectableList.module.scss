@@ -34,7 +34,7 @@
         max-width: 800px;
     }
 
-    @include dirty-glass;
+    @include surface-solid;
 }
 
 .header {
@@ -97,7 +97,7 @@
     border: 1px solid;
     transform: translateY(50px);
 
-    @include dirty-glass(true);
+    @include surface-solid(true);
 
     position: absolute;
     opacity: 0;

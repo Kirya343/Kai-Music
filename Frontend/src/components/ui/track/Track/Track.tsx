@@ -7,6 +7,7 @@ import clsx from "clsx"
 import { usePlaybackData, usePlaybackState } from "@playback"
 import KebabMenu, { IKebabAction } from "@/components/ui/KebabMenu/KebabMenu"
 import { playlistService } from "@playlist"
+import { Artwork } from "../../Artwork/Artwork"
 
 /** Defines an action button displayed on a track. */
 export interface ITrackAction {
@@ -125,9 +126,11 @@ const Track = ({
         >
             <div className={styles.body} onClick={onClick}>
 
-                <div className={styles.audioCover}>
+                <Artwork src={audio.coverUrl} title={audio?.title}   />
+
+                {/* <div className={styles.audioCover}>
                     <MusicNoteIcon/>
-                </div>
+                </div> */}
 
                 <div className={styles.meta}>
                     {(!visualProps || visualProps.title) && (

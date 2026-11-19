@@ -1,17 +1,16 @@
 import { IAudio } from "@audio"
 import styles from "./Track.module.scss"
-import { HeartIcon, MusicNoteIcon, PlayingAudioIcon } from "@/assets/icons"
+import { HeartIcon, PlayingAudioIcon } from "@/assets/icons"
 import { countPosition, useData } from "@common"
-import { HTMLAttributes, ReactNode, useMemo } from "react"
+import { HTMLAttributes, ReactNode, useMemo, useRef } from "react"
 import clsx from "clsx"
-import { usePlaybackData, usePlaybackState } from "@playback"
+import { usePlaybackState } from "@playback"
 import KebabMenu, { IKebabAction } from "@/components/ui/KebabMenu/KebabMenu"
 import { playlistService } from "@playlist"
 import { Artwork } from "../../Artwork/Artwork"
 
 /** Defines an action button displayed on a track. */
 export interface ITrackAction {
-
     /** Non-visible track title */
     title: string;
 
@@ -81,10 +80,10 @@ interface TrackProps extends HTMLAttributes<HTMLDivElement> {
  * Supports customizable metadata visibility, selection mode,
  * playback indication, and standard HTML div attributes.
  */
-const Track = ({ 
-    audio, 
-    actions, 
-    extraActions, 
+const Track = ({
+    audio,
+    actions,
+    extraActions,
     trackNumber,
     noBorder,
     visualProps,
@@ -99,11 +98,11 @@ const Track = ({
 
     ...divProps
 }: TrackProps) => {
-
     const { playbackState } = usePlaybackState();
     const { playlistsData } = useData();
-    
-    const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === audio.id)
+    const dragGhostRef = useRef<HTMLDivElement>(null);
+
+    const isLiked = !!playlistsData.liked?.queue.some(qi => qi.audio.id === audio.id);
 
     const finalActions = useMemo<ITrackAction[]>(() => [
         ...(actions ?? []),
@@ -113,60 +112,89 @@ const Track = ({
             func: () => playlistService.toggleLike(isLiked, audio.id)
         }
     ], [isLiked, actions]);
-    
+
+    const trackTitle = audio?.title ?? audio?.name ?? "Unknown track";
+    const trackArtist = audio?.artist || "Unknown artist";
+
     return (
-        <div 
-            {...divProps}
-            className={clsx(
-                styles.track, 
-                noBorder && styles.noBorder, 
-                playing && styles.playing, 
-                className
-            )}
-        >
-            <div className={styles.body} onClick={onClick}>
+        <>
+            <div
+                {...divProps}
+                className={clsx(
+                    styles.track,
+                    noBorder && styles.noBorder,
+                    playing && styles.playing,
+                    className
+                )}
+                draggable
+                onDragStart={(e) => {
+                    e.dataTransfer.setData("application/json", JSON.stringify(audio));
+                    e.dataTransfer.effectAllowed = "move";
 
-                <Artwork src={audio.coverUrl} title={audio?.title}   />
+                    if (dragGhostRef.current) {
+                        e.dataTransfer.setDragImage(dragGhostRef.current, 16, 16);
+                    }
 
-                {/* <div className={styles.audioCover}>
-                    <MusicNoteIcon/>
-                </div> */}
+                    divProps.onDragStart?.(e);
+                }}
+            >
+                <div className={styles.body} onClick={onClick}>
+                    <Artwork src={audio.coverUrl} title={audio?.title} />
 
-                <div className={styles.meta}>
-                    {(!visualProps || visualProps.title) && (
-                        <span className={styles.title}>
-                            {playing && <PlayingAudioIcon playing={!playbackState?.pause} />}
+                    {/* <div className={styles.audioCover}>
+                        <MusicNoteIcon/>
+                    </div> */}
 
-                            {(!visualProps || visualProps.id) && <span className={styles.id}>#{trackNumber || audio.id}</span>} 
-                            {audio?.title ?? audio?.name}
+                    <div className={styles.meta}>
+                        {(!visualProps || visualProps.title) && (
+                            <span className={styles.title}>
+                                {playing && <PlayingAudioIcon playing={!playbackState?.pause} />}
+
+                                {(!visualProps || visualProps.id) && <span className={styles.id}>#{trackNumber || audio.id}</span>}
+                                {trackTitle}
+                            </span>
+                        )}
+                        {(!visualProps || visualProps.artist) && (
+                            <span className={styles.artist}>{trackArtist}</span>
+                        )}
+                        <span className={styles.info}>
+                            {(!visualProps || visualProps.album) && audio?.album && (<>{audio?.album} • </>)}
+                            {(!visualProps || visualProps.duration) && audio?.duration && (<>{countPosition(audio?.duration)}</>)}
                         </span>
-                    )}
-                    {(!visualProps || visualProps.artist) && (
-                        <span className={styles.artist}>{audio?.artist || "Unknown artist"}</span>
-                    )}
-                    <span className={styles.info}>
-                        {(!visualProps || visualProps.album) && audio?.album && (<>{audio?.album} • </>)}
-                        {(!visualProps || visualProps.duration) && audio?.duration && (<>{countPosition(audio?.duration)}</>)}
-                    </span>
+                    </div>
+                </div>
+
+                <div className={styles.actions}>
+                    {finalActions.map(act => (
+                        <button
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                act.func();
+                            }}
+                            key={act.title}
+                        >
+                            {act.icon}
+                        </button>
+                    ))}
+                    {extraActions && <KebabMenu actions={extraActions} />}
                 </div>
             </div>
 
-            <div className={styles.actions}>
-                {finalActions.map(act => (
-                    <button 
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            act.func();
-                        }}
-                        key={act.title}
-                    >
-                        {act.icon}
-                    </button>
-                ))}
-                {extraActions && <KebabMenu actions={extraActions}/>}
+            <div
+                ref={dragGhostRef}
+                aria-hidden="true"
+                className={styles.dragGhost}
+            >
+                <div className={styles.ghostArtwork}>
+                    <Artwork src={audio.coverUrl} title={audio?.title} />
+                </div>
+                <div className={styles.ghostMeta}>
+                    <span className={styles.ghostTitle}>{trackTitle}</span>
+                    <span className={styles.ghostArtist}>{trackArtist}</span>
+                </div>
             </div>
-        </div>
-    )
-}
+        </>
+    );
+};
 
 export default Track;

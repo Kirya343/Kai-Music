@@ -12,6 +12,8 @@ export interface IQueueItem {
     /** Position of the entry in queue */
     position: number;
 
+    addedBy: string;
+
     /** Audio metadata of queue item */
     audio: IAudio;
 }

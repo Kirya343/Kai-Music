@@ -5,9 +5,10 @@ import styles from "./ActivitySidebar.module.scss";
 import { Artwork } from "@/components/ui/Artwork/Artwork";
 import { CirclePlusIcon, DoorIcon } from "@/assets/icons";
 import { IListeningRoom, roomService } from "@room";
-import { usePlaybackControls } from "@playback";
+import { usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist } from "@playback";
 import { useWebSocket } from "@websocket";
 import { loggerFactory } from "@common";
+import PlaylistQueue from "./PlaylistQueue/PlaylistQueue";
 
 const logger = loggerFactory.getLogger("Components.ActivitySidebar");
 
@@ -77,12 +78,6 @@ const MOCK_NOW_PLAYING: QueueTrackItem = {
     addedBy: "Kirya",
 };
 
-const MOCK_QUEUE: QueueTrackItem[] = [
-    { id: "q-1", title: "Midnight City", artist: "M83", duration: "4:03", addedBy: "Kirya" },
-    { id: "q-2", title: "Chamber of Reflection", artist: "Mac DeMarco", duration: "3:51", addedBy: "Nutellka" },
-    { id: "q-3", title: "Starboy", artist: "The Weeknd", duration: "3:50", addedBy: "Kirya" },
-];
-
 type SidebarTab = "live" | "queue";
 
 function formatListeners(count: number): string {
@@ -107,10 +102,12 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
     const navigate = useNavigate();
     const { client } = useWebSocket();
     const { autoPlay, setAutoPlay, resyncPlayback } = usePlaybackControls();
+    const { currentPlaybackState } = usePlaybackAudio();
+    const { playingAudio, playbackPlaylist } = usePlaybackPlaylist();
 
     const friends = friendsActivity ?? MOCK_FRIENDS;
     const activeTrack = nowPlaying === undefined ? MOCK_NOW_PLAYING : nowPlaying;
-    const queueItems = queue ?? MOCK_QUEUE;
+    const queueItems = playbackPlaylist?.queue || [];
 
     const handleCreateRoom = async () => {
         try {
@@ -388,7 +385,7 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
                     ) : (
                         /* Вкладка Queue */
                         <>
-                            {activeTrack && (
+                            {playingAudio && (
                                 <section className={styles.block}>
                                     <div className={styles.blockHeader}>
                                         <h3>Now Playing</h3>
@@ -396,18 +393,18 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
 
                                     <div className={styles.nowPlayingCard}>
                                         <Artwork
-                                            src={activeTrack.coverUrl}
-                                            title={activeTrack.title}
-                                            seed={activeTrack.title}
+                                            src={playingAudio.coverUrl}
+                                            title={playingAudio.title}
+                                            seed={playingAudio.title}
                                             size="sm"
                                             rounded="md"
-                                            isPlaying={true}
+                                            isPlaying={!currentPlaybackState?.pause}
                                         />
                                         <div className={styles.rowMeta}>
-                                            <strong>{activeTrack.title}</strong>
-                                            <span>{activeTrack.artist}</span>
-                                            {activeTrack.addedBy && (
-                                                <small>Queued by {activeTrack.addedBy}</small>
+                                            <strong>{playingAudio.title}</strong>
+                                            <span>{playingAudio.artist}</span>
+                                            {playingAudio.addedBy && (
+                                                <small>Queued by {playingAudio.addedBy}</small>
                                             )}
                                         </div>
                                     </div>
@@ -420,25 +417,7 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
                                     <span className={styles.badge}>{queueItems.length}</span>
                                 </div>
 
-                                <div className={styles.itemsList}>
-                                    {queueItems.map((track, idx) => (
-                                        <div key={track.id} className={styles.queueRow}>
-                                            <span className={styles.trackIdx}>{idx + 1}</span>
-                                            <Artwork
-                                                src={track.coverUrl}
-                                                title={track.title}
-                                                seed={track.title}
-                                                size="xs"
-                                                rounded="md"
-                                            />
-                                            <div className={styles.rowMeta}>
-                                                <strong>{track.title}</strong>
-                                                <span>{track.artist}</span>
-                                            </div>
-                                            <span className={styles.duration}>{track.duration}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                                <PlaylistQueue />
                             </section>
                         </>
                     )}

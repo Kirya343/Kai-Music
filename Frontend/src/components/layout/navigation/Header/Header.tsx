@@ -41,7 +41,6 @@ const Header = () => {
         { to: "/app", icon: <HomeIcon className={styles.linkIcon} />, title: "Home" },
         { to: "/app/room", icon: <DoorIcon className={styles.linkIcon} />, title: "Room", condition: !!playbackData.room },
         { to: "/app/library", icon: <LibraryIcon className={styles.linkIcon} />, title: "Library", condition: isAuthenticated },
-        { to: "/app/playlists", icon: <PlaylistIcon className={styles.linkIcon} />, title: "Playlists", condition: isAuthenticated },
     ]
     
     return (

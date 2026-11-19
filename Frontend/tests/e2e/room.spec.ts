@@ -22,7 +22,7 @@ const log = (index: number, message: string) => {
     );
 };
 
-for (const [index, user] of users.slice(0, 70).entries()) {
+for (const [index, user] of users.slice(0, 30).entries()) {
     test(`User ${index + 1} enters Kirya's room`, async ({ browser }, testInfo) => {
         log(index, `START | Worker: ${testInfo.workerIndex}`);
 

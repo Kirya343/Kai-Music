@@ -3,7 +3,7 @@
 
 @mixin glass($hover: false, $size: 1, $variant: "default") {
     position: relative;
-    border: 1px solid var(--glass-border);
+    border-color: var(--glass-border);
     outline: 2px solid transparent;
     transition:
         outline-color 0.12s ease,

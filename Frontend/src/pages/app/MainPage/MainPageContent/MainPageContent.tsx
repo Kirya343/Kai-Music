@@ -62,14 +62,14 @@ export default function MainPageContent({
 
     return (
         <div className={styles.mainColumn}>
-            <section className={styles.welcome}>
+            {/* <section className={styles.welcome}>
                 <div className={styles.welcomeBadge}>Live Listening Spaces</div>
                 <h1>Welcome to Kai Music</h1>
                 <p>
                     Kai Music connects friends through shared music experiences. Create rooms,
                     listen together, and find new tracks with your community.
                 </p>
-            </section>
+            </section> */}
 
             {/* Статистика + текущий акцент */}
             <div className={styles.middleGrid}>

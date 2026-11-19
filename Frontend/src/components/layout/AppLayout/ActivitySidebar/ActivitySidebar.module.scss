@@ -9,6 +9,7 @@
     flex-direction: column;
     overflow: hidden;
     transition: width 0.2s ease;
+    margin-bottom: .5rem;
 
     @include glass;
 

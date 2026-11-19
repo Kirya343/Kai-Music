@@ -61,6 +61,10 @@ const PlaylistQueue = () => {
                     />
                 )
             )}
+
+            {/* {queueItems.length == 0 && (
+                <span>Add Tracks</span>
+            )} */}
         </div>
     )
 }

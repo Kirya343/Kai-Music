@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import styles from "./LibraryPage.module.scss"
 import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
 import { CirclePlusIcon, CheckmarkIcon, CrossIcon } from "@/assets/icons";
-import LibraryTrack from "@/components/ui/track/LibraryTrack";
+import LibraryTrack from "@/components/ui/track/variations/LibraryTrack";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
 import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";

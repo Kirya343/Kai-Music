@@ -1,11 +1,12 @@
-import { TrashIcon, CheckmarkIcon, PenIcon, PlusIcon, ShazamIcon } from "@/assets/icons"
+import { TrashIcon, CheckmarkIcon, PenIcon, PlusIcon } from "@/assets/icons"
 import { playlistService } from "@playlist"
-import { audioService, IAudio } from "@audio"
-import Track, { ITrackAction } from "../Track/Track"
+import { IAudio } from "@audio"
+import Track from "../Track/Track"
 import { IQueueItem } from "@playback"
 import { HTMLAttributes, useMemo } from "react"
 import { IKebabAction } from "../../KebabMenu/KebabMenu"
 import { usePlayTrackPersonally } from "@/lib/playback/services/playback.hooks"
+import { ITrackAction } from "../types"
 
 /**
  * Props for the PlaylistTrack component

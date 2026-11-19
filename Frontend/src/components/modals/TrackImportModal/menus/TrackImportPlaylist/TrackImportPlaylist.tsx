@@ -1,4 +1,4 @@
-import ImportingTrack from "@/components/ui/track/ImportingTrack";
+import ImportingTrack from "@/components/ui/track/variations/ImportingTrack";
 import styles from "./TrackImportPlaylist.module.scss"
 import { useMemo } from "react";
 import { Playlist } from "@playlist";

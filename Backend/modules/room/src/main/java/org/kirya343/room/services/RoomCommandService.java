@@ -23,6 +23,11 @@ public class RoomCommandService {
     private final ListeningRoomRepository listeningRoomRepository;
     private final EntityManager entityManager;
     private final ApplicationEventPublisher eventPublisher;
+
+    @Transactional 
+    public ListeningRoom createRoom(UserAuthData authData) {
+        return createRoom(authData, null);
+    }
     
     @Transactional 
     public ListeningRoom createRoom(UserAuthData authData, String vibe) {

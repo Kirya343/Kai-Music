@@ -4,7 +4,7 @@ import Modal from "@/components/modals/Modal/Modal";
 import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import TrackImportModal from "../TrackImportModal/TrackImportModal";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
-import PlaybackQueueTrack from "@/components/ui/track/PlaybackQueueTrack";
+import PlaybackQueueTrack from "@/components/ui/track/variations/PlaybackQueueTrack";
 import { playlistService } from "@playlist";
 
 /**

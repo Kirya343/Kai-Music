@@ -5,6 +5,7 @@ interface PlaybackControlsContextType {
     togglePlay: (newPaused?: boolean) => void;
     pausePlayback: () => void;
     seek: (position: number) => void;
+    changeTrack: (changing: "prev" | "next" | number) => void;
     reconnectPlayback: (client: Client) => void;
     resyncPlayback: (client: Client | null, autoPlay: boolean) => void;
     autoPlay: boolean;

@@ -109,6 +109,11 @@ export const usePlaybackController = ({
         audio.pause();
     }, [audio]);
 
+    const changeTrack = useCallback((changing: "next" | "prev" | number) => {
+        setAutoPlay(true)
+        playbackService.changeTrack(changing)
+    }, [])
+
     /**
      * Resumes playing audio
      */
@@ -426,6 +431,7 @@ export const usePlaybackController = ({
         updateMessage,
         togglePlay,
         seek,
+        changeTrack,
         reconnectPlayback: reconnect,
         resyncPlayback: resync,
         autoPlay,

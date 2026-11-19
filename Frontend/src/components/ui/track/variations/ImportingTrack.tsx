@@ -1,7 +1,7 @@
 import { CheckmarkIcon, PlusIcon } from "@/assets/icons";
 import { playlistService } from "@playlist"
 import { IAudio } from "@audio"
-import Track from "./Track/Track"
+import Track from "../Track/Track"
 import { HTMLAttributes } from "react";
 
 /** Props for the ImportingTrack component */

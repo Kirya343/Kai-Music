@@ -1,10 +1,9 @@
-import { Artwork } from "@/components/ui/Artwork/Artwork";
 import { useState } from "react";
 import styles from "./PlaylistQueue.module.scss"
 import { usePlaybackPlaylist } from "@playback";
 import { IAudio } from "@audio";
 import { playlistService } from "@playlist";
-import { countPosition } from "@common";
+import SidebarPlaybackQueueTrack from "@/components/ui/track/variations/SidebarPlaybackQueueTrack";
 
 /* const MOCK_QUEUE: QueueTrackItem[] = [
     { id: "q-1", title: "Midnight City", artist: "M83", duration: "4:03", addedBy: "Kirya" },
@@ -53,31 +52,15 @@ const PlaylistQueue = () => {
             }}
             className={styles.itemsList}
         >
-            {queueItems.toSorted((a, b) => a.position - b.position).map((entry, idx) => {
-                const track = entry.audio;
-                if (!track) return null;
-
-                return (
-                    <div
-                        key={entry.id ?? `${track.id}-${idx}`}
-                        className={styles.queueRow}
-                    >
-                        <span className={styles.trackIdx}>{idx + 1}</span>
-                        <Artwork
-                            src={track.coverUrl}
-                            title={track.title}
-                            seed={track.title}
-                            size="xs"
-                            rounded="md"
-                        />
-                        <div className={styles.rowMeta}>
-                            <strong>{track.title}</strong>
-                            <span>{track.artist}</span>
-                        </div>
-                        <span className={styles.duration}>{countPosition(track.duration)}</span>
-                    </div>
-                );
-            })}
+            {queueItems
+                .toSorted((a, b) => a.position - b.position)
+                .map((entry, idx) => (
+                    <SidebarPlaybackQueueTrack
+                        key={idx}
+                        entry={entry}
+                    />
+                )
+            )}
         </div>
     )
 }

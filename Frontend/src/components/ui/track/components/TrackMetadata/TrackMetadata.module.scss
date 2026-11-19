@@ -1,0 +1,48 @@
+.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    overflow: hidden;
+    min-width: 0;
+    flex: 1;
+    justify-content: space-around;
+}
+
+.id {
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.title {
+    font-size: 0.9rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline;
+
+    svg {
+        height: 0.9rem;
+    }
+}
+
+.artist {
+    font-size: 0.8rem;
+    color: var(--text-color-l1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.info {
+    font-size: 0.8rem;
+    color: var(--text-color-l1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+}
+
+.playing .title {
+    color: var(--orange);
+    font-weight: 600;
+}

@@ -1,54 +1,46 @@
 .artwork {
   position: relative;
-  flex-shrink: 0;
   overflow: hidden;
-  user-select: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: #18181b;
-  
-  // Размеры
+  user-select: none;
+  color: #fff;
+  background-image: linear-gradient(
+    var(--art-angle, 135deg),
+    var(--art-from, #6d28d9),
+    var(--art-via, #be185d) 55%,
+    var(--art-to, #3b0764)
+  );
+
   &--xs {
-    width: 36px;
-    height: 36px;
-    font-size: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
   }
 
   &--sm {
     width: 44px;
     height: 44px;
-    font-size: 14px;
+    font-size: 13px;
   }
 
   &--md {
-    width: 56px;
-    height: 56px;
-    font-size: 16px;
+    width: 64px;
+    height: 64px;
+    font-size: 18px;
   }
 
   &--lg {
-    width: 80px;
-    height: 80px;
-    font-size: 20px;
+    width: 120px;
+    height: 120px;
+    font-size: 32px;
   }
 
-  // Скругления
-  &--rounded-md {
-    border-radius: 6px;
-  }
-
-  &--rounded-lg {
-    border-radius: 10px;
-  }
-
-  &--rounded-xl {
-    border-radius: 14px;
-  }
-
-  &--rounded-full {
-    border-radius: 9999px;
-  }
+  &--rounded-md { border-radius: 8px; }
+  &--rounded-lg { border-radius: 12px; }
+  &--rounded-xl { border-radius: 18px; }
+  &--rounded-full { border-radius: 9999px; }
 }
 
 .image {
@@ -58,58 +50,67 @@
   display: block;
 }
 
+.glowLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--glow-1-x, 25%) var(--glow-1-y, 25%), rgba(255, 255, 255, 0.24), transparent 45%),
+    radial-gradient(circle at var(--glow-2-x, 80%) var(--glow-2-y, 75%), rgba(255, 255, 255, 0.14), transparent 50%);
+}
+
+.pattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.18;
+  color: #fff;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.28) 100%);
 }
 
 .initials {
   position: relative;
   z-index: 1;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
 }
 
-.equalizer {
-  position: absolute;
-  right: 4px;
-  bottom: 4px;
-  z-index: 2;
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-  padding: 2px 4px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.65);
+.artwork--layout-monogram .initials {
+  font-style: italic;
+  letter-spacing: 0.08em;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.55);
+  padding-bottom: 2px;
+}
+
+.artwork--layout-badge .initials {
+  padding: 0.22em 0.42em;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.28);
   backdrop-filter: blur(4px);
 }
 
-.bar {
-  width: 2px;
-  height: 100%;
-  border-radius: 9999px;
-  background-color: #22c55e; // зеленый акцент в тон твоей активной вкладки Home
-  transform-origin: bottom;
-  animation: eqPulse 0.8s ease-in-out infinite alternate;
-
-  &:nth-child(2) {
-    animation-delay: 0.2s;
+// На мелких иконках упрощаем детали, чтобы не было «каши»
+.artwork--xs,
+.artwork--sm {
+  .pattern,
+  .glowLayer {
+    opacity: 0.1;
   }
 
-  &:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-}
-
-@keyframes eqPulse {
-  0% {
-    transform: scaleY(0.3);
-  }
-  100% {
-    transform: scaleY(1);
+  .artwork--layout-badge .initials {
+    padding: 0;
+    background: none;
+    border: none;
+    backdrop-filter: none;
   }
 }

@@ -76,6 +76,8 @@ public class PlaybackService {
         if (playlistId == null) {
             playlistQueueService.addRundomTracks(30, queuePlaylistId, authData);
         } else {
+
+            // TODO добавить установку sourcePlaylistId для того чтобы привязать очередь к плейлисту
             playlistQueueService.importPlaylist(queuePlaylistId, playlistId, authData);
         }
 

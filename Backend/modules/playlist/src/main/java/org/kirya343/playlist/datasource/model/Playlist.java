@@ -44,6 +44,8 @@ public class Playlist {
     @ManyToOne
     private User owner;
 
+    private Long position;
+
     @Setter
     private String title;
 
@@ -53,8 +55,17 @@ public class Playlist {
     @Enumerated(EnumType.STRING)
     private PlaylistType type;
 
+    private Long sourcePlaylistId;
+
     @CreationTimestamp
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SavedPlaylist> savedBy = new ArrayList<>();    
+
+    @Setter
+    @Column(nullable = false)
+    private Boolean isPublic = false;
 
     public Playlist(String title, User owner) {
         this.title = title;

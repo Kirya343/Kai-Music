@@ -23,6 +23,7 @@ public interface PlaybackStateRepository extends JpaRepository<PlaybackState, Lo
         LEFT JOIN FETCH ps.playlist p
         LEFT JOIN FETCH p.queue q
         LEFT JOIN FETCH q.audio
+        LEFT JOIN FETCH p.savedBy
         WHERE ps.targetId = :targetId
         AND ps.targetType = :targetType
         """)
@@ -37,6 +38,7 @@ public interface PlaybackStateRepository extends JpaRepository<PlaybackState, Lo
         LEFT JOIN FETCH ps.playlist p
         LEFT JOIN FETCH p.queue q
         LEFT JOIN FETCH q.audio
+        LEFT JOIN FETCH p.savedBy
         WHERE p.id = :playlistId
         """)
     Optional<PlaybackState> findByPlaylistId(

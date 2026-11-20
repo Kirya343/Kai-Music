@@ -9,6 +9,8 @@ import org.kirya343.playlist.enums.PlaylistType;
 public record PlaylistDTO(
     Long id,
     Long ownerId,
+    Long sourcePlaylistId,
+    int saved,
     PlaylistType type,
     String title,
     List<QueueItemDTO> queue
@@ -18,6 +20,8 @@ public record PlaylistDTO(
         return new PlaylistDTO(
             playlist.getId(),
             playlist.getOwner() != null ? playlist.getOwner().getId() : null,
+            playlist.getSourcePlaylistId(),
+            playlist.getSavedBy().size(),
             playlist.getType(),
             playlist.getTitle(),
             QueueItemDTO.ofList(playlist.getQueue())
@@ -29,6 +33,8 @@ public record PlaylistDTO(
         return new PlaylistDTO(
             playlist.getId(),
             playlist.getOwner().getId(),
+            playlist.getSourcePlaylistId(),
+            0,
             playlist.getType(),
             playlist.getTitle(),
             null

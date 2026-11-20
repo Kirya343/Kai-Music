@@ -65,7 +65,7 @@ public class Playlist {
 
     @Setter
     @Column(nullable = false)
-    private Boolean isPublic = false;
+    private boolean isPublic = false;
 
     public Playlist(String title, User owner) {
         this.title = title;

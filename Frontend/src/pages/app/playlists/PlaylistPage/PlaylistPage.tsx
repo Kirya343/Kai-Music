@@ -32,7 +32,7 @@ const PlaylistPage = ({}: {}) => {
         if (!playlistId) return null;
 
         return playlistsData.playlists.find(p => p.id === playlistId) || null
-    }, [playlistsData.playlists])
+    }, [playlistsData.playlists, playlistId])
     
     const { filteredList, searchQuery, setSearchQuery } = useSearch(playlist?.queue || []);
 

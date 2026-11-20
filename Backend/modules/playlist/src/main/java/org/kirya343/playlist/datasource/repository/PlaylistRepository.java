@@ -39,7 +39,7 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     @Query("""
         SELECT p
         FROM Playlist p
-        WHERE p.owner.id = :userId
+        WHERE p.owner.id = :userId 
         AND p.type = :type
         """)
     Optional<Playlist> findPlaylistByTypeByOwnerId(
@@ -50,7 +50,15 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     @Query("""
         SELECT p
         FROM Playlist p
-        WHERE p.owner.id = :userId
+        WHERE (
+            p.owner.id = :userId
+            OR EXISTS (
+                SELECT sp
+                FROM SavedPlaylist sp
+                WHERE sp.playlist = p
+                AND sp.user.id = :userId
+            )
+        )
         AND NOT EXISTS (
             SELECT ps
             FROM PlaybackState ps

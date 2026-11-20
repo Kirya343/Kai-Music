@@ -12,6 +12,7 @@ public record ShortUserDTO(
 ) {
 
     public static ShortUserDTO ofUser(User user) {
+        if (user == null) return null;
         return new ShortUserDTO(user.getSub(), user.getName(), user.getAvatarUrl());
     }
 

@@ -4,6 +4,10 @@ import clsx from "clsx";
 import styles from "./PlaylistsSidebar.module.scss";
 import { Artwork } from "@/components/ui/Artwork/Artwork";
 import { CirclePlusIcon } from "@/assets/icons";
+import { useData, useSearch } from "@common";
+import { Playlist, PlaylistType } from "@playlist";
+import { useAuth } from "@user";
+import { usePlaybackPlaylist } from "@playback";
 
 export type PlaylistCategory = "mine" | "saved" | "audiobook";
 
@@ -18,54 +22,12 @@ export interface SidebarPlaylistItem {
 }
 
 interface PlaylistsSidebarProps {
-    playlists?: SidebarPlaylistItem[];
     activePlaylistId?: string;
-    onSelectPlaylist?: (playlist: SidebarPlaylistItem) => void;
+    onSelectPlaylist?: (playlist: Playlist) => void;
     onCreatePlaylist?: () => void;
     defaultCollapsed?: boolean;
     className?: string;
 }
-
-const MOCK_PLAYLISTS: SidebarPlaylistItem[] = [
-    {
-        id: "liked-songs",
-        title: "Liked Songs",
-        subtitle: "Playlist • 48 tracks",
-        category: "mine",
-        pinned: true,
-        isPlaying: true,
-    },
-    {
-        id: "kirya-night",
-        title: "Kirya's Night Rotation",
-        subtitle: "by Kirya • 42 tracks",
-        category: "mine",
-    },
-    {
-        id: "sugar-bass",
-        title: "Sugar & Bass",
-        subtitle: "by Nutellka • 25 tracks",
-        category: "saved",
-    },
-    {
-        id: "deep-focus",
-        title: "Deep Focus",
-        subtitle: "Mood • 28 tracks",
-        category: "saved",
-    },
-    {
-        id: "late-night-lofi",
-        title: "Late Night Lo-Fi",
-        subtitle: "by Kirya • 19 tracks",
-        category: "mine",
-    },
-    {
-        id: "project-hail-mary",
-        title: "Project Hail Mary",
-        subtitle: "Audiobook • Ch. 4",
-        category: "audiobook",
-    },
-];
 
 type FilterTab = "all" | PlaylistCategory;
 
@@ -77,7 +39,6 @@ const FILTER_TABS: { id: FilterTab; label: string }[] = [
 ];
 
 export const PlaylistsSidebar: React.FC<PlaylistsSidebarProps> = ({
-    playlists,
     activePlaylistId,
     onSelectPlaylist,
     onCreatePlaylist,
@@ -86,29 +47,37 @@ export const PlaylistsSidebar: React.FC<PlaylistsSidebarProps> = ({
 }) => {
     const [collapsed, setCollapsed] = useState(defaultCollapsed);
     const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
-    const [searchQuery, setSearchQuery] = useState("");
+
+    const { playlistsData } = useData();
+    const { user } = useAuth();
 
     const navigate = useNavigate();
     const location = useLocation();
+    const { playbackPlaylist } = usePlaybackPlaylist();
 
-    const items = playlists ?? MOCK_PLAYLISTS;
+    const { searchQuery, setSearchQuery, filteredList } = useSearch(playlistsData.playlists)
 
-    const filteredPlaylists = useMemo(() => {
-        const query = searchQuery.trim().toLowerCase();
+    const filteredPlaylists = useMemo<Playlist[]>(() => {
+        return filteredList.filter((playlist) => {
 
-        return items.filter((item) => {
-            const matchesTab =
-                activeFilter === "all" || item.category === activeFilter;
-            const matchesQuery =
-                !query ||
-                item.title.toLowerCase().includes(query) ||
-                item.subtitle.toLowerCase().includes(query);
+            let matchesTab = false;
 
-            return matchesTab && matchesQuery;
+            switch (activeFilter) {
+                case "all": 
+                    matchesTab = true;
+                    break;
+                case "mine":
+                    matchesTab = (playlist.owner.sub === user?.sub)
+                    break;
+                case "saved": 
+                    matchesTab = (playlist.owner.sub !== user?.sub)
+            }
+
+            return matchesTab;
         });
-    }, [items, activeFilter, searchQuery]);
+    }, [filteredList, activeFilter, searchQuery, user]);
 
-    const handleSelect = (item: SidebarPlaylistItem) => {
+    const handleSelect = (item: Playlist) => {
         if (onSelectPlaylist) {
             onSelectPlaylist(item);
             return;
@@ -213,45 +182,51 @@ export const PlaylistsSidebar: React.FC<PlaylistsSidebarProps> = ({
                     </div>
                 )}
 
-                {filteredPlaylists.map((item) => {
-                    const isActive =
-                        activePlaylistId === item.id ||
-                        location.pathname.endsWith(`/${item.id}`);
+                {filteredPlaylists
+                    .toSorted((a, b) => {
+                        if (a.position == null) return 1;
+                        if (b.position == null) return -1;
 
-                    return (
-                        <button
-                            key={item.id}
-                            type="button"
-                            className={clsx(
-                                styles.playlistItem,
-                                isActive && styles.activeItem
-                            )}
-                            onClick={() => handleSelect(item)}
-                            title={collapsed ? `${item.title} — ${item.subtitle}` : item.title}
-                        >
-                            <Artwork
-                                src={item.coverUrl}
-                                title={item.title}
-                                seed={item.id}
-                                size="sm"
-                                rounded="md"
-                                isPlaying={item.isPlaying}
-                            />
+                        return a.position - b.position;
+                    })
+                    .map((item) => {
+                    
+                        const isActive = location.pathname.endsWith(`/${item.id}`);
 
-                            {!collapsed && (
-                                <div className={styles.meta}>
-                                    <div className={styles.titleRow}>
-                                        <span className={styles.title}>{item.title}</span>
-                                        {item.pinned && (
-                                            <span className={styles.pinDot} title="Pinned" />
-                                        )}
+                        return (
+                            <button
+                                key={item.id}
+                                type="button"
+                                className={clsx(
+                                    styles.playlistItem,
+                                    isActive && styles.activeItem
+                                )}
+                                onClick={() => handleSelect(item)}
+                                title={collapsed ? `${item.title} — ${item.queue.length || 0} tracks` : item.title}
+                            >
+                                <Artwork
+                                    src={item.title}
+                                    title={item.title}
+                                    seed={item.title}
+                                    size="sm"
+                                    rounded="md"
+                                    isPlaying={playbackPlaylist?.id === item.id}
+                                />
+
+                                {!collapsed && (
+                                    <div className={styles.meta}>
+                                        <div className={styles.titleRow}>
+                                            <span className={styles.title}>{item.title}</span>
+                                            {item.position !== null && (
+                                                <span className={styles.pinDot} title="Pinned" />
+                                            )}
+                                        </div>
+                                        <span className={styles.subtitle}>{`by ${item.owner.name} • ${item.queue.length} tracks`}</span>
                                     </div>
-                                    <span className={styles.subtitle}>{item.subtitle}</span>
-                                </div>
-                            )}
-                        </button>
-                    );
-                })}
+                                )}
+                            </button>
+                        );
+                    })}
             </div>
         </aside>
     );

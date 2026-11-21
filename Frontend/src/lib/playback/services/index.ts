@@ -4,7 +4,8 @@ import {
     subscribe,
     unsubscribe,
     changeTrack,
-    getCurrentRoomState
+    getCurrentRoomState,
+    getActiveRooms
 } from './playback.api';
 import * as hooks from './playback.hooks';
 
@@ -15,5 +16,6 @@ export const playbackService = {
     unsubscribe,
     changeTrack,
     getCurrentRoomState,
+    getActiveRooms,
     ...hooks
 };

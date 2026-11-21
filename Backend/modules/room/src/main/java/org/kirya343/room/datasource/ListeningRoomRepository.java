@@ -1,5 +1,6 @@
 package org.kirya343.room.datasource;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,38 +43,20 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
             r.code
         FROM listening_room r
         JOIN users u ON u.id = r.owner_id
-        LEFT JOIN user_playbacks up
-            ON up.target_id = r.id
-            AND up.target_type = 'ROOM'
-        GROUP BY
-            r.id,
-            r.title,
-            u.name,
-            r.owner_id,
-            r.code
         """, nativeQuery = true)
-    List<RoomDTO> findAllShortDTOs();
+    List<RoomDTO> findAllDTOs();
 
     @Query(value = """
         SELECT
             r.id,
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
-            r.owner_id AS ownerId,
+            r.owner_sub AS ownerId,
             r.code
         FROM listening_room r
-        JOIN users u ON u.id = r.owner_id
-        LEFT JOIN user_playbacks up
-            ON up.target_id = r.id
-            AND up.target_type = 'ROOM'
-        WHERE r.id = :roomId
-        GROUP BY
-            r.id,
-            r.title,
-            u.name,
-            r.owner_id,
-            r.code
+        JOIN users u ON u.sub = r.owner_sub
+        WHERE r.id IN (:roomIds)
         """, nativeQuery = true)
-    Optional<RoomDTO> findShortRoomById(
-        @Param("roomId") Long roomId
+    List<RoomDTO> findDTOsByIds(
+        @Param("roomIds") Collection<Long> roomIds
     );
 }

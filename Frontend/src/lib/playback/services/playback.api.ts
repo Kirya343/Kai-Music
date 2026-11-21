@@ -1,5 +1,5 @@
 import { createApi } from "@common";
-import { PlaybackState, PlaybackMode } from "@playback";
+import { PlaybackState, PlaybackMode, RoomPlaybackDTO } from "@playback";
 
 const playbackApi = createApi("/playback")
 
@@ -10,6 +10,9 @@ const playbackApi = createApi("/playback")
  */
 export const getCurrentRoomState = (targetType: string, targetId: number) => 
     playbackApi.get<PlaybackState>(`/playback-state`, { params: { targetType, targetId }});
+
+export const getActiveRooms = () => 
+    playbackApi.get<RoomPlaybackDTO[]>(`/live/room`);
 
 /**
  * Changes track in playback.

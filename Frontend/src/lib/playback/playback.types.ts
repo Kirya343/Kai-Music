@@ -73,3 +73,9 @@ export interface PlaybackData {
     room?: IListeningRoom
     listeners?: IShortUser[]
 }
+
+export interface RoomPlaybackDTO {
+    room: IListeningRoom;
+    listeners: number; 
+    audio: IAudio;
+}

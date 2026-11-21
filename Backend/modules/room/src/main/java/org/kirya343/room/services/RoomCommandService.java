@@ -42,7 +42,7 @@ public class RoomCommandService {
 
         eventPublisher.publishEvent(new PlaybackSubscribeEvent(authData, "ROOM", room.getId()));
 
-        if (vibe.equals("RUNDOM")) {
+        if (vibe != null && vibe.equals("RUNDOM")) {
             // TODO написать логику согздания плейлиста с рандомными аудио
         }
 

@@ -1,12 +1,19 @@
 package org.kirya343.playback.presentation.http;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.kirya343.playback.infrastructure.persistence.entity.PlaybackState;
 import org.kirya343.playback.domain.enums.PlaybackTargetType;
 import org.kirya343.playback.infrastructure.persistence.repository.PlaybackStateRepository;
+import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorker;
+import org.kirya343.playback.infrastructure.streaming.playback.worker.PlaybackStreamWorkerManager;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
+import org.kirya343.playback.presentation.dto.RoomPlaybackDTO;
+import org.kirya343.room.datasource.ListeningRoomRepository;
+import org.kirya343.room.dto.RoomDTO;
+import org.kirya343.audio.dto.AudioDTO;
 import org.kirya343.playback.application.command.ChangeTrack;
 import org.kirya343.playback.application.command.PlaybackCommand;
 import org.kirya343.playback.application.command.UpdatePlayback;
@@ -15,6 +22,7 @@ import org.kirya343.playback.application.service.PlaybackSessionService;
 import org.kirya343.playback.domain.dto.PlaybackTarget;
 import org.kirya343.playback.domain.enums.PlaybackMode;
 import org.kirya343.security.core.annotations.controllers.Authenticated;
+import org.kirya343.security.core.annotations.controllers.PublicEndpoint;
 import org.kirya343.security.core.annotations.parameters.AuthUser;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,6 +49,9 @@ public class PlaybackController {
     private final Map<String, Long> lastUpdate = new ConcurrentHashMap<>();
     private static final long UPDATE_DELAY_MS = 300;
     private final ApplicationEventPublisher eventPublisher;
+    private final ListeningRoomRepository listeningRoomRepository;
+    
+    private final PlaybackStreamWorkerManager playbackStreamWorkerManager;
     
     @GetMapping("/playback-state")
     @Authenticated
@@ -128,6 +139,25 @@ public class PlaybackController {
         @AuthUser UserAuthData authData
     ) {
         playbackService.playTrack(targetType, audioId, playlistId, authData);
+    }
+
+    @GetMapping("/live/rooms")
+    @PublicEndpoint
+    public List<RoomPlaybackDTO> getMainPage() {
+
+        List<PlaybackStreamWorker> roomWorkers = playbackStreamWorkerManager.get(PlaybackTargetType.ROOM);
+
+        List<RoomDTO> rooms = listeningRoomRepository.findDTOsByIds(
+            roomWorkers.stream().map(w -> w.getTarget().id()).toList()
+        );
+
+        return roomWorkers.stream().map(worker -> 
+            new RoomPlaybackDTO(
+                rooms.stream().filter(r -> r.id() == worker.getTarget().id()).findFirst().orElse(null), 
+                worker.getPresence().countAll(), 
+                AudioDTO.ofAudioFile(worker.getContext().getAudio())
+            )).toList();
+
     }
 
     private boolean shouldIgnore(Long userId, String action) {

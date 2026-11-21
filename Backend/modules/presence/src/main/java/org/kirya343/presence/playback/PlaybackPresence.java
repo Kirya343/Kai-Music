@@ -20,7 +20,7 @@ public class PlaybackPresence {
         presences.remove(userSub);
     }
 
-    public long countAll() {
+    public int countAll() {
         return presences.size();
     }
 

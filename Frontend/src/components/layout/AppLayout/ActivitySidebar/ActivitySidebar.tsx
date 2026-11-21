@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import styles from "./ActivitySidebar.module.scss";
 import { Artwork } from "@/components/ui/Artwork/Artwork";
 import { CirclePlusIcon, DoorIcon } from "@/assets/icons";
 import { IListeningRoom, roomService } from "@room";
-import { usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist } from "@playback";
+import { playbackService, RoomPlaybackDTO, usePlaybackAudio, usePlaybackControls, usePlaybackPlaylist } from "@playback";
 import { useWebSocket } from "@websocket";
 import { loggerFactory } from "@common";
 import PlaylistQueue from "./PlaylistQueue/PlaylistQueue";
@@ -70,14 +70,6 @@ const MOCK_FRIENDS: FriendActivityItem[] = [
     },
 ];
 
-const MOCK_NOW_PLAYING: QueueTrackItem = {
-    id: "np-1",
-    title: "BABY SAID",
-    artist: "Måneskin",
-    duration: "2:44",
-    addedBy: "Kirya",
-};
-
 type SidebarTab = "live" | "queue";
 
 function formatListeners(count: number): string {
@@ -88,8 +80,6 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
     rooms,
     currentRoom = null,
     friendsActivity,
-    queue,
-    nowPlaying,
     onOpenJoinModal,
     defaultCollapsed = false,
     className,
@@ -105,9 +95,21 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
     const { currentPlaybackState } = usePlaybackAudio();
     const { playingAudio, playbackPlaylist } = usePlaybackPlaylist();
 
+    const [activity, setActivity] = useState<RoomPlaybackDTO[] | null>(null)
+
     const friends = friendsActivity ?? MOCK_FRIENDS;
-    const activeTrack = nowPlaying === undefined ? MOCK_NOW_PLAYING : nowPlaying;
     const queueItems = playbackPlaylist?.queue || [];
+
+    useEffect(() => {
+        async function loadActiveRooms() {
+
+            const res = await playbackService.getActiveRooms();
+            
+            setActivity(res.data)
+        }
+
+        loadActiveRooms()
+    }, [])
 
     const handleCreateRoom = async () => {
         try {
@@ -333,48 +335,48 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
                             {/* Активность друзей / сообщества */}
                             <section className={styles.block}>
                                 <div className={styles.blockHeader}>
-                                    <h3>Friend Activity</h3>
+                                    <h3>Activity</h3>
                                     <span className={styles.onlineCount}>
-                                        {friends.filter((f) => f.isOnline).length} online
+                                        {activity?.length || 0} rooms online
                                     </span>
                                 </div>
 
                                 <div className={styles.itemsList}>
-                                    {friends.map((friend) => (
-                                        <div key={friend.id} className={styles.friendCard}>
+                                    {activity?.map((item) => (
+                                        <div key={item.room.id} className={styles.friendCard}>
                                             <div className={styles.avatarWrap}>
                                                 <Artwork
-                                                    title={friend.username}
-                                                    seed={friend.username}
+                                                    title={item.room.title}
+                                                    seed={item.room.title}
                                                     size="xs"
                                                     rounded="full"
                                                 />
-                                                <span
+                                                {/* <span
                                                     className={clsx(
                                                         styles.statusDot,
                                                         friend.isOnline && styles.isOnline
                                                     )}
-                                                />
+                                                /> */}
                                             </div>
 
                                             <div className={styles.rowMeta}>
                                                 <div className={styles.friendTop}>
-                                                    <strong>{friend.username}</strong>
-                                                    {friend.roomTitle && friend.roomCode && (
+                                                    <strong>{item.room.title}</strong>
+                                                    {item.room.title && item.room.code && (
                                                         <button
                                                             type="button"
                                                             className={styles.roomLink}
                                                             onClick={() =>
-                                                                handleJoinRoom(friend.roomCode!)
+                                                                handleJoinRoom(item.room.code!)
                                                             }
-                                                            title={`Join ${friend.roomTitle}`}
+                                                            title={`Join ${item.room.title}`}
                                                         >
-                                                            {friend.roomTitle}
+                                                            {item.room.title}
                                                         </button>
                                                     )}
                                                 </div>
                                                 <span>
-                                                    {friend.artist} — {friend.trackTitle}
+                                                    {item.audio.artist} — {item.audio.title}
                                                 </span>
                                             </div>
                                         </div>

@@ -1,5 +1,6 @@
 package org.kirya343.playback.infrastructure.streaming.playback.worker;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +52,20 @@ public class PlaybackStreamWorkerManager {
 
     public Set<Long> keySet(PlaybackTargetType type) {
         return workers.computeIfAbsent(type, key -> new ConcurrentHashMap<>()).keySet();
+    }
+
+    public List<PlaybackStreamWorker> get(PlaybackTargetType type) {
+
+        log.debug("Пытаемся получить все {} воркеры", type);
+
+        Map<Long, PlaybackStreamWorker> workersMap = workers.get(type);
+
+        if (workersMap != null) {
+
+            return workersMap.values().stream().toList();
+        }
+
+        return new ArrayList<>();
     }
 
     public PlaybackStreamWorker get(PlaybackTarget target) {

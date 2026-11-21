@@ -57,7 +57,7 @@ public class RoomController {
     @PublicEndpoint
     public MainPageRequest getMainPage() {
 
-        List<RoomDTO> rooms = listeningRoomRepository.findAllShortDTOs();
+        List<RoomDTO> rooms = listeningRoomRepository.findAllDTOs();
         long roomsCount = listeningRoomRepository.count();
 
         return new MainPageRequest(

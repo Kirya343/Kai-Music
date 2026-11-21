@@ -11,14 +11,14 @@ import org.kirya343.audio.datasource.AudioFile;
 public record RoomDTO(
     Long id,
     String title,
-    Long ownerId,
+    String ownerSub,
     String code
 ) {
     public static RoomDTO ofRoom(ListeningRoom room, AudioFile audio) {
         return new RoomDTO(
             room.getId(),
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
-            room.getOwner().getId(),
+            room.getOwner().getSub(),
             room.getCode()
         );
     }
@@ -28,7 +28,7 @@ public record RoomDTO(
         return new RoomDTO(
             room.getId(),
             room.getTitle() != null ? room.getTitle() : room.getOwner().getName() + "\'s room",
-            room.getOwner().getId(),
+            room.getOwner().getSub(),
             room.getCode()
         );
     }
@@ -37,7 +37,7 @@ public record RoomDTO(
         return new RoomDTO(
             room.id(), 
             room.title(), 
-            room.ownerId(),
+            room.ownerSub(),
             room.code()
         );
     }

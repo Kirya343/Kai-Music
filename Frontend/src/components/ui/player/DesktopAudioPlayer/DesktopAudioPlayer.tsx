@@ -26,7 +26,6 @@ const DesktopAudioPlayer = () => {
  
     const { isMobile } = useGlobal();
 
-    const { currentPlaybackState } = usePlaybackAudio();
     const { resyncPlayback, autoPlay } = usePlaybackControls();
     const { playbackState } = usePlaybackState();
     const { playingAudio } = usePlaybackPlaylist();

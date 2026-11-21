@@ -2,7 +2,9 @@ package org.kirya343.playlist.datasource.model;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.user.datasource.User;
@@ -61,7 +63,7 @@ public class Playlist {
     private Instant createdAt;
 
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SavedPlaylist> savedBy = new ArrayList<>();    
+    private Set<SavedPlaylist> savedBy = new HashSet<>();    
 
     @Setter
     @Column(nullable = false)

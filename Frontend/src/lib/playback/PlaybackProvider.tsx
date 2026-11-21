@@ -6,7 +6,6 @@ import { PlaybackControlsProvider } from "./contexts/PlaybackControlsContext";
 import { PlaybackPlaylistProvider } from "./contexts/PlaybackPlaylistContext";
 import { PlaybackDataProvider } from "./contexts/PlaybackDataContext";
 import { PlaybackUIProvider } from "./contexts/PlaybackUIContext";
-import { playbackService } from "./services";
 
 export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 

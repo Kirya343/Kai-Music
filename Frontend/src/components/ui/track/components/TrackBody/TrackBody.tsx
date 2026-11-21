@@ -24,7 +24,7 @@ export const TrackBody = ({
         <div className={styles.body} onClick={onClick}>
             <Artwork
                 src={audio.coverUrl}
-                title={audio.title}
+                title={`${audio.title}-${audio.artist}`}
             />
 
             <TrackMetadata

@@ -19,7 +19,7 @@
     flex-shrink: 0;
 }
 
-.rowMeta {
+.meta {
     display: flex;
     flex-direction: column;
     gap: 0.12rem;
@@ -46,4 +46,9 @@
         font-size: 0.68rem;
         color: rgba(255, 255, 255, 0.45);
     }
+}
+
+.playing .title {
+    color: var(--orange);
+    font-weight: 600;
 }

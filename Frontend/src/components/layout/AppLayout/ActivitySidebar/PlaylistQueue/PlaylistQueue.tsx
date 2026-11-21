@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./PlaylistQueue.module.scss"
-import { usePlaybackPlaylist } from "@playback";
+import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import { IAudio } from "@audio";
 import { playlistService } from "@playlist";
 import SidebarPlaybackQueueTrack from "@/components/ui/track/variations/SidebarPlaybackQueueTrack";
@@ -15,6 +15,7 @@ const PlaylistQueue = () => {
     const [isOver, setIsOver] = useState(false);
 
     const { playbackPlaylist } = usePlaybackPlaylist();
+    const { playbackState } = usePlaybackState();
 
     const queueItems = playbackPlaylist?.queue || [];
 
@@ -27,6 +28,12 @@ const PlaylistQueue = () => {
             [{ audioId: audio.id }]
         )
     }
+
+    const playingAudioId = useMemo(() => {
+        return playbackPlaylist?.queue.find(
+            item => item.id === playbackState?.entryId
+        )?.audio.id;
+    }, [playbackPlaylist?.queue, playbackState?.entryId]);
 
     return (
         <div 
@@ -58,6 +65,7 @@ const PlaylistQueue = () => {
                     <SidebarPlaybackQueueTrack
                         key={idx}
                         entry={entry}
+                        playing={playingAudioId === entry.audio.id}
                     />
                 )
             )}

@@ -31,6 +31,7 @@ export const PlaybackControlsProvider = ({
     children: React.ReactNode;
     value: PlaybackControlsContextType;
 }) => {
+
     return (
         <PlaybackControlsContext.Provider value={value}>
             {children}

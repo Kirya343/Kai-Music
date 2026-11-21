@@ -47,8 +47,6 @@ const PlaylistTrack = ({
     ...divProps
 }: PlaylistTrackProps) => {
 
-    console.log("render")
-
     const extraActions = useMemo<IKebabAction[]>(() => {
         const actions: IKebabAction[] = [
             {

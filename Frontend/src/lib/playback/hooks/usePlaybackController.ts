@@ -48,15 +48,10 @@ export const usePlaybackController = ({
     const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
 
     // state to increase the fastmutable position 
-    const [position, setPosition] = useState<number>(0);
+    const positionRef = useRef<number>(0);
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
 
-    const currentPlaybackState: PlaybackState | null = playbackState ? 
-        { 
-            ...playbackState, 
-            pause: playbackState?.pause || !autoPlay, 
-            position: Math.max(audio?.currentTime || 0, position)
-        } : null;
+    const [playbackTick, setPlaybackTick] = useState(0);
 
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
@@ -64,7 +59,23 @@ export const usePlaybackController = ({
 
     const navigate = useNavigate();
 
+    const currentPlaybackState: PlaybackState | null = useMemo(() => {
+        if (!playbackState) return null;
+
+        return {
+            ...playbackState,
+            position: Math.max(audio?.currentTime || 0, positionRef.current)
+        };
+    }, [playbackState, playbackTick]);
+
     useEffect(() => {
+
+        logger.debug(
+            "Попытка найти аудио из плейлиста", 
+            playbackState?.entryId,
+            playbackPlaylist?.queue
+        )
+
         const audio = playbackPlaylist?.queue.find(
             qi => qi.id === playbackState?.entryId
         )?.audio;
@@ -110,9 +121,9 @@ export const usePlaybackController = ({
     }, [audio]);
 
     const changeTrack = useCallback((changing: "next" | "prev" | number) => {
-        setAutoPlay(true)
-        playbackService.changeTrack(changing)
-    }, [])
+        setAutoPlay(true);
+        playbackService.changeTrack(changing);
+    }, []);
 
     /**
      * Resumes playing audio
@@ -156,8 +167,12 @@ export const usePlaybackController = ({
             pausePlayback()
         }
 
-        await playbackService.updateTrackPosition({...playbackState, position, pause: newPaused, });
-    }, [playbackState, position, pausePlayback]);
+        await playbackService.updateTrackPosition({
+            ...playbackState, 
+            position: positionRef.current, 
+            pause: newPaused
+        });
+    }, [playbackState, pausePlayback]);
 
     const seek = useCallback((position: number) => {
 
@@ -259,17 +274,8 @@ export const usePlaybackController = ({
     const addTimeUpdateListener = useCallback(
         (audio: HTMLAudioElement) => {
             const handleTimeUpdate = () => {
-                if (unsyncedStateRef.current !== null) {
-                    return;
-                }
-
-                setPosition(prev => {
-                    if (prev === null) {
-                        return prev;
-                    }
-
-                    return audio.currentTime;
-                });
+                positionRef.current = audio.currentTime;
+                setPlaybackTick(prev => prev + 1);
             };
 
             audio.addEventListener("timeupdate", handleTimeUpdate);
@@ -300,7 +306,7 @@ export const usePlaybackController = ({
         initMediaSource(streamId);
     }, [cleanupMediaSource, initMediaSource]);
 
-    const reconnect = (stompClient: Client | null) => {
+    const reconnect = useCallback((stompClient: Client | null) => {
 
         if (!stompClient) return;
 
@@ -310,9 +316,9 @@ export const usePlaybackController = ({
             destination: "/app/playback.reconnect",
             body: ""
         });
-    }
+    }, []);
 
-    const resync = (stompClient: Client | null, autoPlay: boolean) => {
+    const resync = useCallback((stompClient: Client | null, autoPlay: boolean) => {
 
         if (!stompClient) return;
 
@@ -326,7 +332,7 @@ export const usePlaybackController = ({
             destination: "/app/playback.resync",
             body: ""
         });
-    }
+    }, []);
 
     const handleEvent = useCallback((event: PlaybackEventType) => {
         switch (event) {
@@ -366,8 +372,11 @@ export const usePlaybackController = ({
                 awaitingStateRef.current = false;
 
                 setPlaybackState(state);
-                setPosition(state.position)
+
+                positionRef.current = state.position;
+
                 unsyncedStateRef.current = state;
+
                 playIfBufferedRef.current();
             });
 

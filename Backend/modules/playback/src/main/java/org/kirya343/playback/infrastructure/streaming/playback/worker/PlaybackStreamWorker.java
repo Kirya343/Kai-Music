@@ -17,6 +17,7 @@ import org.kirya343.playback.infrastructure.streaming.playback.management.Playba
 import org.kirya343.playback.infrastructure.streaming.user.worker.UserStreamWorker;
 import org.kirya343.playback.presentation.dto.PlaybackStateDTO;
 import org.kirya343.playlist.datasource.model.QueueItem;
+import org.kirya343.presence.playback.PlaybackPresence;
 import org.kirya343.security.core.dto.UserAuthData;
 import org.kirya343.user.dto.ShortUserDTO;
 import org.springframework.context.ApplicationEventPublisher;
@@ -72,6 +73,10 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
         tickScheduler.start(this::tickInternal);
     }
 
+    public PlaybackContext getContext() {
+        return trackManager.getCurrentPlayback();
+    }
+
     public void broadcast(Consumer<UserStreamWorker> action) {
         subscriberManager.broadcast(action);
     }
@@ -86,6 +91,10 @@ public class PlaybackStreamWorker extends DiagnosticLoggable {
 
     public void unsubscribe(String userSub) {
         subscriberManager.unsubscribe(userSub);
+    }
+
+    public PlaybackPresence getPresence() {
+        return subscriberManager.getPresence();
     }
 
     public void shutdown() {

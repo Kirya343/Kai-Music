@@ -9,7 +9,7 @@ import { CheckBoxIcon, PlusIcon, ShuffleIcon } from "@/assets/icons";
 import Loader from "@/components/ui/Loader/Loader";
 import { playlistService } from "@playlist";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
-import PlaybackQueueTrack from "@/components/ui/track/PlaybackQueueTrack";
+import PlaybackQueueTrack from "@/components/ui/track/variations/PlaybackQueueTrack";
 import { loggerFactory } from "@common";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
 import AvatarStack from "@/components/ui/AvatarStack/AvatarStack";

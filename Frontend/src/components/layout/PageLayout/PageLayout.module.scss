@@ -8,6 +8,7 @@
     min-height: 0;
     overflow: auto;
     gap: .5rem;
+    padding-bottom: .5rem;
 
     @include mobile {
         gap: .5rem;

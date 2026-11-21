@@ -6,7 +6,7 @@
     border-radius: 10px;
     font-size: medium;
     
-    @include dirty-glass-light(true);
+    @include glass(true, 0.98, "filled");
 }
 
 .body {

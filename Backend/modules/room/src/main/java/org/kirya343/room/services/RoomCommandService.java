@@ -23,9 +23,14 @@ public class RoomCommandService {
     private final ListeningRoomRepository listeningRoomRepository;
     private final EntityManager entityManager;
     private final ApplicationEventPublisher eventPublisher;
-    
+
     @Transactional 
     public ListeningRoom createRoom(UserAuthData authData) {
+        return createRoom(authData, null);
+    }
+    
+    @Transactional 
+    public ListeningRoom createRoom(UserAuthData authData, String vibe) {
         listeningRoomRepository.findAllByOwnerId(authData.id())
             .forEach(r -> deleteRoom(r));
 
@@ -36,6 +41,10 @@ public class RoomCommandService {
         ListeningRoom saved = listeningRoomRepository.save(room);
 
         eventPublisher.publishEvent(new PlaybackSubscribeEvent(authData, "ROOM", room.getId()));
+
+        if (vibe != null && vibe.equals("RUNDOM")) {
+            // TODO написать логику согздания плейлиста с рандомными аудио
+        }
 
         return saved;
     }

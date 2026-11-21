@@ -2,7 +2,9 @@ package org.kirya343.playlist.datasource.model;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.kirya343.user.datasource.User;
@@ -44,6 +46,8 @@ public class Playlist {
     @ManyToOne
     private User owner;
 
+    private Long position;
+
     @Setter
     private String title;
 
@@ -53,8 +57,17 @@ public class Playlist {
     @Enumerated(EnumType.STRING)
     private PlaylistType type;
 
+    private Long sourcePlaylistId;
+
     @CreationTimestamp
     private Instant createdAt;
+
+    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<SavedPlaylist> savedBy = new HashSet<>();    
+
+    @Setter
+    @Column(nullable = false)
+    private boolean isPublic = false;
 
     public Playlist(String title, User owner) {
         this.title = title;

@@ -8,6 +8,9 @@ import { useEffect, useState } from "react";
 import { useWebSocket } from "@websocket";
 import DesktopAudioPlayer from "@/components/ui/player/DesktopAudioPlayer/DesktopAudioPlayer";
 import { AppProviders } from "@/AppProviders";
+import PlaylistsSidebar from "./PlaylistsSidebar/PlaylistsSidebar";
+import ActivitySidebar from "./ActivitySidebar/ActivitySidebar";
+import ScrollArea from "../ScrollArea/ScrollArea";
 
 /**
  * AppLayout is layout for the entire application to keep same style
@@ -51,7 +54,13 @@ const AppLayout = () => {
                     <Header/>
 
                     <main className={styles.main}>
-                        <Outlet />
+                        <PlaylistsSidebar/>
+
+                        <ScrollArea>
+                            <Outlet />
+                        </ScrollArea>
+
+                        <ActivitySidebar />
                     </main>
 
                     <AudioPlayer />

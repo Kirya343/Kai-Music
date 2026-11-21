@@ -1,4 +1,4 @@
-import { playbackService, usePlaybackControls, usePlaybackData, usePlaybackPlaylist, usePlaybackState } from "@playback";
+import { playbackService, usePlaybackAudio, usePlaybackControls, usePlaybackData, usePlaybackPlaylist, usePlaybackState } from "@playback";
 
 import styles from "./DesktopAudioPlayer.module.scss"
 import { useGlobal } from "@common";
@@ -10,6 +10,7 @@ import { useState } from "react";
 import PlaybackQueueModal from "@/components/modals/PlaybackQueueModal/PlaybackQueueModal";
 import { PlaylistIcon } from "@/assets/icons";
 import { useWebSocket } from "@websocket";
+import { Artwork } from "../../Artwork/Artwork";
 
 /**
  * Component that display on bottom of pages and displays
@@ -49,6 +50,7 @@ const DesktopAudioPlayer = () => {
             )}
 
             <div className={styles.info}>
+                <Artwork src={playingAudio.coverUrl} title={playingAudio?.title} />
                 <ScrollableTitle title={playingAudio?.title ?? playingAudio?.name} />
             </div>
 

@@ -1,0 +1,198 @@
+@use "@/css/components/mixins/" as *;
+
+// Правый сайдбар
+.sidebar {
+    width: 100%;
+    border-radius: 1.15rem;
+    overflow: hidden;
+
+    @include glass;
+
+    section {
+        padding: 1.15rem;
+
+        &.actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            border-bottom: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
+        }
+
+        &.publicRooms {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+    }
+}
+
+.actionBtn {
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    border-radius: 0.75rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, filter 0.15s ease;
+
+    @include glass(true, 0.98, "filled");
+
+    &:hover {
+        filter: brightness(1.06);
+    }
+
+    &:active {
+        transform: scale(0.99);
+    }
+
+    svg {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    span {
+        flex: 1;
+        text-align: left;
+    }
+}
+
+.quickCodeForm {
+    display: flex;
+    gap: 0.45rem;
+    margin-top: 0.1rem;
+}
+
+.codeInput {
+    flex: 1;
+    min-width: 0;
+    padding: 0.55rem 0.7rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(0, 0, 0, 0.28);
+    color: #ffffff;
+    font-size: 0.85rem;
+
+    &::placeholder {
+        color: rgba(255, 255, 255, 0.42);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.35);
+    }
+}
+
+.codeSubmit {
+    padding: 0 0.85rem;
+    border-radius: 0.65rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+}
+
+.roomsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.room {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+
+    @include glass(true);
+
+    &:hover {
+        transform: translateX(2px);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.18rem;
+        min-width: 0;
+        flex: 1;
+    }
+}
+
+.roomTopLine {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+}
+
+.roomName {
+    font-size: 0.92rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.genreBadge {
+    font-size: 0.68rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.72);
+    flex-shrink: 0;
+}
+
+.audioName {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.listnersCount {
+    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.52);
+}
+
+.emptyState {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    text-align: center;
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.countBadge {
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}

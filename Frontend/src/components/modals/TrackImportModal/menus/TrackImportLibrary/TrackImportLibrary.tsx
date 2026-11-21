@@ -1,6 +1,6 @@
 import { useLibrary } from "@audio";
 import styles from "./TrackImportLibrary.module.scss"
-import ImportingTrack from "@/components/ui/track/ImportingTrack";
+import ImportingTrack from "@/components/ui/track/variations/ImportingTrack";
 import { useMemo, useState } from "react";
 import { Playlist, playlistService } from "@playlist";
 import { ShuffleIcon } from "@/assets/icons";

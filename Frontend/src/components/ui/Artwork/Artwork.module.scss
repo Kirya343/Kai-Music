@@ -1,0 +1,116 @@
+.artwork {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  color: #fff;
+  background-image: linear-gradient(
+    var(--art-angle, 135deg),
+    var(--art-from, #6d28d9),
+    var(--art-via, #be185d) 55%,
+    var(--art-to, #3b0764)
+  );
+
+  &--xs {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+
+  &--sm {
+    width: 44px;
+    height: 44px;
+    font-size: 13px;
+  }
+
+  &--md {
+    width: 64px;
+    height: 64px;
+    font-size: 18px;
+  }
+
+  &--lg {
+    width: 120px;
+    height: 120px;
+    font-size: 32px;
+  }
+
+  &--rounded-md { border-radius: 8px; }
+  &--rounded-lg { border-radius: 12px; }
+  &--rounded-xl { border-radius: 18px; }
+  &--rounded-full { border-radius: 9999px; }
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.glowLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--glow-1-x, 25%) var(--glow-1-y, 25%), rgba(255, 255, 255, 0.24), transparent 45%),
+    radial-gradient(circle at var(--glow-2-x, 80%) var(--glow-2-y, 75%), rgba(255, 255, 255, 0.14), transparent 50%);
+}
+
+.pattern {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.18;
+  color: #fff;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.28) 100%);
+}
+
+.initials {
+  position: relative;
+  z-index: 1;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.28);
+}
+
+.artwork--layout-monogram .initials {
+  font-style: italic;
+  letter-spacing: 0.08em;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.55);
+  padding-bottom: 2px;
+}
+
+.artwork--layout-badge .initials {
+  padding: 0.22em 0.42em;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(4px);
+}
+
+// На мелких иконках упрощаем детали, чтобы не было «каши»
+.artwork--xs,
+.artwork--sm {
+  .pattern,
+  .glowLayer {
+    opacity: 0.1;
+  }
+
+  .artwork--layout-badge .initials {
+    padding: 0;
+    background: none;
+    border: none;
+    backdrop-filter: none;
+  }
+}

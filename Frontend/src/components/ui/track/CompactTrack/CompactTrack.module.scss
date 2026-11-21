@@ -1,0 +1,54 @@
+@use "@/css/components/mixins/" as *;
+
+.track {
+    @include glassCard(true);
+}
+
+.trackIdx {
+    width: 14px;
+    font-size: 0.74rem;
+    color: rgba(255, 255, 255, 0.45);
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.duration {
+    font-size: 0.74rem;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, 0.55);
+    flex-shrink: 0;
+}
+
+.meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+    flex: 1;
+
+    strong {
+        font-size: 0.84rem;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    span {
+        font-size: 0.74rem;
+        color: rgba(255, 255, 255, 0.6);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    small {
+        font-size: 0.68rem;
+        color: rgba(255, 255, 255, 0.45);
+    }
+}
+
+.playing .title {
+    color: var(--orange);
+    font-weight: 600;
+}

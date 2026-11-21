@@ -67,6 +67,8 @@ export interface IAudio {
 
     /** URL of the album cover image. */
     coverUrl: string;
+
+    addedBy?: string;
 }
 
 /**

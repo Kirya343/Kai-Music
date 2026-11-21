@@ -1,8 +1,9 @@
 import { playlistService } from "@playlist";
-import Track, { ITrackAction } from "./Track/Track";
 import { TrashIcon } from "@/assets/icons";
 import { IQueueItem, playbackService, usePlaybackControls, usePlaybackPlaylist, usePlaybackState } from "@playback";
 import { HTMLAttributes } from "react";
+import { ITrackAction } from "../types";
+import Track from "../Track/Track";
 
 /** Props for the PlaybackQueueTrack component */
 interface PlaybackQueueTrackProps extends HTMLAttributes<HTMLDivElement> {
@@ -26,8 +27,6 @@ const PlaybackQueueTrack = ({
     const { togglePlay } = usePlaybackControls();
 
     const handleTrackClick = async (qiId: number) => {
-
-        console.log("Клик по треку в плейбэке")
 
         if (playbackState?.entryId === qiId) {
             togglePlay()

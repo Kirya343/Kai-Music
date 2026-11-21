@@ -5,10 +5,15 @@ import java.util.List;
 import org.kirya343.playlist.datasource.model.Playlist;
 import org.kirya343.playlist.dto.queue.QueueItemDTO;
 import org.kirya343.playlist.enums.PlaylistType;
+import org.kirya343.user.dto.ShortUserDTO;
 
 public record PlaylistDTO(
     Long id,
-    Long ownerId,
+    ShortUserDTO owner,
+    Long sourcePlaylistId,
+    int saved,
+    Long position,
+    boolean isPublic,
     PlaylistType type,
     String title,
     List<QueueItemDTO> queue
@@ -17,7 +22,11 @@ public record PlaylistDTO(
 
         return new PlaylistDTO(
             playlist.getId(),
-            playlist.getOwner() != null ? playlist.getOwner().getId() : null,
+            ShortUserDTO.ofUser(playlist.getOwner()),
+            playlist.getSourcePlaylistId(),
+            playlist.getSavedBy().size(),
+            playlist.getPosition(),
+            playlist.isPublic(),
             playlist.getType(),
             playlist.getTitle(),
             QueueItemDTO.ofList(playlist.getQueue())
@@ -28,7 +37,11 @@ public record PlaylistDTO(
 
         return new PlaylistDTO(
             playlist.getId(),
-            playlist.getOwner().getId(),
+            ShortUserDTO.ofUser(playlist.getOwner()),
+            playlist.getSourcePlaylistId(),
+            0,
+            playlist.getPosition(),
+            playlist.isPublic(),
             playlist.getType(),
             playlist.getTitle(),
             null

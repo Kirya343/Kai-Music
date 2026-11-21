@@ -18,8 +18,6 @@ export const removeEntry = async (
         typeof item === "number" ? item : item.audio?.id
     );
 
-    console.log(ids)
-
     try {
         await api.removeFromQueue(playlistId, ids);
     } catch (e) {

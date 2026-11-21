@@ -1,9 +1,10 @@
 import { TrashIcon, CheckmarkIcon, PenIcon, PlusIcon, ShazamIcon } from "@/assets/icons"
 import { playlistService } from "@playlist"
 import { audioService, IAudio } from "@audio"
-import Track, { ITrackAction } from "../Track/Track"
+import { ITrackAction } from "../types";
+import Track from "../Track/Track";
 import { IQueueItem } from "@playback"
-import React, { HTMLAttributes } from "react"
+import { HTMLAttributes } from "react"
 import { IKebabAction } from "../../KebabMenu/KebabMenu"
 import { loggerFactory } from "@common"
 import { usePlayTrackPersonally } from "@/lib/playback/services/playback.hooks"

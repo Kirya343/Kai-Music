@@ -6,7 +6,7 @@ const roomApi = createApi("/room")
 export const loadCurrentRoom = () => roomApi.get<IListeningRoom>("");
 
 export const getRoomsPage = () => roomApi.get<MainPageRequest>(`/list/page`)
-export const createRoom = () => roomApi.post<void>("")
+export const createRoom = (vibe?: string) => roomApi.post<void>("", null, { params: { vibe }})
 
 export const joinRoom = (code: string) => roomApi.post<void>("/join", {}, { params: { code }})
 

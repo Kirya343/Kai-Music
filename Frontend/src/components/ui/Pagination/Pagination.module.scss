@@ -40,7 +40,7 @@
             }
 
             &.active {
-                @include dirty-glass-light(true);
+                @include glass(true, 0.1, "filled");
             }
         }
     }

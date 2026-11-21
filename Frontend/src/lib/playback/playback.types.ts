@@ -12,6 +12,8 @@ export interface IQueueItem {
     /** Position of the entry in queue */
     position: number;
 
+    addedBy: string;
+
     /** Audio metadata of queue item */
     audio: IAudio;
 }
@@ -70,4 +72,10 @@ export enum PlaybackTargetType {
 export interface PlaybackData {
     room?: IListeningRoom
     listeners?: IShortUser[]
+}
+
+export interface RoomPlaybackDTO {
+    room: IListeningRoom;
+    listeners: number; 
+    audio: IAudio;
 }

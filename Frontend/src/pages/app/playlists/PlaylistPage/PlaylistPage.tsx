@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Playlist, playlistService, PlaylistType } from "@playlist";
 import { IAudio } from "@audio";
 import AudioFileModal from "@/components/modals/AudioFileModal/AudioFileModal";
-import PlaylistTrack from "@/components/ui/track/playlistTracks/PlaylistTrack";
+import PlaylistTrack from "@/components/ui/track/variations/PlaylistTrack";
 import { useParams } from "react-router-dom";
 import { CheckBoxIcon, CirclePlusIcon, TrashIcon } from "@/assets/icons";
 import SearchableLayout from "@/components/layout/SearchableLayout/SearchableLayout";
@@ -11,7 +11,7 @@ import { useData, useSearch } from "@common";
 import { usePlaybackPlaylist, usePlaybackState } from "@playback";
 import TrackImportModal from "@/components/modals/TrackImportModal/TrackImportModal";
 import SelectableList from "@/components/ui/SelectableList/SelectableList";
-import UploadsPlaylistTrack from "@/components/ui/track/playlistTracks/UploadsPlaylistTrack";
+import UploadsPlaylistTrack from "@/components/ui/track/variations/UploadsPlaylistTrack";
 
 const PlaylistPage = ({}: {}) => {
 
@@ -32,7 +32,7 @@ const PlaylistPage = ({}: {}) => {
         if (!playlistId) return null;
 
         return playlistsData.playlists.find(p => p.id === playlistId) || null
-    }, [playlistsData.playlists])
+    }, [playlistsData.playlists, playlistId])
     
     const { filteredList, searchQuery, setSearchQuery } = useSearch(playlist?.queue || []);
 

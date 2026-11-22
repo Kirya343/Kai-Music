@@ -12,6 +12,15 @@ interface MediaSourceConstructor {
 }
 
 const getMediaSourceConstructor = () => {
+
+    console.log({
+        mediaSource: typeof MediaSource !== "undefined",
+        mp4: MediaSource?.isTypeSupported(
+            'audio/mp4; codecs="mp4a.40.2"'
+        ),
+        audioContext: typeof AudioContext !== "undefined"
+    });
+
     const managed = (
         window as Window & {
             ManagedMediaSource?: MediaSourceConstructor;

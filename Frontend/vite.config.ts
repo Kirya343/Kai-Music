@@ -36,7 +36,7 @@ export default defineConfig({
     },
     server: {
         host: '0.0.0.0',
-        allowedHosts: ['kaimusic.app'],
+        allowedHosts: ['kaimusic.app', '.trycloudflare.com'],
         port: 30000,
     },
     preview: {

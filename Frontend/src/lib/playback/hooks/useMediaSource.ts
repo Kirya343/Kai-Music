@@ -13,13 +13,123 @@ interface MediaSourceConstructor {
 
 const getMediaSourceConstructor = () => {
 
-    console.log({
-        mediaSource: typeof MediaSource !== "undefined",
-        mp4: MediaSource?.isTypeSupported(
-            'audio/mp4; codecs="mp4a.40.2"'
-        ),
-        audioContext: typeof AudioContext !== "undefined"
-    });
+    const ua = navigator.userAgent;
+    const isIOS = /iPad|iPhone|iPod/.test(ua)
+        || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+    const mse = typeof MediaSource !== "undefined";
+    const mediaSource = mse ? new MediaSource() : null;
+
+    const codecs = [
+        'audio/mp4; codecs="mp4a.40.2"',
+        'audio/mp4; codecs="mp4a.40.5"',
+        'audio/aac',
+        'audio/mpeg',
+        'audio/webm; codecs="opus"',
+        'audio/webm; codecs="vorbis"'
+    ];
+
+    const audio = document.createElement("audio");
+    const video = document.createElement("video");
+
+    const audioContext = window.AudioContext
+        || (window as Window & {
+            webkitAudioContext?: typeof AudioContext;
+        }).webkitAudioContext;
+
+    const managedMediaSource =
+            "ManagedMediaSource" in window;
+
+    const result = {
+        device: {
+            userAgent: ua,
+            platform: navigator.platform,
+            isIOS,
+            isSafari: /^((?!chrome|android).)*safari/i.test(ua),
+            touchPoints: navigator.maxTouchPoints
+        },
+
+        browser: {
+            secureContext: window.isSecureContext,
+            online: navigator.onLine,
+            serviceWorker: "serviceWorker" in navigator,
+            webSocket: typeof WebSocket !== "undefined"
+        },
+
+        mse: {
+            supported: mse,
+            isTypeSupported: mse
+                ? Object.fromEntries(
+                    codecs.map(codec => [
+                        codec,
+                        MediaSource.isTypeSupported(codec)
+                    ])
+                )
+                : false,
+
+            isTypeSupportedFunction:
+                typeof MediaSource?.isTypeSupported === "function",
+
+            sourceBuffer:
+                typeof SourceBuffer !== "undefined",
+
+            sourceBufferMode:
+                typeof SourceBuffer !== "undefined"
+                    ? "mode" in SourceBuffer.prototype
+                    : false,
+
+            changeType:
+                typeof SourceBuffer !== "undefined"
+                    ? "changeType" in SourceBuffer.prototype
+                    : false,
+                    
+            managedMediaSource
+        },
+
+        audio: {
+            element: !!audio.canPlayType,
+            codecs: Object.fromEntries(
+                codecs.map(codec => [
+                    codec,
+                    audio.canPlayType(codec)
+                ])
+            ),
+            mediaSession: "mediaSession" in navigator,
+            audioContext: typeof audioContext !== "undefined",
+            audioWorklet: typeof AudioWorklet !== "undefined"
+        },
+
+        video: {
+            element: !!video.canPlayType,
+            mse: mse && MediaSource.isTypeSupported(
+                'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'
+            ),
+            requestVideoFrameCallback:
+                "requestVideoFrameCallback" in video
+        },
+
+        apis: {
+            requestAnimationFrame:
+                typeof requestAnimationFrame === "function",
+            resizeObserver:
+                typeof ResizeObserver !== "undefined",
+            intersectionObserver:
+                typeof IntersectionObserver !== "undefined",
+            abortController:
+                typeof AbortController !== "undefined",
+            textDecoder:
+                typeof TextDecoder !== "undefined",
+            crypto:
+                typeof crypto !== "undefined",
+            indexedDB:
+                typeof indexedDB !== "undefined"
+        }
+    };
+
+    console.log("=== DEVICE DIAGNOSTICS ===");
+    console.log(result);
+    console.table(result.mse.isTypeSupported);
+    console.table(result.audio.codecs);
 
     const managed = (
         window as Window & {

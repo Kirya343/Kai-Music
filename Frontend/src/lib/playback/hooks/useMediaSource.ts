@@ -126,8 +126,10 @@ const getMediaSourceConstructor = () => {
         }
     };
 
-    console.log("=== DEVICE DIAGNOSTICS ===");
-    console.log(result);
+    console.log(
+        "=== DEVICE DIAGNOSTICS ===",
+        JSON.stringify(result, null, 4)
+    );
     console.table(result.mse.isTypeSupported);
     console.table(result.audio.codecs);
 

@@ -41,7 +41,7 @@
 
 		<dependency>
 			<groupId>org.kirya343</groupId>
-			<artifactId>authentication</artifactId>
+			<artifactId>authorization</artifactId>
 		</dependency>
 
 		<dependency>

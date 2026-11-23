@@ -189,40 +189,6 @@ export const useMediaSource = () => {
         audio.autoplay = false;
         audio.controls = false;
 
-        if (audio) {
-            const events = [
-                "loadstart",
-                "loadedmetadata",
-                "loadeddata",
-                "canplay",
-                "canplaythrough",
-                "play",
-                "playing",
-                "pause",
-                "waiting",
-                "stalled",
-                "suspend",
-                "abort",
-                "emptied",
-                "error"
-            ];
-
-            events.forEach(event => {
-                audio.addEventListener(event, () => {
-                    console.log(`[Audio] ${event}`, JSON.stringify({
-                        currentTime: audio.currentTime,
-                        duration: audio.duration,
-                        readyState: audio.readyState,
-                        networkState: audio.networkState,
-                        paused: audio.paused,
-                        ended: audio.ended,
-                        error: audio.error?.code,
-                        errorMessage: audio.error?.message
-                    }));
-                });
-            });
-        }
-
         if (managed) {
             audio.disableRemotePlayback = true;
         }

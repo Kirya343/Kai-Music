@@ -39,7 +39,7 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         SELECT
             r.id,
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
-            r.owner_id AS ownerId,
+            u.sub,
             r.code
         FROM listening_room r
         JOIN users u ON u.id = r.owner_id
@@ -50,10 +50,10 @@ public interface ListeningRoomRepository extends JpaRepository<ListeningRoom, Lo
         SELECT
             r.id,
             COALESCE(r.title, CONCAT(u.name, '''s room')) AS title,
-            r.owner_sub AS ownerId,
+            u.sub,
             r.code
         FROM listening_room r
-        JOIN users u ON u.sub = r.owner_sub
+        JOIN users u ON u.id = r.owner_id
         WHERE r.id IN (:roomIds)
         """, nativeQuery = true)
     List<RoomDTO> findDTOsByIds(

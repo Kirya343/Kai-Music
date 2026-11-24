@@ -10,7 +10,7 @@ import { usePlaybackAudio } from "@playback";
  */
 export default function VolumeSlider({ visible = true }: { visible?: boolean }) {
 
-    const { audio } = usePlaybackAudio();
+    const { audioRef } = usePlaybackAudio();
     const { isMobile } = useGlobal();
 
     // on init gets state from localstorage
@@ -27,10 +27,11 @@ export default function VolumeSlider({ visible = true }: { visible?: boolean }) 
 
     // on change volume, it also changes in audio
     useEffect(() => {
+        const audio = audioRef.current;
         if (!audio) return;
 
         audio.volume = volume;
-    }, [volume, audio]);
+    }, [volume]);
 
     // void, changes volume and puts it to localStorage
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

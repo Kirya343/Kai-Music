@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 import { PlaybackState } from "../playback.types";
 
 interface PlaybackAudioContextType {
-    audio: HTMLAudioElement | null;
+    audioRef: React.RefObject<HTMLAudioElement | null>;
     currentPlaybackState: PlaybackState | null;
 }
 

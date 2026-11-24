@@ -5,12 +5,14 @@ import { countPosition } from "@common";
 const TrackPositionTracker = () => {
 
     // controls from RoomPlaybackContext
-    const { audio, currentPlaybackState } = usePlaybackAudio();
+    const { audioRef, currentPlaybackState } = usePlaybackAudio();
     const { playingAudio } = usePlaybackPlaylist();
     const { seek } = usePlaybackControls();
 
     // variables to control the scrolling title
     const duration = playingAudio?.duration || 0
+
+    const audio = audioRef.current;
 
     const buffered = audio?.buffered;
 

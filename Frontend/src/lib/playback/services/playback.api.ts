@@ -12,7 +12,7 @@ export const getCurrentRoomState = (targetType: string, targetId: number) =>
     playbackApi.get<PlaybackState>(`/playback-state`, { params: { targetType, targetId }});
 
 export const getActiveRooms = () => 
-    playbackApi.get<RoomPlaybackDTO[]>(`/live/room`);
+    playbackApi.get<RoomPlaybackDTO[]>(`/live/rooms`);
 
 /**
  * Changes track in playback.

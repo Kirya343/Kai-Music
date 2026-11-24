@@ -1,7 +1,7 @@
 import { AudioChunk } from "@audio";
 import { loggerFactory } from "@common";
 
-const logger = loggerFactory.getLogger("Playback.AudioBufferManager")
+const logger = loggerFactory.getLogger("Audio.AudioBufferManager")
 
 export default class AudioBufferManager {
 

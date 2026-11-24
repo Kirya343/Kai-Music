@@ -5,7 +5,7 @@ import { useWebSocket } from "@websocket";
 import { loggerFactory } from "@common";
 import { Playlist } from "@playlist";
 import { Client } from "@stomp/stompjs";
-import { IAudio } from "@audio";
+import { AudioChunk, AudioChunkFeedback, IAudio } from "@audio";
 import { useNavigate } from "react-router-dom";
 import PlaybackController from "../audio/PlaybackController";
 
@@ -21,14 +21,7 @@ export const usePlayback = () => {
 
     const { addOnConnectHandler } = useWebSocket();
 
-    const unsyncedStateRef = useRef<PlaybackState | null>(null);
-    const awaitingStateRef = useRef(false);
     const prevPlaybackStateRef = useRef<PlaybackState | null>(null);
-    const currentStreamIdRef = useRef<string | null>(null)
-
-    // state to increase the fastmutable position 
-    const positionRef = useRef<number>(0);
-    const [autoPlay, setAutoPlay] = useState<boolean>(false);
 
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
@@ -36,8 +29,14 @@ export const usePlayback = () => {
 
     const [controller, setController] = useState<PlaybackController | null>(null);
 
+    const setAutoPlay = useCallback((autoPlay: boolean) => {
+        controller?.context.updateAutoPlay(autoPlay)
+    }, [controller])
+
     useEffect(() => {
-        const instance = new PlaybackController(() => setAutoPlay(false));
+        const instance = new PlaybackController(() => {
+            instance.context.updateAutoPlay(true);
+        });
 
         setController(instance);
 
@@ -48,13 +47,29 @@ export const usePlayback = () => {
 
     const playbackState = useSyncExternalStore(
         controller?.context.subscribeState ?? (() => () => {}),
-        controller?.context.getState ?? (() => null)
+        controller?.context.getPlaybackState ?? (() => null)
     );
 
     const position = useSyncExternalStore(
         controller?.context.subscribePosition ?? (() => () => {}),
         controller?.context.getPosition ?? (() => 0)
     );
+
+    const autoPlay = useSyncExternalStore(
+        controller?.context.subscribeAutoPlay ?? (() => () => {}),
+        controller?.context.getAutoPlay ?? (() => false)
+    );
+
+    const audio = useSyncExternalStore(
+        controller?.context.subscribeAudio ?? (() => () => {}),
+        controller?.context.getAudio ?? (() => null)
+    );
+
+    const audioRef = useRef<HTMLAudioElement | null>(null)
+
+    useEffect(() => {
+        audioRef.current = audio;
+    }, [audio])
 
     const currentPlaybackState = useMemo(() => {
         if (!playbackState) return null;
@@ -126,7 +141,7 @@ export const usePlayback = () => {
 
         logger.debug("перезагружаем состояние")
 
-        awaitingStateRef.current = true;
+        controller?.setAwaitingState(true)
 
         setAutoPlay(autoPlay)
 
@@ -134,7 +149,7 @@ export const usePlayback = () => {
             destination: "/app/playback.resync",
             body: ""
         });
-    }, []);
+    }, [controller]);
 
     const handleEvent = useCallback((event: PlaybackEventType) => {
         switch (event) {
@@ -167,19 +182,7 @@ export const usePlayback = () => {
 
                 logger.debug("Пришло обновление playback.state: ", state, streamId)
 
-                if (currentStreamIdRef.current !== streamId) {
-                    controller?.startNewStream(streamId);
-                }
-
-                awaitingStateRef.current = false;
-
-                controller?.context.updateFromServer(state);
-
-                positionRef.current = state.position;
-
-                unsyncedStateRef.current = state;
-
-                controller?.playIfBuffered();
+                controller?.updateStateFromServer(state, streamId);
             });
 
             const playbackModeSub = client.subscribe(`/user/queue/playback.mode`, (message) => {
@@ -214,6 +217,32 @@ export const usePlayback = () => {
                 handleEvent(playbackEvent.type)
             });
 
+            const audioSub = client.subscribe(`/user/queue/audio`, (message) => {
+                const chunk: AudioChunk = {
+                    bytes: message.binaryBody,
+                    sequence: Number(message.headers["sequence"]),
+                    duration: Number(message.headers["duration"]),
+                    entryId: Number(message.headers["entry-id"]),
+                    streamId: message.headers["stream-id"],
+                    initialization: message.headers["initialization"] === "true"
+                };
+
+                logger.debug("Пришёл чанк: ", chunk.sequence)
+
+                controller?.handleAudioChunk(chunk);
+
+                const chunkFeedback: AudioChunkFeedback = {
+                    streamId: chunk.streamId,
+                    sequence: chunk.sequence,
+                    initialization: chunk.initialization
+                }
+
+                client.publish({
+                    destination: "/app/audio.feedback",
+                    body: JSON.stringify(chunkFeedback)
+                });
+            });
+
             logger.debug("Подписались на /user/queue/playback .mode, .playlist, .state, .data, .event")
 
             reconnect(client);
@@ -224,14 +253,16 @@ export const usePlayback = () => {
                 playbackSub.unsubscribe();
                 playbackDataSub.unsubscribe();
                 playbackEventSub.unsubscribe();
+                audioSub.unsubscribe();
             }
         });
 
         return unsubscribe;
-    }, [addOnConnectHandler]);
+    }, [addOnConnectHandler, controller]);
 
     return {
-        audio: controller?.getAudio() ?? null,
+        audioRef,
+        audio,
         pausePlayback: () => controller?.pausePlayback(),
         resumePlayback: () => controller?.resumePlayback(),
         currentPlaybackState,

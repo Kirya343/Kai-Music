@@ -11,7 +11,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
     const { 
         pausePlayback, 
-        audio,
+        audioRef,
 
         currentPlaybackState,
         playbackState, 
@@ -43,8 +43,8 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
     }, [playbackState, playbackMode]);
 
     const audioValue = useMemo(() => ({
-        audio, currentPlaybackState
-    }), [audio, currentPlaybackState]);
+        audioRef, currentPlaybackState
+    }), [audioRef, currentPlaybackState]);
 
     const controlsValue = useMemo(() => ({
         togglePlay,
@@ -113,11 +113,11 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
-            seek(Math.max(0, audio?.currentTime || 0 - 10));
+            seek(Math.max(0, audioRef.current?.currentTime || 0 - 10));
         });
 
         navigator.mediaSession.setActionHandler("seekforward", () => {
-            seek(audio?.currentTime || 0 + 10);
+            seek(audioRef.current?.currentTime || 0 + 10);
         });
 
         navigator.mediaSession.setActionHandler("seekto", (details) => {
@@ -128,7 +128,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
         navigator.mediaSession.setPositionState({
             playbackRate: 1,
-            position: Math.min(audio?.currentTime || 0, playingAudio.duration),
+            position: Math.min(audioRef.current?.currentTime || 0, playingAudio.duration),
             duration: playingAudio.duration
         })
 

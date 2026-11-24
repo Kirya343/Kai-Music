@@ -12,7 +12,9 @@ export default class PlaybackController {
 
     private mediaSource: AudioMediaSource | null = null;
 
-    private debounceTimeout: number | null = 0;
+    private debounceTimeout: number | null = null;
+
+    private streamId: string | null = null;
 
     private autoPlay = false
 
@@ -31,7 +33,18 @@ export default class PlaybackController {
         )
     }
 
-    private createNewMediaSource(streamId: string): AudioMediaSource {
+    public setAwaitingState(state: boolean) {
+        this.awaitingState = state;
+    }
+
+    private createNewMediaSource(): AudioMediaSource {
+
+        const streamId = this.streamId;
+
+        if (!streamId) throw new Error("StreamId is null")
+
+        logger.debug("createNewMediaSource", streamId)
+
         return new AudioMediaSource(
             this.bufferManager,
             streamId,
@@ -40,6 +53,21 @@ export default class PlaybackController {
     }
 
     private handleBufferUpdate() {
+        this.playIfBuffered();
+    }
+
+    public updateStateFromServer(state: PlaybackState, streamId: string) {
+        if (this.streamId !== streamId) {
+            this.streamId = streamId;
+
+            this.startNewStream();
+        }
+
+        this.context.updateFromServer(state)
+
+        this.unsyncedState = state;
+        this.awaitingState = false;
+
         this.playIfBuffered();
     }
 
@@ -123,15 +151,13 @@ export default class PlaybackController {
             this.context.updateState(newState)
 
             // отменяем предыдущий таймаут, если был
-            if (this.debounceTimeout) {
+            if (this.debounceTimeout !== null) {
                 clearTimeout(this.debounceTimeout);
             }
 
             // ставим новый таймаут на 300 мс
             this.debounceTimeout = setTimeout(async () => {
-                if (state) {
-                    await playbackService.updateTrackPosition(newState);
-                }
+                playbackService.updateTrackPosition(newState);
                 this.debounceTimeout = null;
             }, 100);
         }
@@ -181,11 +207,15 @@ export default class PlaybackController {
         }
     };
 
-    startNewStream(streamId: string) {
+    startNewStream() {
         logger.debug("Начинаем новый media resource");
 
         this.mediaSource?.cleanupMediaSource();
-        this.mediaSource = this.createNewMediaSource(streamId);
+        this.mediaSource = this.createNewMediaSource();
+
+        logger.debug("new audio: ", this.mediaSource.audio)
+
+        this.context.updateAudio(this.mediaSource.audio);
     };
 
     cleanup() {
@@ -205,9 +235,5 @@ export default class PlaybackController {
         manager.addChunk(chunk);
 
         this.mediaSource?.processQueue()
-    }
-
-    public getAudio() {
-        return this.mediaSource?.audio ?? null;
     }
 } 

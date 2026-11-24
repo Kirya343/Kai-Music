@@ -342,7 +342,7 @@ export const ActivitySidebar: React.FC<ActivitySidebarProps> = ({
                                 </div>
 
                                 <div className={styles.itemsList}>
-                                    {activity?.map((item) => (
+                                    {activity?.map((item) => item.room && (
                                         <div key={item.room.id} className={styles.friendCard}>
                                             <div className={styles.avatarWrap}>
                                                 <Artwork

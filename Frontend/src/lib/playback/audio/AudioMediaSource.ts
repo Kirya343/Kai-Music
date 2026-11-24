@@ -125,12 +125,12 @@ const getMediaSourceConstructor = () => {
         }
     };
 
-    console.log(
-        "=== DEVICE DIAGNOSTICS ===",
-        JSON.stringify(result, null, 4)
-    );
-    console.table(result.mse.isTypeSupported);
-    console.table(result.audio.codecs);
+    // console.log(
+    //     "=== DEVICE DIAGNOSTICS ===",
+    //     JSON.stringify(result, null, 4)
+    // );
+    // console.table(result.mse.isTypeSupported);
+    // console.table(result.audio.codecs);
 
     const managed = (
         window as Window & {

@@ -31,10 +31,12 @@ const DesktopAudioPlayer = () => {
     const { playingAudio } = usePlaybackPlaylist();
     const playbackData = usePlaybackData();
 
+    console.log(!autoPlay, playbackData.room, !playbackState?.pause)
+
     return playingAudio && playbackState && !isMobile && (
         <div 
             className={styles.player} 
-            data-testid="desctop-player" 
+            data-testid="desktop-player" 
         >
             {!autoPlay && playbackData.room && !playbackState.pause && (
                 <div className={styles.overlay}>

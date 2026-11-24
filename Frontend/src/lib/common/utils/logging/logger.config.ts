@@ -7,9 +7,10 @@ const config: LoggerConfig = {
 
     categories: {
         Audio: {
-            Buffer: "INFO",
+            AudioBufferManager: "DEBUG",
             MediaSource: "INFO",
             Playback: "DEBUG",
+            PlaybackController: "DEBUG"
         },
         WebSocket: "ERROR",
         GlobalContext: "INFO",

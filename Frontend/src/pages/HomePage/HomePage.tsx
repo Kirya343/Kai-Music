@@ -12,6 +12,7 @@ import styles from "./HomePage.module.scss";
 import clsx from "clsx";
 import Logo from "@/components/ui/Logo/Logo";
 import { ArrowIcon, DiscIcon, LeftIcon, MusicNoteIcon, PauseIcon, PlaylistIcon, RightIcon } from "@/assets/icons";
+import ScrollArea from "@/components/layout/ScrollArea/ScrollArea";
 
 const features = [
     {
@@ -82,8 +83,7 @@ function Equalizer() {
 
 export default function HomePage() {
     return (
-        <>
-
+        <ScrollArea>
             <section className={styles.hero}>
                 <div className={styles.heroContent}>
                     <div className={styles.eyebrow}>
@@ -407,6 +407,6 @@ export default function HomePage() {
                     © {new Date().getFullYear()} Kai Music
                 </span>
             </footer>
-        </>
+        </ScrollArea>
     );
 }

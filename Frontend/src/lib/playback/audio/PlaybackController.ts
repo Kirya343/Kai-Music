@@ -121,9 +121,11 @@ export default class PlaybackController {
             this.pausePlayback()
         }
 
+        logger.debug("Текущее время: ", this.context.getPosition())
+
         playbackService.updateTrackPosition({
             ...state, 
-            position: this.mediaSource?.audio.currentTime || 0, 
+            position: this.context.getPosition(), 
             pause: newPaused
         });
     };

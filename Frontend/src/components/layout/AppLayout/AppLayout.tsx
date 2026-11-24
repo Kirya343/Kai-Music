@@ -56,9 +56,7 @@ const AppLayout = () => {
                     <main className={styles.main}>
                         <PlaylistsSidebar/>
 
-                        <ScrollArea>
-                            <Outlet />
-                        </ScrollArea>
+                        <Outlet />
 
                         <ActivitySidebar />
                     </main>

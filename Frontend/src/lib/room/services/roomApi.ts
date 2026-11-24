@@ -10,4 +10,4 @@ export const createRoom = (vibe?: string) => roomApi.post<void>("", null, { para
 
 export const joinRoom = (code: string) => roomApi.post<void>("/join", {}, { params: { code }})
 
-export const updateRoom = (roomId: number, room: IRoomUpdate) => roomApi.post<void>(`/${roomId}`, room)
+export const updateRoom = (roomId: number, room: IRoomUpdate) => roomApi.patch<void>(`/${roomId}`, room)

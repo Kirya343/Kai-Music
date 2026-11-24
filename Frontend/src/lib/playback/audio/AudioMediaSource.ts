@@ -153,8 +153,8 @@ const getMediaSourceConstructor = () => {
 
 export default class AudioMediaSource {
 
-    public audio;
-    private mediaSource: MediaSource = new MediaSource();
+    public audio!: HTMLAudioElement;
+    private mediaSource!: MediaSource;
     private objectUrl: string | null = null;
 
     private removeTimeUpdateListener: (() => void) | null = null;
@@ -164,20 +164,16 @@ export default class AudioMediaSource {
         private readonly streamId: string,
         private readonly onPositionUpdate: (position: number) => void
     ) {
-        this.audio = this.createMediaSource()
-
-        this.removeTimeUpdateListener?.();
-
-        this.removeTimeUpdateListener =
-            this.addTimeUpdateListener(this.audio);
+        this.createMediaSource()
     }
 
-    private createMediaSource(): HTMLAudioElement {
+    private createMediaSource() {
         this.cleanupMediaSource();
 
         logger.debug("создаём новый mediaSource")
 
-        const audio = new Audio();
+        this.audio = new Audio();
+        const audio = this.audio;
         
         const { constructor: MediaSourceConstructor, managed } =
             getMediaSourceConstructor();
@@ -210,7 +206,10 @@ export default class AudioMediaSource {
             });
         });
 
-        return audio;
+        this.removeTimeUpdateListener?.();
+
+        this.removeTimeUpdateListener =
+            this.addTimeUpdateListener(audio);
     }
 
     initializeSourceBuffer() {
@@ -246,6 +245,7 @@ export default class AudioMediaSource {
 
         if (this.objectUrl) {
             URL.revokeObjectURL(this.objectUrl);
+            this.objectUrl = null;
         }
 
         this.bufferManager.reset();
@@ -256,8 +256,11 @@ export default class AudioMediaSource {
      */
     addTimeUpdateListener(audio: HTMLAudioElement) {
         const handleTimeUpdate = () => {
+            logger.debug("обновление времени")
             this.onPositionUpdate(audio.currentTime)
         };
+
+        logger.debug("Установка хендлера timeupdate")
 
         audio.addEventListener("timeupdate", handleTimeUpdate);
 

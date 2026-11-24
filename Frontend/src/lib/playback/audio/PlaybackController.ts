@@ -16,8 +16,6 @@ export default class PlaybackController {
 
     private streamId: string | null = null;
 
-    private autoPlay = false
-
     private awaitingState = false;
     private unsyncedState: PlaybackState | null = null;
 
@@ -169,7 +167,12 @@ export default class PlaybackController {
      */
     playIfBuffered() {
 
-        if (!this.autoPlay || this.awaitingState) return;
+        logger.debug("playIfBuffered start", this.context.getAutoPlay(), this.awaitingState)
+
+        // остановить если автопроигрывание запрещено или ожидается новая позиция
+        if (!this.context.getAutoPlay() || this.awaitingState) return;
+
+        logger.debug("playIfBuffered 1")
 
         const state = this.unsyncedState;
         const audio = this.mediaSource?.audio

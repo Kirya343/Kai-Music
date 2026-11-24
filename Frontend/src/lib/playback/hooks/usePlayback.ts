@@ -72,6 +72,8 @@ export const usePlayback = () => {
     }, [audio])
 
     const currentPlaybackState = useMemo(() => {
+
+        console.log("рендер currentPlaybackState")
         if (!playbackState) return null;
 
         return {

@@ -13,6 +13,8 @@
     &:not(.noBorder) {
         @include glass(true);
 
+        gap: 0;
+
         & > * {
             padding: 10px;
         }

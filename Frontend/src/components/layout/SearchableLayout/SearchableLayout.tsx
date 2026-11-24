@@ -5,7 +5,7 @@ import { SearchInput } from "@/components/ui/SearchInput/SearchInput";
 
 interface SearchableLayoutProps<T extends { id: number }> {
     title: string,
-    extraActions: ReactNode[],
+    extraActions?: ReactNode[],
     search: {
         searchQuery: string;
         setSearchQuery: Dispatch<SetStateAction<string>>;

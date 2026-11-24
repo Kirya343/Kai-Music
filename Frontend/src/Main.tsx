@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import App from "./App";
+import App from "./pages/app/account/App";
 import "@/css/main.scss";
 import { GlobalProviders } from "./GlobalProviders";
 import { WebSocketProvider } from "@websocket";

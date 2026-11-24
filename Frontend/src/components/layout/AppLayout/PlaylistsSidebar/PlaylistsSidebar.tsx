@@ -8,6 +8,7 @@ import { useData, useSearch } from "@common";
 import { Playlist, PlaylistType } from "@playlist";
 import { useAuth } from "@user";
 import { usePlaybackPlaylist } from "@playback";
+import PlaylistCreateModal from "@/components/modals/PlaylistCreateModal/PlaylistCreateModal";
 
 export type PlaylistCategory = "mine" | "saved" | "audiobook";
 
@@ -47,6 +48,7 @@ export const PlaylistsSidebar: React.FC<PlaylistsSidebarProps> = ({
 }) => {
     const [collapsed, setCollapsed] = useState(defaultCollapsed);
     const [activeFilter, setActiveFilter] = useState<FilterTab>("all");
+    const [isOpen, setOpen] = useState(false);
 
     const { playlistsData } = useData();
     const { user } = useAuth();
@@ -86,11 +88,7 @@ export const PlaylistsSidebar: React.FC<PlaylistsSidebarProps> = ({
     };
 
     const handleCreate = () => {
-        if (onCreatePlaylist) {
-            onCreatePlaylist();
-            return;
-        }
-        navigate("/app/playlists");
+        setOpen(true)
     };
 
     return (
@@ -228,6 +226,11 @@ export const PlaylistsSidebar: React.FC<PlaylistsSidebarProps> = ({
                         );
                     })}
             </div>
+
+            <PlaylistCreateModal
+                isOpen={isOpen}
+                onClose={() => setOpen(false)}
+            />
         </aside>
     );
 };

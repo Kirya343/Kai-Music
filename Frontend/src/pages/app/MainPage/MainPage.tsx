@@ -8,21 +8,18 @@ import MainPageContent from "./MainPageContent/MainPageContent";
 const logger = loggerFactory.getLogger("Pages.Main");
 
 const MainPage = () => {
-    const [rooms, setRooms] = useState<IListeningRoom[] | null>(null);
     const [stat, setStat] = useState<{ activeListners: number; activeRooms: number } | null>(null);
 
     useEffect(() => {
         async function loadPage() {
             try {
                 const res = await roomService.getRoomsPage();
-                setRooms(res.data.publicRooms);
                 setStat({
                     activeListners: res.data.activeListners,
                     activeRooms: res.data.activeRooms,
                 });
             } catch (e) {
                 logger.error(e);
-                setRooms([]);
             }
         }
 

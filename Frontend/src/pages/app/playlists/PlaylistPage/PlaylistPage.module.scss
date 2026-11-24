@@ -1,5 +1,13 @@
 @use "@/css/components/mixins/" as *;
 
+$surface-card: #16171a;
+$surface-elevated: #1e2025;
+$surface-hover: #252830;
+$border-subtle: rgba(255, 255, 255, 0.08);
+$border-strong: rgba(255, 255, 255, 0.14);
+$accent-green: #22c55e;
+$text-secondary: #a1a1aa;
+
 .page {
     display: flex;
     flex-direction: column;
@@ -11,12 +19,12 @@
     overflow-x: hidden;
 
     padding: 1rem;
-    padding-bottom: 0;
+    padding-bottom: 0.5rem;
 
     @include mobile {
         padding: 0.5rem;
         padding-bottom: 0;
-    }   
+    }
 }
 
 .header {
@@ -64,7 +72,8 @@
         }
     }
 
-    button, label {
+    button,
+    label {
         border: 2px solid;
         padding: 8px 15px;
         height: 40px;
@@ -81,13 +90,13 @@
     .upload {
         display: flex;
         align-items: center;
-        gap: .5rem;
+        gap: 0.5rem;
         padding: 8px;
         padding-right: 12px;
 
         @include mobile {
             padding-right: 8px;
-            
+
             span {
                 display: none;
             }
@@ -106,6 +115,235 @@
     @include glass;
 }
 
+/* Фолбэк несуществующего плейлиста */
+.fallbackPage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.fallbackCard {
+    width: 100%;
+    max-width: 480px;
+    padding: 1.75rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+
+    @include glass;
+
+    @include mobile {
+        padding: 1.25rem;
+    }
+}
+
+.fallbackBadge {
+    align-self: flex-start;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(239, 68, 68, 0.14);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.fallbackTitle {
+    margin: 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.fallbackDesc {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: $text-secondary;
+}
+
+.fallbackActions {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-top: 0.25rem;
+}
+
+.quickSwitch {
+    margin-top: 0.5rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid $border-subtle;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.quickSwitchLabel {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: $text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.quickSwitchList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.quickSwitchItem {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.55rem 0.7rem;
+    border-radius: 10px;
+    background: $surface-elevated;
+    border: 1px solid $border-subtle;
+    color: var(--text-color);
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+
+    &:hover {
+        background: $surface-hover;
+        border-color: $border-strong;
+    }
+}
+
+.quickSwitchName {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.quickSwitchCount {
+    font-size: 0.76rem;
+    color: $text-secondary;
+    flex-shrink: 0;
+}
+
+/* Фолбэк пустого плейлиста */
+.emptyState {
+    flex: 1;
+    min-height: 280px;
+    padding: 2rem 1.25rem;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.65rem;
+    
+    @include glass;
+}
+
+.emptyIcon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    color: #c4b5fd;
+    background: rgba(139, 92, 246, 0.14);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.emptyTitle {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.emptyDesc {
+    margin: 0;
+    max-width: 380px;
+    font-size: 0.86rem;
+    line-height: 1.5;
+    color: $text-secondary;
+}
+
+.emptyActions {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 0.4rem;
+}
+
+.primaryBtn,
+.secondaryBtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    svg {
+        width: 17px;
+    }
+}
+
+.primaryBtn {
+    background: $accent-green;
+    border: 1px solid transparent;
+    color: #09120c;
+
+    &:hover {
+        filter: brightness(1.06);
+    }
+}
+
+.secondaryBtn {
+    background: $surface-elevated;
+    border: 1px solid $border-subtle;
+    color: var(--text-color);
+
+    &:hover:not(:disabled) {
+        background: $surface-hover;
+        border-color: $border-strong;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+.upload {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: 8px;
+    padding-right: 12px;
+
+    @include mobile {
+        padding-right: 8px;
+        
+        span {
+            display: none;
+        }
+    }
+}
+
 .uploadingStat {
     display: flex;
     gap: 1rem;
@@ -115,6 +353,7 @@
     display: flex;
     flex-direction: column;
     max-height: 150px;
+    height: fit-content;
     overflow: auto;
     min-height: 0;
     gap: 1px
@@ -130,6 +369,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     position: relative;
+    flex-shrink: 0;
 
     .progressBar {
         position: absolute;
@@ -153,6 +393,7 @@
     .status {
         position: absolute;
         right: .5rem;
+        width: 20px;
 
         &.success {
             *, &::before, &::after {
@@ -170,26 +411,4 @@
 
 input.uploadAudio {
     display: none;
-}
-
-.roomTopUpActions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    position: fixed;
-    bottom: 70px;
-    z-index: 100;
-    justify-content: center;
-    width: 100%;
-    max-width: 1000px;
-
-    .listAction {
-        padding: 10px;
-        border-radius: 10px;
-        font-weight: 600;
-        cursor: pointer;
-        border: 1px solid;
-
-        @include glass(true);
-    }
 }

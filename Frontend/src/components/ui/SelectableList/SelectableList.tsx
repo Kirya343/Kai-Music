@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import styles from "./SelectableList.module.scss"
 import clsx from "clsx";
 import KebabMenu from "../KebabMenu/KebabMenu";
+import Pagination from "../Pagination/Pagination";
 
 interface SelectableListProps<T extends ItemKey> extends HTMLAttributes<HTMLDivElement> {
     data: {
@@ -14,6 +15,11 @@ interface SelectableListProps<T extends ItemKey> extends HTMLAttributes<HTMLDivE
     setSelectMode: Dispatch<SetStateAction<boolean>>;
     trackedItem?: T;
     initialVisible?: number | "all";
+    pagination?: {
+        page: number;
+        totalPages: number;
+        onPageChange: (page: number) => void
+    }
 }
 
 interface ListActionBase {
@@ -41,6 +47,7 @@ export default function SelectableList<T extends ItemKey>({
     setSelectMode,
     trackedItem,
     initialVisible = 50,
+    pagination,
     ...props
 }: SelectableListProps<T>) {
 
@@ -170,6 +177,14 @@ export default function SelectableList<T extends ItemKey>({
 
                 {visibleCount < allItems.length && (
                     <button className={styles.loadMore} onClick={() => setVisibleCount(prev => prev + 50)}>Show more</button>
+                )}
+
+                {pagination && (
+                    <Pagination 
+                        page={pagination.page} 
+                        totalPages={pagination.totalPages} 
+                        onChange={(i) => pagination.onPageChange(i)} 
+                    />
                 )}
             </div>
         )

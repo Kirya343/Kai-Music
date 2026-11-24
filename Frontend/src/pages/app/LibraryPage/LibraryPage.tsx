@@ -16,8 +16,8 @@ const LibraryPage = () => {
 
     const {
         setSearchQuery,
-        searchQuery, uploadAudios,
-        uploading, audiosPage, loading,
+        searchQuery,
+        audiosPage, loading,
         page, setPage
     } = useLibrary();
 
@@ -36,36 +36,7 @@ const LibraryPage = () => {
         <SearchableLayout
             title="Library"
             search={{ searchQuery, setSearchQuery, filteredList: audiosPage?.content || [] }}
-            extraActions={[
-                <label htmlFor="uploadAudio" key={"upload"} className={styles.upload}>
-                    <CirclePlusIcon />
-                    <span>Upload new</span>
-                </label>
-            ]}
         >
-
-            {uploading.length > 0 && (
-                <>
-                    <div className={styles.uploadingStat}>
-                        <span>Uploaded: <strong>{uploading.filter(a => a.progress == 100).length}/{uploading.length}</strong></span>
-                        <span>||</span>
-                        <span>Success: <strong>{uploading.filter(a => a.success && a.progress == 100).length}</strong></span>
-                        <span>||</span>
-                        <span>Failed: <strong>{uploading.filter(a => !a.success && a.progress == 100).length}</strong></span>
-                    </div>
-                    <div className={styles.uploadingList}>
-                        {uploading.map(item => (
-                            <div key={item.id} className={styles.uploadItem}>
-                                <div className={styles.progressBar} style={{ width: `${item.progress}%` }}/>
-                                <span>{item.file?.name}</span>
-                                <span className={styles.percent}>{item.progress}%</span>
-                                {item.success && <CheckmarkIcon className={`${styles.status} ${styles.success}`} />}
-                                {item.success === false && <CrossIcon className={`${styles.status} ${styles.error}`} />}
-                            </div>
-                        ))}
-                    </div>
-                </>
-            )}
             
             <Loader loadingActive={!loading && !audiosPage?.content}>
                 <SelectableList
@@ -90,21 +61,13 @@ const LibraryPage = () => {
                     setSelectMode={setSelectMode}
                     trackedItem={playbackState?.entryId}
                     initialVisible={50}
+                    pagination={audiosPage ? {
+                        page: page,
+                        totalPages: audiosPage.page.totalPages,
+                        onPageChange: (i) => setPage(i)
+                    } : undefined}
                 />
             </Loader>
-
-            {audiosPage && (
-                <Pagination page={page} totalPages={audiosPage.page.totalPages} onChange={(i) => setPage(i)} />
-            )}
-            
-            <input 
-                type="file"
-                accept="audio/*"
-                id="uploadAudio"
-                className={styles.uploadAudio}
-                multiple
-                onChange={uploadAudios}
-            />
 
             <AudioFileModal 
                 audioFile={audioFileView} 

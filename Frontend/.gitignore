@@ -1,6 +1,7 @@
 /node_modules
 /package-lock.json
 /dist
+/docs
 dist.zip
 /android
 .yarn/install-state.gz

@@ -1,7 +1,8 @@
 import { AudioChunk, AudioChunkFeedback } from "@audio";
 import { useWebSocket } from "@websocket";
-import { RefObject, useCallback, useEffect, useRef } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { loggerFactory } from "@common";
+import AudioBufferManager from "../audio/AudioBufferManager";
 
 const logger = loggerFactory.getLogger("Audio.Buffer");
 
@@ -10,11 +11,13 @@ interface useAudioBufferProps {
     currentStreamIdRef: RefObject<string | null>
 }
 
-export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioBufferProps) {
+export function useAudioBuffer({ currentStreamIdRef }: useAudioBufferProps) {
 
-    const sourceBufferRef = useRef<SourceBuffer | null>(null);
+    const [sourceBuffer, setSourceBuffer] = useState<SourceBuffer | null>(null);
+
+    const bufferManagerRef = useRef<AudioBufferManager | null>(null);
+
     const onBufferUpdateRef = useRef<(() => void) | null>(null);
-    const queueRef = useRef<AudioChunk[]>([]);
 
     const { addOnConnectHandler } = useWebSocket();
 
@@ -23,109 +26,37 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
             onBufferUpdateRef.current = callback;
         }, []);
 
-    /**
-     * Append chunks to the buffer
-     */
-    const appendChunks = useCallback((chunks: AudioChunk[]) => {
-        const sourceBuffer = sourceBufferRef.current;
-
-        if (!sourceBuffer || sourceBuffer.updating || chunks.length === 0) {
-            return false;
+    useEffect(() => {
+        if (!sourceBuffer) {
+            return;
         }
 
-        const totalSize = chunks.reduce(
-            (size, chunk) => size + chunk.bytes.byteLength,
-            0
+        const manager = new AudioBufferManager(
+            () => onBufferUpdateRef.current?.()
         );
 
-        const buffer = new Uint8Array(totalSize);
+        manager.setSourceBuffer(sourceBuffer);
 
-        let offset = 0;
+        bufferManagerRef.current = manager;
 
-        for (const chunk of chunks) {
-            buffer.set(chunk.bytes, offset);
-            offset += chunk.bytes.byteLength;
-        }
-
-        sourceBuffer.appendBuffer(buffer);
-
-        onBufferUpdateRef.current?.();
-
-        return true;
-    }, []);
+        return () => {
+            manager.reset();
+            bufferManagerRef.current = null;
+        };
+    }, [sourceBuffer]);
 
     /**
      * Resets the source buffer
      */
     const resetBuffer = useCallback(() => {
-        logger.info("Очищаем буфер")
-        sourceBufferRef.current = null;
+        const manager = bufferManagerRef.current;
+
+        if (!manager) {
+            return;
+        }
+
+        manager.reset();
     }, []);
-
-    const processQueue = useCallback((streamId: string) => {
-
-        logger.debug('Собираем очередь: ', streamId);
-
-        const sourceBuffer = sourceBufferRef.current;
-        const mediaSource = mediaSourceRef.current;
-
-        if (!sourceBuffer || !mediaSource) {
-            return;
-        }
-
-        logger.debug('Собираем очередь: ', streamId);
-
-        if (
-            mediaSource.readyState !== 'open' ||
-            sourceBuffer.updating
-        ) {
-            return;
-        }
-
-        const chunks = queueRef.current
-            .filter(chunk => chunk.streamId === streamId);
-
-        const initializationChunk = chunks.find(
-            chunk => chunk.initialization
-        );
-
-        if (!initializationChunk) {
-            return;
-        }
-
-        const mediaChunks = chunks
-            .filter(chunk => !chunk.initialization)
-            .sort((a, b) => a.sequence - b.sequence);
-
-        if (mediaChunks.length === 0) {
-            return;
-        }
-
-        const chunksToAppend: AudioChunk[] = [
-            initializationChunk
-        ];
-        
-        for (const chunk of mediaChunks) {
-            chunksToAppend.push(chunk);
-        }
-
-        if (chunksToAppend.length === 1) {
-            return;
-        }
-
-        if (!appendChunks(chunksToAppend)) {
-            return;
-        }
-
-        logger.debug(
-            'Добавлен buffer:',
-            chunksToAppend.map(chunk =>
-                chunk.initialization
-                    ? 'init'
-                    : chunk.sequence
-            )
-        );
-    }, [appendChunks]);
 
     /**
      * Вызывается на каждый chunk от backend.
@@ -134,12 +65,18 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
 
         logger.debug(`Получен ${chunk.initialization ? "init" : "media"} chunk: ${chunk.sequence}`);
 
-        queueRef.current.push(chunk);
+        const manager = bufferManagerRef.current;
+
+        if (!manager) {
+            return;
+        }
+
+        manager.addChunk(chunk);
 
         const streamId = currentStreamIdRef.current;
 
-        if (streamId) processQueue(streamId);
-    }, [processQueue]);
+        if (streamId) manager.processQueue(streamId);
+    }, []);
 
     useEffect(() => {
         const unsubscribe = addOnConnectHandler((client) => {
@@ -181,8 +118,8 @@ export function useAudioBuffer({ mediaSourceRef, currentStreamIdRef }: useAudioB
     return {
         setBufferUpdateHandler,
         onBufferUpdateRef,
-        sourceBufferRef,
-        appendChunks,
+        sourceBuffer,
+        setSourceBuffer,
         resetBuffer
     }
 }

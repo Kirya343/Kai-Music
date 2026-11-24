@@ -1,5 +1,5 @@
 import { countPosition, useGlobal } from "@common";
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { PlaybackState, PlaybackMode, PlaybackData, PlaybackEventType } from "../playback.types";
 import { useWebSocket } from "@websocket";
 import { playbackService } from "../services";
@@ -8,28 +8,11 @@ import { Playlist } from "@playlist";
 import { Client } from "@stomp/stompjs";
 import { IAudio } from "@audio";
 import { useNavigate } from "react-router-dom";
+import PlaybackController from "../audio/PlaybackController";
 
 const logger = loggerFactory.getLogger("Audio.Playback");
 
-interface usePlaybackProps {
-    audio: HTMLAudioElement | null,
-    audioRef: RefObject<HTMLAudioElement | null>,
-    createMediaSource: (entryId: string) => HTMLAudioElement | null,
-    cleanupMediaSource: () => void,
-    currentStreamIdRef: RefObject<string | null>
-
-    setBufferUpdateHandler: (callback: () => void) => void
-}
-
-export const usePlaybackController = ({
-    audio, 
-    audioRef,
-    createMediaSource, 
-    cleanupMediaSource, 
-    currentStreamIdRef,
-
-    setBufferUpdateHandler
-}: usePlaybackProps) => {
+export const usePlayback = () => {
 
     const [playbackPlaylist, setPlaybackPlaylist] = useState<Playlist | null>(() => {
         const saved = localStorage.getItem("playback.playlist");
@@ -40,33 +23,50 @@ export const usePlaybackController = ({
     const { addOnConnectHandler } = useWebSocket();
 
     const unsyncedStateRef = useRef<PlaybackState | null>(null);
-    const debounceTimeoutRef = useRef<number | null>(null);
     const awaitingStateRef = useRef(false);
     const prevPlaybackStateRef = useRef<PlaybackState | null>(null);
-
-    // audio state
-    const [playbackState, setPlaybackState] = useState<PlaybackState | null>(null);
+    const currentStreamIdRef = useRef<string | null>(null)
 
     // state to increase the fastmutable position 
     const positionRef = useRef<number>(0);
     const [autoPlay, setAutoPlay] = useState<boolean>(false);
 
-    const [playbackTick, setPlaybackTick] = useState(0);
-
     const [playbackMode, setPlaybackMode] = useState<PlaybackMode>(PlaybackMode.NORMAL);
     const [playbackData, setPlaybackData] = useState<PlaybackData>({})
     const [playingAudio, setPlayingAudio] = useState<IAudio | null>(null);
 
-    const navigate = useNavigate();
+    const [controller, setController] = useState<PlaybackController | null>(null);
 
-    const currentPlaybackState: PlaybackState | null = useMemo(() => {
+    useEffect(() => {
+        const instance = new PlaybackController(() => setAutoPlay(false));
+
+        setController(instance);
+
+        return () => {
+            instance.cleanup();
+        };
+    }, []);
+
+    const playbackState = useSyncExternalStore(
+        controller?.subscribeState ?? (() => () => {}),
+        controller?.getState ?? (() => null)
+    );
+
+    const position = useSyncExternalStore(
+        controller?.subscribePosition ?? (() => () => {}),
+        controller?.getPosition ?? (() => 0)
+    );
+
+    const currentPlaybackState = useMemo(() => {
         if (!playbackState) return null;
 
         return {
             ...playbackState,
-            position: Math.max(audio?.currentTime || 0, positionRef.current)
+            position
         };
-    }, [playbackState, playbackTick]);
+    }, [playbackState, position]);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
 
@@ -109,203 +109,6 @@ export const usePlaybackController = ({
         return message;
     }, [playbackState]);
 
-    /**
-     * Pauses playing audio
-     */
-    const pausePlayback = useCallback(() => {
-        if (!audio) {
-            return;
-        }
-
-        audio.pause();
-    }, [audio]);
-
-    const changeTrack = useCallback((changing: "next" | "prev" | number) => {
-        setAutoPlay(true);
-        playbackService.changeTrack(changing);
-    }, []);
-
-    /**
-     * Resumes playing audio
-     */
-    const resumePlayback = useCallback(async () => {
-
-        if (!audio) {
-            return;
-        }
-
-        try {
-            await audio.play();
-
-            setAutoPlay(true);
-
-        } catch (error) {
-            if (
-                error instanceof DOMException &&
-                error.name === 'AbortError'
-            ) {
-                return;
-            }
-
-            logger.error(
-                'Ошибка запуска audio:',
-                error
-            );
-        }
-    }, [audio]);
-
-    // Play / Pause кнопка
-    const togglePlay = useCallback(async (newPaused?: boolean) => {
-
-        if (!playbackState) return;
-
-        if (newPaused === undefined) newPaused = !playbackState?.pause
-
-        setAutoPlay(true);
-
-        if (newPaused) {
-            pausePlayback()
-        }
-
-        await playbackService.updateTrackPosition({
-            ...playbackState, 
-            position: positionRef.current, 
-            pause: newPaused
-        });
-    }, [playbackState, pausePlayback]);
-
-    const seek = useCallback((position: number) => {
-
-        if (!playbackState?.entryId) return;
-
-        awaitingStateRef.current = true;
-        setAutoPlay(true);
-
-        try {
-            pausePlayback();
-        } finally {
-
-            const newState = ({...playbackState, position})
-            unsyncedStateRef.current = newState
-            setPlaybackState(newState)
-
-            // отменяем предыдущий таймаут, если был
-            if (debounceTimeoutRef.current) {
-                clearTimeout(debounceTimeoutRef.current);
-            }
-
-            // ставим новый таймаут на 300 мс
-            debounceTimeoutRef.current = setTimeout(async () => {
-                if (playbackState) {
-                    await playbackService.updateTrackPosition(newState);
-                }
-                debounceTimeoutRef.current = null;
-            }, 100);
-        }
-    }, [playbackState, pausePlayback]);
-
-    /**
-     * Starts playing audio if last playbackState isn't paused and 
-     * audio is loaded on current position
-     */
-    const playIfBuffered = useCallback(() => {
-
-        if (!autoPlay || awaitingStateRef.current) return;
-
-        const state = unsyncedStateRef.current;
-
-        //logger.debug("audio", audio, "state", state)
-
-        if (!audio || !state) return;
-
-        const isBuffered = Array.from(
-            { length: audio.buffered.length },
-            (_, i) => ({
-                start: audio.buffered.start(i),
-                end: audio.buffered.end(i)
-            })
-        ).some(
-            range =>
-                state.position >= range.start &&
-                state.position <= range.end
-        );
-
-        if (!isBuffered) {
-            logger.warn(
-                'Требуемая позиция не буферизирована',
-                state.position
-            );
-            return;
-        }
-
-        audio.currentTime = state.position;
-        unsyncedStateRef.current = null;
-
-        if (!state.pause) {
-            logger.debug("начинаем проигрываание")
-            setPlaybackState(prev => ({ ...prev!, pause: false }));
-            resumePlayback();
-        }
-    }, [audio, autoPlay, setPlaybackState, resumePlayback]);
-
-    useEffect(() => {
-        playIfBuffered();
-    }, [playIfBuffered]);
-
-    const playIfBufferedRef = useRef(playIfBuffered);
-
-    useEffect(() => {
-        playIfBufferedRef.current = playIfBuffered;
-    }, [playIfBuffered]);
-
-    useEffect(() => {
-        setBufferUpdateHandler(() => {
-            playIfBufferedRef.current();
-        });
-
-        return () => {
-            setBufferUpdateHandler(() => {});
-        };
-    }, [setBufferUpdateHandler]);
-
-    /**
-     * Adds listners to HTMLAudioElement events
-     */
-    const addTimeUpdateListener = useCallback(
-        (audio: HTMLAudioElement) => {
-            const handleTimeUpdate = () => {
-                positionRef.current = audio.currentTime;
-                setPlaybackTick(prev => prev + 1);
-            };
-
-            audio.addEventListener("timeupdate", handleTimeUpdate);
-
-            return () => {
-                audio.removeEventListener("timeupdate", handleTimeUpdate);
-            };
-        },
-        [setPlaybackState]
-    );
-
-    /**
-     * Inits media resource, when came new entryId
-     */
-    const initMediaSource = useCallback((streamId: string) => {
-
-        const audio = createMediaSource(streamId);
-
-        if (!audio) return;
-
-        addTimeUpdateListener(audio);
-    }, [addTimeUpdateListener, createMediaSource]);
-
-    const startNewStream = useCallback((streamId: string) => {
-        logger.debug("Начинаем новый media resource");
-
-        cleanupMediaSource();
-        initMediaSource(streamId);
-    }, [cleanupMediaSource, initMediaSource]);
-
     const reconnect = useCallback((stompClient: Client | null) => {
 
         if (!stompClient) return;
@@ -338,10 +141,10 @@ export const usePlaybackController = ({
         switch (event) {
             case "UNSUBSCRIBED":
                 
-                pausePlayback()
+                controller?.pausePlayback()
 
                 setPlaybackData({})
-                setPlaybackState(null)
+                controller?.setPlaybackState(null)
                 setPlaybackPlaylist(null)
                 setPlayingAudio(null)
 
@@ -353,7 +156,7 @@ export const usePlaybackController = ({
             default:
                 break;
         }
-    }, [pausePlayback])
+    }, [controller])
 
     useEffect(() => {
         const unsubscribe = addOnConnectHandler((client) => {
@@ -366,18 +169,18 @@ export const usePlaybackController = ({
                 logger.debug("Пришло обновление playback.state: ", state, streamId)
 
                 if (currentStreamIdRef.current !== streamId) {
-                    startNewStream(streamId);
+                    controller?.startNewStream(streamId);
                 }
 
                 awaitingStateRef.current = false;
 
-                setPlaybackState(state);
+                controller?.setPlaybackState(state);
 
                 positionRef.current = state.position;
 
                 unsyncedStateRef.current = state;
 
-                playIfBufferedRef.current();
+                controller?.playIfBuffered();
             });
 
             const playbackModeSub = client.subscribe(`/user/queue/playback.mode`, (message) => {
@@ -429,8 +232,9 @@ export const usePlaybackController = ({
     }, [addOnConnectHandler]);
 
     return {
-        pausePlayback,
-        resumePlayback,
+        audio: controller?.getAudio(),
+        pausePlayback: () => controller?.pausePlayback(),
+        resumePlayback: () => controller?.resumePlayback(),
         currentPlaybackState,
         playbackState,
         playbackMode,
@@ -438,9 +242,9 @@ export const usePlaybackController = ({
         playbackData,
         playingAudio,
         updateMessage,
-        togglePlay,
-        seek,
-        changeTrack,
+        togglePlay: () => controller?.togglePlay(),
+        seek: (position: number) => controller?.seek(position),
+        changeTrack: (changing: "next" | "prev" | number) => controller?.changeTrack(changing),
         reconnectPlayback: reconnect,
         resyncPlayback: resync,
         autoPlay,

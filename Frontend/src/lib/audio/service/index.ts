@@ -1,8 +1,8 @@
 import { 
     loadAudioInfo,
     loadLibrary,
-    upload,
-    update,
+    uploadAudio,
+    updateAudio,
     recognizeAudio
 } from './audio.api';
 import * as service from './audio.service';
@@ -13,8 +13,8 @@ import * as service from './audio.service';
 export const audioService = {
     loadAudioInfo,
     loadLibrary,
-    upload,
-    update,
+    uploadAudio,
+    updateAudio,
     recognizeAudio,
     ...service
 };

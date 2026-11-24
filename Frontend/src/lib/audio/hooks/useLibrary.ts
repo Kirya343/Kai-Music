@@ -1,6 +1,5 @@
 import { IPage } from "@/lib/common/common.types";
 import { IAudio, audioService } from "@audio";
-import { useSearch } from "@common";
 import { AxiosProgressEvent } from "axios";
 import { useCallback, useEffect, useState } from "react";
 
@@ -76,7 +75,7 @@ export const useLibrary = () => {
             formData.append("file", file);
 
             try {
-                await audioService.upload(formData, (progressEvent: AxiosProgressEvent) => {
+                await audioService.uploadAudio(formData, (progressEvent: AxiosProgressEvent) => {
                     if (!progressEvent.total) return;
 
                     const percent = Math.round(

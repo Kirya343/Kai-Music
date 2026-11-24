@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAudioPlayer } from "./hooks";
 import { PlaybackStateProvider } from "./contexts/PlaybackStateContext";
 import { PlaybackAudioProvider } from "./contexts/PlaybackAudioContext";
 import { PlaybackControlsProvider } from "./contexts/PlaybackControlsContext";
 import { PlaybackPlaylistProvider } from "./contexts/PlaybackPlaylistContext";
 import { PlaybackDataProvider } from "./contexts/PlaybackDataContext";
 import { PlaybackUIProvider } from "./contexts/PlaybackUIContext";
+import { usePlayback } from "./hooks/usePlayback";
 
 export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) => {
 
     const { 
         pausePlayback, 
-        audioRef,
+        audio,
 
         currentPlaybackState,
         playbackState, 
@@ -29,7 +29,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         resyncPlayback,
         autoPlay,
         setAutoPlay
-    } = useAudioPlayer();
+    } = usePlayback();
 
     // ui
     const [fullPlayerOpen, setFullPlayerOpen] = useState<boolean>(false);
@@ -43,8 +43,8 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
     }, [playbackState, playbackMode]);
 
     const audioValue = useMemo(() => ({
-        audioRef, currentPlaybackState
-    }), [audioRef, currentPlaybackState]);
+        audio, currentPlaybackState
+    }), [audio, currentPlaybackState]);
 
     const controlsValue = useMemo(() => ({
         togglePlay,
@@ -113,11 +113,11 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
         });
 
         navigator.mediaSession.setActionHandler("seekbackward", () => {
-            seek(Math.max(0, audioRef.current?.currentTime || 0 - 10));
+            seek(Math.max(0, audio?.currentTime || 0 - 10));
         });
 
         navigator.mediaSession.setActionHandler("seekforward", () => {
-            seek(audioRef.current?.currentTime || 0 + 10);
+            seek(audio?.currentTime || 0 + 10);
         });
 
         navigator.mediaSession.setActionHandler("seekto", (details) => {
@@ -128,7 +128,7 @@ export const PlaybackProvider = ({ children }: { children?: React.ReactNode }) =
 
         navigator.mediaSession.setPositionState({
             playbackRate: 1,
-            position: Math.min(audioRef.current?.currentTime || 0, playingAudio.duration),
+            position: Math.min(audio?.currentTime || 0, playingAudio.duration),
             duration: playingAudio.duration
         })
 

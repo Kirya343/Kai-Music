@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAudioBuffer } from "./useAudioBuffer";
 import { loggerFactory } from "@common";
+import AudioMediaSource from "../audio/AudioMediaSource";
+import AudioBufferManager from "../audio/AudioBufferManager";
 
 const logger = loggerFactory.getLogger("Audio.MediaSource");
 
@@ -157,18 +159,45 @@ export const useMediaSource = () => {
     const currentStreamIdRef = useRef<string | null>(null)
 
     const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    const bufferManagerRef = useRef<AudioBufferManager | null>(null);
+    const audioMediaSourceRef = useRef<AudioMediaSource | null>(null);
+    
     const mediaSourceRef = useRef<MediaSource | null>(null);
     const objectUrlRef = useRef<string | null>(null);
 
     const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
     const { 
-        sourceBufferRef, 
+        setSourceBuffer,
+        sourceBuffer, 
         setBufferUpdateHandler,
         onBufferUpdateRef, 
-        appendChunks,
         resetBuffer
     } = useAudioBuffer({ currentStreamIdRef, mediaSourceRef });
+
+    useEffect(() => {
+        if (!sourceBuffer) {
+            return;
+        }
+
+        const manager = new AudioBufferManager(
+            () => onBufferUpdateRef.current?.()
+        );
+
+        const audioMediaSource = new AudioMediaSource(
+            manager
+        );
+
+        manager.setSourceBuffer(sourceBuffer);
+
+        bufferManagerRef.current = manager;
+
+        return () => {
+            manager.reset();
+            bufferManagerRef.current = null;
+        };
+    }, [sourceBuffer]);
 
     const createMediaSource = useCallback<(streamId: string) => HTMLAudioElement | null>((streamId: string) => {
         logger.debug("создаём новый mediaSource, streamId:", streamId)
@@ -206,30 +235,7 @@ export const useMediaSource = () => {
         mediaSource.addEventListener('sourceopen', () => {
             logger.debug('MediaSource opened');
 
-            if (!sourceBufferRef.current) {
-                const sourceBuffer = mediaSource.addSourceBuffer(
-                    'audio/mp4; codecs="mp4a.40.2"'
-                );
-
-                sourceBufferRef.current = sourceBuffer;
-
-                sourceBuffer.addEventListener('updateend', () => {
-                    const currentStreamId = currentStreamIdRef.current;
-
-                    if (!currentStreamId) {
-                        return;
-                    }
-
-                    onBufferUpdateRef.current?.();
-                });
-
-                sourceBuffer.addEventListener('error', event => {
-                    logger.error(
-                        'SourceBuffer error:',
-                        event
-                    );
-                });
-            }
+            initializeSourceBuffer(mediaSource)
 
             mediaSource.addEventListener('error', event => {
                 logger.error(
@@ -242,7 +248,32 @@ export const useMediaSource = () => {
         setAudio(audio);
 
         return audio;
-    }, [])
+    }, [sourceBuffer])
+
+    const initializeSourceBuffer = (mediaSource: MediaSource) => {
+        const sourceBuffer = mediaSource.addSourceBuffer(
+            'audio/mp4; codecs="mp4a.40.2"'
+        );
+
+        sourceBuffer.addEventListener('updateend', () => {
+            const currentStreamId = currentStreamIdRef.current;
+
+            if (!currentStreamId) {
+                return;
+            }
+
+            onBufferUpdateRef.current?.();
+        });
+
+        sourceBuffer.addEventListener('error', event => {
+            logger.error(
+                'SourceBuffer error:',
+                event
+            );
+        });
+
+        setSourceBuffer(sourceBuffer)
+    }
     
     useEffect(() => {
         logger.debug("audio updated", audio)
@@ -279,7 +310,6 @@ export const useMediaSource = () => {
         currentStreamIdRef,
 
         setBufferUpdateHandler,
-        appendChunks,
         resetBuffer
     };
 }

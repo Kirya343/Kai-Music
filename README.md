@@ -125,7 +125,7 @@ Dependencies follow the direction `Presentation → Application → Domain`, kee
 | `playlist` | Personal playlist management and room playback queue operations. |
 | `playback` | Playback orchestration, audio streaming, synchronization, and playback session management. |
 | `permission` | Role and permission management. |
-| `authorization` | User authentication, registration, login, and JWT issuance through cookies. |
+| `authorization` | User authorization, registration, login, and JWT issuance through cookies. |
 | `audio` | Audio management, metadata operations, and audio recognition through ACRCloud. |
 
 #### Infrastructure Modules

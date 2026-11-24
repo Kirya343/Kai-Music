@@ -1,5 +1,5 @@
 import { useMediaSource } from "./useMediaSource";
-import { usePlaybackController } from "./usePlaybackController";
+import { usePlaybackController } from "./usePlayback";
 
 export const useAudioPlayer = () => {
 

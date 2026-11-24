@@ -20,7 +20,7 @@ export const loadLibrary = (query?: string, page?: number, size?: number) => aud
  * @param formData - Form data containing the audio file.
  * @param onProgress - Optional callback for upload progress updates.
  */
-export const upload = (
+export const uploadAudio = (
     formData: FormData,
     onProgress?: (event: AxiosProgressEvent) => void
 ) => {
@@ -35,7 +35,7 @@ export const upload = (
  * @param audioId - ID of the audio track.
  * @param audio - Updated audio metadata.
  */
-export const update = (audioId: number, audio: IAudioUpdate) => audioApi.patch<void>(`/${audioId}`, audio)
+export const updateAudio = (audioId: number, audio: IAudioUpdate) => audioApi.patch<void>(`/${audioId}`, audio)
 
 /**
  * Deletes an audio track.

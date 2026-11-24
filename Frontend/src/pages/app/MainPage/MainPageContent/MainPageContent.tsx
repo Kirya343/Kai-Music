@@ -174,7 +174,7 @@ export default function MainPageContent({
                     <button
                         type="button"
                         className={styles.sectionAction}
-                        onClick={() => navigate("/app/playlists")}
+                        //onClick={() => navigate("/app/playlists")}
                     >
                         All playlists
                     </button>
@@ -185,7 +185,7 @@ export default function MainPageContent({
                         <div
                             key={item.seed}
                             className={styles.mediaCard}
-                            onClick={() => navigate("/app/playlists")}
+                            onClick={() => navigate(`/app/playlists/${item.vibe}`)}
                         >
                             <Artwork
                                 title={item.title}
@@ -278,7 +278,7 @@ export default function MainPageContent({
                     <button
                         type="button"
                         className={styles.sectionAction}
-                        onClick={() => navigate("/app/playlists")}
+                        //onClick={() => navigate("/app/playlists")}
                     >
                         Browse all
                     </button>
@@ -289,7 +289,7 @@ export default function MainPageContent({
                         <div
                             key={pl.seed}
                             className={styles.mediaCard}
-                            onClick={() => navigate("/app/playlists")}
+                            onClick={() => navigate(`/app/playlists/${pl.title}`)}
                         >
                             <Artwork
                                 title={pl.title}

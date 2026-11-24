@@ -4,15 +4,13 @@ import AudioMediaSource from "./AudioMediaSource";
 import { PlaybackState } from "../playback.types";
 import AudioBufferManager from "./AudioBufferManager";
 import { AudioChunk } from "@audio";
+import PlaybackContext from "./PlaybackContext";
 
 const logger = loggerFactory.getLogger("Audio.PlaybackController");
 
 export default class PlaybackController {
 
     private mediaSource: AudioMediaSource | null = null;
-    
-    private playbackState: PlaybackState | null = null;
-    private position = 0;
 
     private debounceTimeout: number | null = 0;
 
@@ -21,10 +19,9 @@ export default class PlaybackController {
     private awaitingState = false;
     private unsyncedState: PlaybackState | null = null;
 
-    private positionListeners = new Set<() => void>();
-    private stateListeners = new Set<() => void>();
-
     private bufferManager;
+
+    public context = new PlaybackContext();
 
     constructor(
         private readonly enableAutoPlay: () => void
@@ -37,17 +34,13 @@ export default class PlaybackController {
     private createNewMediaSource(streamId: string): AudioMediaSource {
         return new AudioMediaSource(
             this.bufferManager,
-            streamId
+            streamId,
+            position => this.context.updatePosition(position)
         );
     }
 
     private handleBufferUpdate() {
         this.playIfBuffered();
-    }
-
-    public setPlaybackState(state: PlaybackState | null) {
-        this.playbackState = state;
-        this.notifyState()
     }
 
     /**
@@ -90,7 +83,7 @@ export default class PlaybackController {
     // Play / Pause кнопка
     public togglePlay(newPaused?: boolean) {
 
-        const state = this.playbackState
+        const state = this.context.getPlaybackState();
 
         if (!state) return;
 
@@ -111,7 +104,7 @@ export default class PlaybackController {
 
     public seek(position: number) {
         
-        const state = this.playbackState
+        const state = this.context.getPlaybackState()
 
         if (!state) return;
 
@@ -127,7 +120,7 @@ export default class PlaybackController {
 
             this.unsyncedState = newState
 
-            this.playbackState = newState
+            this.context.updateState(newState)
 
             // отменяем предыдущий таймаут, если был
             if (this.debounceTimeout) {
@@ -153,9 +146,6 @@ export default class PlaybackController {
         if (!this.autoPlay || this.awaitingState) return;
 
         const state = this.unsyncedState;
-
-        //logger.debug("audio", audio, "state", state)
-
         const audio = this.mediaSource?.audio
 
         if (!audio || !state) return;
@@ -185,27 +175,10 @@ export default class PlaybackController {
 
         if (!state.pause) {
             logger.debug("начинаем проигрываание")
-            this.playbackState = { ...this.playbackState!, pause: false };
+            const prevState = this.context.getPlaybackState()
+            this.context.updateState({ ...prevState!, pause: false });
             this.resumePlayback();
         }
-    };
-
-    private removeTimeUpdateListener: (() => void) | null = null;
-
-    /**
-     * Adds listners to HTMLAudioElement events
-     */
-    addTimeUpdateListener(audio: HTMLAudioElement) {
-        const handleTimeUpdate = () => {
-            this.position = audio.currentTime;
-            this.notifyPosition()
-        };
-
-        audio.addEventListener("timeupdate", handleTimeUpdate);
-
-        return () => {
-            audio.removeEventListener("timeupdate", handleTimeUpdate);
-        };
     };
 
     startNewStream(streamId: string) {
@@ -213,47 +186,10 @@ export default class PlaybackController {
 
         this.mediaSource?.cleanupMediaSource();
         this.mediaSource = this.createNewMediaSource(streamId);
-
-        this.addTimeUpdateListener(this.mediaSource.audio);
     };
 
     cleanup() {
-        this.removeTimeUpdateListener?.();
-        this.removeTimeUpdateListener = null;
-
         this.mediaSource?.cleanupMediaSource();
-    }
-
-    subscribePosition = (listener: () => void) => {
-        this.positionListeners.add(listener);
-
-        return () => this.positionListeners.delete(listener);
-    };
-
-    getPosition = () => this.position;
-
-    private notifyPosition() {
-        this.positionListeners.forEach(listener => listener());
-    }
-
-    private notifyState() {
-        this.stateListeners.forEach(listener => listener());
-    }
-
-    subscribeState = (listener: () => void) => {
-        this.stateListeners.add(listener);
-
-        return () => this.stateListeners.delete(listener);
-    };
-
-    getState = () => this.playbackState;
-
-    onServerStateUpdate(state: PlaybackState | null) {
-        this.playbackState = state;
-        this.position = state?.position ?? 0;
-
-        this.notifyState();
-        this.notifyPosition();
     }
 
     public handleAudioChunk(chunk: AudioChunk) {

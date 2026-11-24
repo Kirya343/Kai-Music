@@ -1,8 +1,7 @@
-import { countPosition, useGlobal } from "@common";
-import { RefObject, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { countPosition } from "@common";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { PlaybackState, PlaybackMode, PlaybackData, PlaybackEventType } from "../playback.types";
 import { useWebSocket } from "@websocket";
-import { playbackService } from "../services";
 import { loggerFactory } from "@common";
 import { Playlist } from "@playlist";
 import { Client } from "@stomp/stompjs";
@@ -48,13 +47,13 @@ export const usePlayback = () => {
     }, []);
 
     const playbackState = useSyncExternalStore(
-        controller?.subscribeState ?? (() => () => {}),
-        controller?.getState ?? (() => null)
+        controller?.context.subscribeState ?? (() => () => {}),
+        controller?.context.getState ?? (() => null)
     );
 
     const position = useSyncExternalStore(
-        controller?.subscribePosition ?? (() => () => {}),
-        controller?.getPosition ?? (() => 0)
+        controller?.context.subscribePosition ?? (() => () => {}),
+        controller?.context.getPosition ?? (() => 0)
     );
 
     const currentPlaybackState = useMemo(() => {
@@ -144,7 +143,7 @@ export const usePlayback = () => {
                 controller?.pausePlayback()
 
                 setPlaybackData({})
-                controller?.setPlaybackState(null)
+                controller?.context.updateState(null)
                 setPlaybackPlaylist(null)
                 setPlayingAudio(null)
 
@@ -174,7 +173,7 @@ export const usePlayback = () => {
 
                 awaitingStateRef.current = false;
 
-                controller?.setPlaybackState(state);
+                controller?.context.updateFromServer(state);
 
                 positionRef.current = state.position;
 
@@ -232,7 +231,7 @@ export const usePlayback = () => {
     }, [addOnConnectHandler]);
 
     return {
-        audio: controller?.getAudio(),
+        audio: controller?.getAudio() ?? null,
         pausePlayback: () => controller?.pausePlayback(),
         resumePlayback: () => controller?.resumePlayback(),
         currentPlaybackState,

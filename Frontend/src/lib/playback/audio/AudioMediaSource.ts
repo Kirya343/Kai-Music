@@ -1,6 +1,5 @@
 import { loggerFactory } from "@common";
 import AudioBufferManager from "./AudioBufferManager";
-import { AudioChunk } from "@audio";
 
 const logger = loggerFactory.getLogger("Audio.MediaSource");
 
@@ -158,14 +157,24 @@ export default class AudioMediaSource {
     private mediaSource: MediaSource = new MediaSource();
     private objectUrl: string | null = null;
 
+    private removeTimeUpdateListener: (() => void) | null = null;
+
     constructor(
         private readonly bufferManager: AudioBufferManager,
-        private readonly streamId: string
+        private readonly streamId: string,
+        private readonly onPositionUpdate: (position: number) => void
     ) {
         this.audio = this.createMediaSource()
+
+        this.removeTimeUpdateListener?.();
+
+        this.removeTimeUpdateListener =
+            this.addTimeUpdateListener(this.audio);
     }
 
     private createMediaSource(): HTMLAudioElement {
+        this.cleanupMediaSource();
+
         logger.debug("создаём новый mediaSource")
 
         const audio = new Audio();
@@ -224,6 +233,9 @@ export default class AudioMediaSource {
     }
 
     cleanupMediaSource() {
+        this.removeTimeUpdateListener?.();
+        this.removeTimeUpdateListener = null;
+
         const audioElement = this.audio;
 
         if (audioElement) {
@@ -238,6 +250,21 @@ export default class AudioMediaSource {
 
         this.bufferManager.reset();
     }
+
+    /**
+     * Adds listners to HTMLAudioElement events
+     */
+    addTimeUpdateListener(audio: HTMLAudioElement) {
+        const handleTimeUpdate = () => {
+            this.onPositionUpdate(audio.currentTime)
+        };
+
+        audio.addEventListener("timeupdate", handleTimeUpdate);
+
+        return () => {
+            audio.removeEventListener("timeupdate", handleTimeUpdate);
+        };
+    };
 
     public processQueue() {
         this.bufferManager.processQueue(this.streamId);
